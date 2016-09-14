@@ -1,0 +1,1 @@
+{"version":3,"sources":["public.css"],"names":[],"mappings":"AACA,iBACE,eAAgB,AAChB,cAAgB,CACjB","file":"public.css","sourcesContent":["/* This stylesheet is used to style the public-facing components of the plugin. */\n.some-cool-class {\n  font-size: 56px;\n  font-size: 4rem;\n}\n"]}

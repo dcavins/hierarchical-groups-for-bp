@@ -1,0 +1,68 @@
+// LESS Mixins
+@ccblue:#008EAA;
+@ccgreen:#869B3C;
+@ccyellow:#F7B718;
+@ccred:#DF5927;
+@white:#FFF;
+@driftwood:#827772;
+@graydark:#454545; //#666;
+@graymid:#AAA;//#DDD;
+@graylight:#DEDEDE;//#EAEAEA;
+@black:#211F1F;
+
+// Set a cache buster for background images
+@cache-version: 20160808;
+
+.font-size(@sizeValue){
+  @remValue: @sizeValue;
+  @pxValue: (@sizeValue * 14);
+  font-size: ~"@{pxValue}px";
+  font-size: ~"@{remValue}rem";
+}
+
+.border-radius(@radius){
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    border-radius: @radius;
+}
+.border-radius-variable(@topleft: 5px, @topright: 5px, @bottomright: 5px, @bottomleft: 5px) {
+    -webkit-border-radius: @topleft @topright @bottomright @bottomleft;
+    -moz-border-radius: @topleft @topright @bottomright @bottomleft;
+    border-radius: @topleft @topright @bottomright @bottomleft;
+}
+
+.outliner(){
+	//border: 1px solid #FAB;
+}
+
+.drop-shadow(@x: 0, @y: 1px, @blur: 2px, @spread: 0, @alpha: 0.25) {
+	-webkit-box-shadow:	@x @y @blur @spread rgba(0, 0, 0, @alpha);
+	-moz-box-shadow:	@x @y @blur @spread rgba(0, 0, 0, @alpha);
+	box-shadow:		@x @y @blur @spread rgba(0, 0, 0, @alpha);
+}
+
+.inner-shadow(@x: 0, @y: 0px, @blur: 3px, @spread: 0, @alpha: 0.25) {
+	-webkit-box-shadow: inset @x @y @blur @spread rgba(0, 0, 0, @alpha);
+	-moz-box-shadow:    inset @x @y @blur @spread rgba(0, 0, 0, @alpha);
+	box-shadow:         inset @x @y @blur @spread rgba(0, 0, 0, @alpha);
+}
+.inner-glow(@x: 0, @y: 0px, @blur: 3px, @spread: 0, @color: @ccblue) {
+	-webkit-box-shadow: inset @x @y @blur @spread @color;
+	-moz-box-shadow:    inset @x @y @blur @spread @color;
+	box-shadow:         inset @x @y @blur @spread @color;
+}
+.outer-glow(@x: 0, @y: 0px, @blur: 3px, @spread: 0, @color: @ccblue) {
+	-webkit-box-shadow: @x @y @blur @spread @color;
+	-moz-box-shadow:    @x @y @blur @spread @color;
+	box-shadow:         @x @y @blur @spread @color;
+}
+.gradient(@startColor: #eee, @endColor: white) {
+	background-color: @startColor; /* Old browsers */
+	background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, @startColor, @endColor); /* Chrome10+,Safari5.1+ */
+	background: -moz-linear-gradient(top, @startColor, @endColor); /* FF3.6+ */
+	background: -ms-linear-gradient(top, @startColor, @endColor); /* IE10+ */
+	background: -o-linear-gradient(top, @startColor, @endColor); /* Opera 11.10+ */
+	background: linear-gradient(to bottom,  @startColor, @endColor); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@{startColor}', endColorstr='@{endColor}',GradientType=0 ); /* IE6-9 */
+}

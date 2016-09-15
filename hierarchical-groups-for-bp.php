@@ -30,12 +30,20 @@ if ( ! defined( 'WPINC' ) ) {
 
 function hierarchical_groups_for_bp_init() {
 
+	// Take an early out if the groups component isn't activated.
+	if ( ! bp_is_active( 'groups' ) ) {
+		return;
+	}
+
 	// Helper functions
 	require_once( plugin_dir_path( __FILE__ ) . 'includes/hgbp-functions.php' );
 
 	// Template output functions
 	require_once( plugin_dir_path( __FILE__ ) . 'public/views/template-tags.php' );
 	require_once( plugin_dir_path( __FILE__ ) . 'public/views/shortcodes.php' );
+
+	// The BP_Group_Extension class
+	require_once( plugin_dir_path( __FILE__ ) . 'includes/class-bp-group-extension.php' );
 
 	// The main class
 	require_once( plugin_dir_path( __FILE__ ) . 'public/class-hgbp.php' );

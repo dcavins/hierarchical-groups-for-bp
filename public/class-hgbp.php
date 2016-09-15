@@ -70,8 +70,27 @@ class HGBP_Public {
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
+		// Caching
+		add_action( 'init', array( $this, 'add_cache_groups' ) );
+		// Reset the cache group's incrementor when groups are added, changed or deleted.
+		add_action( 'groups_delete_group', array( $this, 'reset_cache_incrementor' ) );
+		add_action( 'groups_update_group', array( $this, 'reset_cache_incrementor' ) );
+
 		// Load public-facing style sheet and JavaScript.
 		// add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles_scripts' ) );
+
+		// Add our templates to BuddyPress' template stack.
+		add_filter( 'bp_get_template_stack', array( $this, 'add_template_stack'), 10, 1 );
+
+		// Save a group's allowed_subgroup_creators setting as group metadata.
+		add_action( 'groups_group_settings_edited', array( $this, 'save_allowed_subgroups_creators' ) );
+		add_action( 'bp_group_admin_edit_after',    array( $this, 'save_allowed_subgroups_creators' ) );
+
+		// Save a group's allowed_subgroup_creators setting from the create group screen.
+		add_action( 'groups_create_group_step_save_group-settings', array( $this, 'save_allowed_subgroups_creators_create_step' ) );
+
+		// Determine whether a specific user can create a subgroup of a particular group.
+		add_filter( 'bp_user_can', array( $this, 'user_can_create_subgroups' ), 10, 5 );
 
 	}
 
@@ -116,6 +135,36 @@ class HGBP_Public {
 	}
 
 	/**
+	 * Set up a group for cache usage.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_cache_groups() {
+		wp_cache_add_global_groups( 'hgbp' );
+	}
+
+	/**
+	 * Reset the cache group's incrementor when groups are added, changed or deleted.
+	 *
+	 * @since    1.0.0
+	 */
+	public function reset_cache_incrementor() {
+		bp_core_reset_incrementor( 'hgbp' );
+	}
+
+	/**
+	 * Add our templates to BuddyPress' template stack.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_template_stack( $templates ) {
+		if ( bp_is_current_component( 'groups' ) ) {
+			$templates[] = plugin_dir_path( __FILE__ ) . 'views/templates';
+		}
+		return $templates;
+	}
+
+	/**
 	 * Register and enqueue public-facing style sheet.
 	 *
 	 * @since    1.0.0
@@ -133,6 +182,87 @@ class HGBP_Public {
 			// Scripts
 			wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'js/public.min.js', __FILE__ ), array( 'jquery' ), $this->version );
 		}
+	}
+
+	/**
+	 * Save a group's allowed_subgroup_creators setting as group metadata.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int    $group_id   ID of the group to update.
+	 */
+	function save_allowed_subgroups_creators( $group_id ) {
+		if ( bp_allow_hierarchical_groups() &&
+			 isset( $_POST['allowed-subgroup-creators'] ) &&
+			 in_array( $_POST['allowed-subgroup-creators'], array( 'noone', 'admin', 'mod', 'member' ) ) ) {
+			groups_update_groupmeta( $group_id, 'allowed_subgroup_creators', $_POST['allowed-subgroup-creators'] );
+		}
+	}
+
+	/**
+	 * Save a group's allowed_subgroup_creators setting from the create group screen.
+	 *
+	 * @since 1.0.0
+	 */
+	function save_allowed_subgroups_creators_create_step() {
+		$group_id = buddypress()->groups->new_group_id;
+		$this->save_allowed_subgroups_creators( $group_id );
+	}
+
+
+	/**
+	 * Determine whether a specific user can create a subgroup of a particular group.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool   $retval     Whether or not the current user has the capability.
+	 * @param int    $user_id    ID of user to check.
+	 * @param string $capability The capability being checked for.
+	 * @param int    $site_id    Site ID. Defaults to the BP root blog.
+	 * @param array  $args       Array of extra arguments passed.
+	 *
+	 * @return bool
+	 */
+	function user_can_create_subgroups( $retval, $user_id, $capability, $site_id, $args ) {
+		if ( 'create_subgroups' != $capability ) {
+			return $retval;
+		}
+
+		// If group creation is restricted, respect that setting.
+		if ( bp_restrict_group_creation() && ! bp_user_can( $user_id, 'bp_moderate' ) ) {
+			return false;
+		}
+
+		// We need to know which group is in question.
+		if ( empty( $args['group_id'] ) ) {
+			return false;
+		}
+		$group_id = (int) $args['group_id'];
+
+		// Possible settings for the group meta setting 'allowed_subgroup_creators'
+		$creator_setting = groups_get_groupmeta( $group_id, 'allowed_subgroup_creators' );
+		switch ( $creator_setting ) {
+			case 'admin' :
+				$retval = groups_is_user_admin( $user_id, $group_id );
+				break;
+
+			case 'mod' :
+				$retval = ( groups_is_user_mod( $user_id, $group_id ) ||
+							groups_is_user_admin( $user_id, $group_id ) );
+				break;
+
+			case 'member' :
+				$retval = groups_is_user_member( $user_id, $group_id );
+				break;
+
+			case 'noone' :
+			default :
+				// @TODO: This seems weird, but I can imagine situations where only site admins should be able to associate groups.
+				$retval = bp_user_can( $user_id, 'bp_moderate' );
+				break;
+		}
+
+		return $retval;
 	}
 
 }

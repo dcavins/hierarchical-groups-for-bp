@@ -18,7 +18,8 @@
  * @return bool True if the current page is a group's directory of subgroups.
  */
 function hgbp_is_group_subgroups() {
-	return (bool) ( bp_is_groups_component() && bp_is_current_action( 'hierarchy' ) );
+	$screen_slug = apply_filters( 'hgbp_screen_slug', 'hierarchy' );
+	return (bool) ( bp_is_groups_component() && bp_is_current_action( $screen_slug ) );
 }
 
 
@@ -35,7 +36,7 @@ function hgbp_is_group_subgroups() {
  *
  * @return array Array of group objects.
  */
-function hgbp_group_get_child_groups( $group_id = false, $user_id = false ) {
+function hgbp_get_child_groups( $group_id = false, $user_id = false ) {
 	$retval = array();
 
 	/*
@@ -139,7 +140,7 @@ function hgbp_group_has_children( $group_id = false, $user_id = false ) {
 		}
 	}
 
-	$children = hgbp_group_get_child_groups( $group_id, $user_id );
+	$children = hgbp_get_child_groups( $group_id, $user_id );
 	return ! empty ( $children ) ? true : false;
 }
 
@@ -156,7 +157,7 @@ function hgbp_group_has_children( $group_id = false, $user_id = false ) {
  *
  * @return array Array of group objects.
  */
-function hgbp_group_get_descendent_groups( $group_id = false, $user_id = false ) {
+function hgbp_get_descendent_groups( $group_id = false, $user_id = false ) {
 	/*
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
@@ -340,7 +341,7 @@ function hgbp_get_possible_parent_groups( $group_id = false, $user_id = false ) 
 	}
 
 	// First, get a list of descendants (don't pass a user id--we want them all).
-	$descendants = hgbp_group_get_descendent_groups( $group_id );
+	$descendants = hgbp_get_descendent_groups( $group_id );
 	$exclude_ids = wp_list_pluck( $descendants, 'id' );
 	// Also exclude the current group.
 	$exclude_ids[] = $group_id;

@@ -168,8 +168,7 @@ class HGBP_Public {
 	 * @param int    $group_id   ID of the group to update.
 	 */
 	function save_allowed_subgroups_creators( $group_id ) {
-		if ( bp_allow_hierarchical_groups() &&
-			 isset( $_POST['allowed-subgroup-creators'] ) &&
+		if ( isset( $_POST['allowed-subgroup-creators'] ) &&
 			 in_array( $_POST['allowed-subgroup-creators'], array( 'noone', 'admin', 'mod', 'member' ) ) ) {
 			groups_update_groupmeta( $group_id, 'allowed_subgroup_creators', $_POST['allowed-subgroup-creators'] );
 		}

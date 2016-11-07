@@ -21,15 +21,6 @@
 class HGBP_Admin extends HGBP_Public {
 
 	/**
-	 * Instance of this class.
-	 *
-	 * @since    1.0.0
-	 *
-	 * @var      object
-	 */
-	protected static $instance = null;
-
-	/**
 	 * Slug of the plugin screen.
 	 *
 	 * @since    1.0.0
@@ -39,13 +30,11 @@ class HGBP_Admin extends HGBP_Public {
 	protected $plugin_screen_hook_suffix = null;
 
 	/**
-	 * Initialize the plugin by loading admin scripts & styles and adding a
-	 * settings page and menu.
+	 * Add actions and filters to WordPress/BuddyPress hooks.
 	 *
-	 * @since     1.0.0
+	 * @since    1.0.0
 	 */
-	private function __construct() {
-
+	public function add_action_hooks() {
 		/*
 		 * @TODO :
 		 *
@@ -66,33 +55,6 @@ class HGBP_Admin extends HGBP_Public {
 		// Add an action link pointing to the options page.
 		// $plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_slug . '.php' );
 		// add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
-
-	}
-
-	/**
-	 * Return an instance of this class.
-	 *
-	 * @since     1.0.0
-	 *
-	 * @return    object    A single instance of this class.
-	 */
-	public static function get_instance() {
-
-		/*
-		 * @TODO :
-		 *
-		 * - Uncomment following lines if the admin class should only be available for super admins
-		 */
-		/* if( ! is_super_admin() ) {
-			return;
-		} */
-
-		// If the single instance hasn't been set, set it now.
-		if ( null == self::$instance ) {
-			self::$instance = new self;
-		}
-
-		return self::$instance;
 	}
 
 	/**

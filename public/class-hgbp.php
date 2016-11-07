@@ -9,10 +9,7 @@
  */
 
 /**
- * Plugin class for the public side.
- *
- * If you're interested in introducing administrative or dashboard
- * functionality, then refer to `admin/class-hgbp-admin.php`
+ * Plugin class for public functionality.
  *
  * @package   HierarchicalGroupsForBP_Public_Class
  * @author    dcavins
@@ -20,15 +17,6 @@
  * @copyright 2016 David Cavins
  */
 class HGBP_Public {
-
-	/**
-	 * Instance of this class.
-	 *
-	 * @since    1.0.0
-	 *
-	 * @var      object
-	 */
-	protected static $instance = null;
 
 	/**
 	 *
@@ -63,10 +51,16 @@ class HGBP_Public {
 	 *
 	 * @since     1.0.0
 	 */
-	private function __construct() {
-
+	public function __construct() {
 		$this->version = hgbp_get_plugin_version();
+	}
 
+	/**
+	 * Add actions and filters to WordPress/BuddyPress hooks.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_action_hooks() {
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
@@ -91,24 +85,6 @@ class HGBP_Public {
 
 		// Determine whether a specific user can create a subgroup of a particular group.
 		add_filter( 'bp_user_can', array( $this, 'user_can_create_subgroups' ), 10, 5 );
-
-	}
-
-	/**
-	 * Return an instance of this class.
-	 *
-	 * @since     1.0.0
-	 *
-	 * @return    object    A single instance of this class.
-	 */
-	public static function get_instance() {
-
-		// If the single instance hasn't been set, set it now.
-		if ( null == self::$instance ) {
-			self::$instance = new self;
-		}
-
-		return self::$instance;
 	}
 
 	/**

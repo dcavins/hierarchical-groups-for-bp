@@ -47,12 +47,14 @@ function hierarchical_groups_for_bp_init() {
 
 	// The main class
 	require_once( plugin_dir_path( __FILE__ ) . 'public/class-hgbp.php' );
-	HGBP_Public::get_instance();
+	$hgbp_public = new HGBP_Public();
+	$hgbp_public->add_action_hooks();
 
 	// Admin and dashboard functionality
 	if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 		require_once( plugin_dir_path( __FILE__ ) . 'admin/class-hgbp-admin.php' );
-		HGBP_Admin::get_instance();
+		$hgbp_admin = new HGBP_Admin();
+		$hgbp_admin->add_action_hooks();
 	}
 
 }

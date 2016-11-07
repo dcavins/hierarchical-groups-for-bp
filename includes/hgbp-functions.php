@@ -92,8 +92,8 @@ function hgbp_get_child_group_ids( $group_id = false ) {
 	}
 
 	// Check the cache first.
-	$cache_key = bp_core_get_incremented_cache_key( 'bp_groups_child_groups_of_' . $group_id, 'hgbp' );
-	$child_ids = wp_cache_get( $cache_key, 'hgbp' );
+	$cache_key = 'bp_groups_child_groups_of_' . $group_id;
+	$child_ids = bp_core_get_incremented_cache( $cache_key, 'hgbp' );
 
 	if ( false === $child_ids ) {
 		// Fetch all child groups.
@@ -107,7 +107,7 @@ function hgbp_get_child_group_ids( $group_id = false ) {
 		$child_ids = wp_list_pluck( $children['groups'], 'id' );
 
 		// Set the cache to avoid duplicate requests.
-		wp_cache_set( $cache_key, $child_ids, 'hgbp' );
+		bp_core_set_incremented_cache( $cache_key, 'hgbp', $child_ids );
 	}
 
 	return $child_ids;
@@ -171,14 +171,8 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false ) {
 	}
 
 	// Check the cache first.
-	$last_changed = wp_cache_get( 'last_changed', 'bp_groups' );
-	if ( false === $last_changed ) {
-		$last_changed = microtime();
-		wp_cache_set( 'last_changed', $last_changed, 'bp_groups' );
-	}
-
-	$cache_key   = 'bp_groups_descendants_of_' . $group_id . '_' . $last_changed;
-	$descendants = wp_cache_get( $cache_key, 'bp_groups' );
+	$cache_key   = 'descendants_of_' . $group_id;
+	$descendants = bp_core_get_incremented_cache( $cache_key, 'hgbp' );
 
 	if ( false === $descendants ) {
 		// Start from the group specified.
@@ -202,7 +196,7 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false ) {
 		}
 
 		// Set the cache to avoid duplicate requests.
-		wp_cache_set( $cache_key, $descendants, 'bp_groups' );
+		bp_core_set_incremented_cache( $cache_key, 'hgbp', $descendants );
 	}
 
 	// If a user ID has been specified, we filter hidden groups accordingly.

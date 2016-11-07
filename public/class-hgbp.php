@@ -67,8 +67,8 @@ class HGBP_Public {
 		// Caching
 		add_action( 'init', array( $this, 'add_cache_groups' ) );
 		// Reset the cache group's incrementor when groups are added, changed or deleted.
-		add_action( 'groups_delete_group', array( $this, 'reset_cache_incrementor' ) );
-		add_action( 'groups_update_group', array( $this, 'reset_cache_incrementor' ) );
+		add_action( 'groups_group_after_save', array( $this, 'reset_cache_incrementor' ) );
+		add_action( 'bp_groups_delete_group', array( $this, 'reset_cache_incrementor' ) );
 
 		// Load public-facing style sheet and JavaScript.
 		// add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles_scripts' ) );

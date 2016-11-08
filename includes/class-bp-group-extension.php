@@ -9,14 +9,14 @@
 class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 
 	function __construct() {
-		$enable_nav_item = $this->enable_nav_item();
+		$nav_item_visibility = $this->nav_item_visibility();
 
 		$args = array(
-			'slug'              => apply_filters( 'hgbp_screen_slug', 'hierarchy' ),
-			'name'              => apply_filters( 'hgbp_screen_nav_item_name', 'Hierarchy' ),
+			'slug'              => hgbp_get_subgroups_screen_slug(),
+			'name'              => hgbp_get_subgroups_nav_item_name(),
 			'nav_item_position' => 61,
-			'access'            => ( $enable_nav_item ) ? 'anyone' : 'noone',
-			'show_tab'          => ( $enable_nav_item ) ? 'anyone' : 'noone',
+			'access'            => $nav_item_visibility,
+			'show_tab'          => $nav_item_visibility,
 		);
 		parent::init( $args );
 	}
@@ -94,11 +94,22 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	 *
 	 * @since 1.0.0
 	 */
-	function enable_nav_item() {
-		// The nav item should only be enabled when subgroups exist.
-		$enable_nav_item = ( hgbp_group_has_children( bp_get_current_group_id(), bp_loggedin_user_id() ) ) ? true : false;
+	function nav_item_visibility() {
+		$nav_item_vis = 'noone';
+		$group_id     = bp_get_current_group_id();
 
-		return apply_filters( 'hgbp_enable_nav_item', $enable_nav_item );
+		// The nav item should only be enabled when subgroups exist.
+		$has_children = hgbp_group_has_children( $group_id, bp_loggedin_user_id() );
+		if ( $has_children ) {
+			// If this group is not public, make the tab visible to members only.
+			if ( 'public' == bp_get_group_status( groups_get_group( $group_id ) ) ) {
+				$nav_item_vis = 'anyone';
+			} else {
+				$nav_item_vis = 'member';
+			}
+		}
+
+		return apply_filters( 'hgbp_nav_item_visibility', $nav_item_vis );
 	}
 
 }

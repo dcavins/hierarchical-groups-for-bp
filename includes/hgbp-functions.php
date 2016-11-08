@@ -18,10 +18,32 @@
  * @return bool True if the current page is a group's directory of subgroups.
  */
 function hgbp_is_group_subgroups() {
-	$screen_slug = apply_filters( 'hgbp_screen_slug', 'hierarchy' );
+	$screen_slug = hgbp_get_subgroups_screen_slug();
 	return (bool) ( bp_is_groups_component() && bp_is_current_action( $screen_slug ) );
 }
 
+/**
+ * Get the slug of the hierarchy screen for a group.
+ *
+ * @since 1.0.0
+ *
+ * @return string Slug to use as part of the url.
+ */
+function hgbp_get_subgroups_screen_slug() {
+	return apply_filters( 'hgbp_screen_slug', 'hierarchy' );
+}
+
+/**
+ * Get the label of the hierarchy screen's navigation item for a group.
+ *
+ * @since 1.0.0
+ *
+ * @return string Label to use on the hierarchy navigation item.
+ */
+function hgbp_get_subgroups_nav_item_name() {
+	$name = _x( 'Hierarchy', 'Label for group navigation tab', 'hierarchical-groups-for-bp' );
+	return apply_filters( 'hgbp_screen_nav_item_name', $name );
+}
 
 /**
  * Get the child groups for a specific group.

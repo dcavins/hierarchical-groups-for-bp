@@ -45,7 +45,7 @@ class HGBP_Admin extends HGBP_Public {
 		} */
 
 		// Load admin style sheet and JavaScript.
-		// add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
 		// add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
 		// Add the options page and menu item.
@@ -71,7 +71,7 @@ class HGBP_Admin extends HGBP_Public {
 		}
 
 		$screen = get_current_screen();
-		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
+		if ( isset( $screen->id ) && in_array( $screen->id, array( $this->plugin_screen_hook_suffix, 'toplevel_page_bp-groups' ) ) ) {
 			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), $this->version );
 		}
 
@@ -91,7 +91,7 @@ class HGBP_Admin extends HGBP_Public {
 		}
 
 		$screen = get_current_screen();
-		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
+		if ( isset( $screen->id ) && in_array( $screen->id, array( $this->plugin_screen_hook_suffix, 'toplevel_page_bp-groups' ) ) ) {
 			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js', __FILE__ ), array( 'jquery' ), $this->version );
 		}
 

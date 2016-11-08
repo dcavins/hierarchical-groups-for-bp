@@ -1,1 +1,14 @@
-/* This stylesheet is used to style the admin option form of the plugin. */
+/* Styles for the single group admin screen in WP Admin */
+.hierarchy-allowed-subgroup-creators legend {
+	margin-top: 10px;
+	font-weight: bold;
+	line-height: 1.6em;
+}
+.hierarchy-allowed-subgroup-creators label {
+	clear: left;
+	display: block;
+	float: left;
+	vertical-align: middle;
+	line-height: 2em;
+}
+/* Changes to the single group admin screen in WP Admin */

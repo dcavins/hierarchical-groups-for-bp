@@ -8,9 +8,6 @@
  * @subpackage bp-legacy
  */
 
-?>
-
-<?php
 // Store the groups template global so we can "reset" the loop after this subloop.
 global $groups_template;
 $parent_groups_template = $groups_template;
@@ -20,8 +17,8 @@ $parent_groups_template = $groups_template;
  *
  * @since 1.2.0
  */
-do_action( 'bp_before_subgroups_loop' ); ?>
-<?php
+do_action( 'bp_before_subgroups_loop' );
+
 // @TODO: Hidden groups are excluded by default. Showing them all is dangerous.
 // Will be much better when group capabilities are in place that allow granular exclusion of hidden groups.
 // @TODO: Ajax pagination doesn't work.
@@ -137,7 +134,7 @@ do_action( 'bp_before_subgroups_loop' ); ?>
 <?php else: ?>
 
 	<div id="message" class="info">
-		<p><?php _e( 'There were no subgroups found.', 'buddypress' ); ?></p>
+		<p><?php _e( 'There were no subgroups found.', 'hierarchical-groups-for-bp' ); ?></p>
 	</div>
 
 <?php endif; ?>
@@ -153,4 +150,3 @@ do_action( 'bp_after_subgroups_loop' );
 
 // Reset the $groups_template global and continue with the main group's
 $groups_template = $parent_groups_template;
-?>

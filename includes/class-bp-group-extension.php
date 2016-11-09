@@ -26,10 +26,21 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		parent::init( $args );
 	}
 
+	/**
+	 * Output the code for the front-end screen for a single group.
+	 *
+	 * @since 1.0.0
+	 */
 	function display( $group_id = NULL ) {
 		bp_get_template_part( 'groups/single/subgroups-loop' );
 	}
 
+	/**
+	 * Output the code for the settings screen, the create step form
+	 * and the wp-admin single group edit screen meta box.
+	 *
+	 * @since 1.0.0
+	 */
 	function settings_screen( $group_id = NULL ) {
 		?>
 		<label for="parent-id">Parent Group</label>
@@ -83,6 +94,11 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	<?php
 	}
 
+	/**
+	 * Save parent association and subgroup creators set on settings screen.
+	 *
+	 * @since 1.0.0
+	 */
 	function settings_screen_save( $group_id = NULL ) {
 		$group_object = groups_get_group( $group_id );
 		$parent_id = isset( $_POST['parent-id'] ) ? $_POST['parent-id'] : 0;
@@ -96,7 +112,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	}
 
 	/**
-	 * Determine whether the group nav item should show up for the current user
+	 * Determine whether the group nav item should show up for the current user.
 	 *
 	 * @since 1.0.0
 	 */

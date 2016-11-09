@@ -1,11 +1,10 @@
 <?php
 /**
- * BuddyPress - Subgroups Loop
+ * HierarchicalGroupsForBP - Subgroups Loop
  *
  * Querystring is set via AJAX in _inc/ajax.php - bp_legacy_theme_object_filter().
  *
- * @package BuddyPress
- * @subpackage bp-legacy
+ * @package HierarchicalGroupsForBP
  */
 
 // Store the groups template global so we can "reset" the loop after this subloop.
@@ -15,7 +14,7 @@ $parent_groups_template = $groups_template;
 /**
  * Fires before the display of groups from the groups loop.
  *
- * @since 1.2.0
+ * @since 1.2.0 (BuddyPress)
  */
 do_action( 'bp_before_subgroups_loop' );
 
@@ -46,7 +45,7 @@ do_action( 'bp_before_subgroups_loop' );
 	/**
 	 * Fires before the listing of the groups list.
 	 *
-	 * @since 1.1.0
+	 * @since 1.1.0 (BuddyPress)
 	 */
 	do_action( 'bp_before_directory_subgroups_list' ); ?>
 
@@ -74,7 +73,7 @@ do_action( 'bp_before_subgroups_loop' );
 				/**
 				 * Fires inside the listing of an individual group listing item.
 				 *
-				 * @since 1.1.0
+				 * @since 1.1.0 (BuddyPress)
 				 */
 				do_action( 'bp_directory_groups_item' ); ?>
 
@@ -87,7 +86,7 @@ do_action( 'bp_before_subgroups_loop' );
 				/**
 				 * Fires inside the action section of an individual group listing item.
 				 *
-				 * @since 1.1.0
+				 * @since 1.1.0 (BuddyPress)
 				 */
 				do_action( 'bp_directory_groups_actions' ); ?>
 
@@ -111,7 +110,7 @@ do_action( 'bp_before_subgroups_loop' );
 	/**
 	 * Fires after the listing of the groups list.
 	 *
-	 * @since 1.1.0
+	 * @since 1.1.0 (BuddyPress)
 	 */
 	do_action( 'bp_after_directory_subgroups_list' ); ?>
 
@@ -144,7 +143,7 @@ do_action( 'bp_before_subgroups_loop' );
 /**
  * Fires after the display of groups from the groups loop.
  *
- * @since 1.2.0
+ * @since 1.2.0 (BuddyPress)
  */
 do_action( 'bp_after_subgroups_loop' );
 

@@ -31,15 +31,15 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	}
 
 	function settings_screen( $group_id = NULL ) {
-		echo '<pre>'; var_dump( get_current_screen() ); echo '</pre>';
 		?>
 		<label for="parent-id">Parent Group</label>
 		<?php
-		$current_parent_group_id = hgbp_get_parent_group_id();
+		$current_parent_group_id = hgbp_get_parent_group_id( $group_id );
 		$possible_parent_groups = hgbp_get_possible_parent_groups( $group_id, bp_loggedin_user_id() );
+
 		if ( $possible_parent_groups ) :
 			?>
-			<select id="parent-id" name="parent-id">
+			<select id="parent-id" name="parent-id" autocomplete="off">
 				<option value="0" <?php selected( 0, $current_parent_group_id ); ?>><?php echo _x( 'None selected', 'The option that sets a group to be a top-level group and have no parent.', 'hierarchical-groups-for-bp' ); ?></option>
 			<?php foreach ( $possible_parent_groups as $possible_parent_group ) {
 				?>

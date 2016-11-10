@@ -79,6 +79,15 @@ function hgbp_get_plugin_base_uri(){
 }
 
 /**
+ * Helper function.
+ *
+ * @return Fully-qualified URI to the root of the plugin.
+ */
+function hgbp_get_plugin_base_name(){
+	return plugin_basename( __FILE__ );
+}
+
+/**
  * Helper function to return the current version of the plugin.
  *
  * @return string Current version of plugin.

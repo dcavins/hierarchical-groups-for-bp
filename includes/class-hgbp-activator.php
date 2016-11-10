@@ -145,7 +145,11 @@ class HGBP_Activator {
 	 * @since    1.0.0
 	 */
 	private static function single_activate() {
-		// @TODO: Define activation functionality here
+		// Don't activate this plugin on installations with pre-2.7 BuddyPress.
+		if ( version_compare( bp_get_version(), '2.7', '<' ) ) {
+            deactivate_plugins( hgbp_get_plugin_base_name() );
+            wp_die( __( 'Hierarchical Groups for BP requires BuddyPress 2.7 or newer.', 'hierarchical-groups-for-bp' ) );
+        }
 	}
 
 	/**

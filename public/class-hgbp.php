@@ -85,6 +85,9 @@ class HGBP_Public {
 
 		// Determine whether a specific user can create a subgroup of a particular group.
 		add_filter( 'bp_user_can', array( $this, 'user_can_create_subgroups' ), 10, 5 );
+
+		// Filters. Change BP Actions and behaviors.
+		add_filter( 'bp_get_group_permalink', array( $this, 'make_permalink_hierarchical' ), 10, 2 );
 	}
 
 	/**
@@ -238,6 +241,16 @@ class HGBP_Public {
 		}
 
 		return $retval;
+	}
+
+	public function make_permalink_hierarchical( $permalink, $group ) {
+		// We only need to filter if this not a top-level group.
+		if ( $group->parent_id != 0 ) {
+			$group_path = hgbp_build_hierarchical_slug( $group->id );
+			$permalink  = trailingslashit( bp_get_groups_directory_permalink() . $group_path . '/' );
+		}
+		return $permalink;
+
 	}
 
 }

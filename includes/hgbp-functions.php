@@ -385,3 +385,32 @@ function hgbp_get_possible_parent_groups( $group_id = false, $user_id = false ) 
 
 	return $possible_parents['groups'];
 }
+
+/**
+ * Create the hierarchical-style URL for a subgroup: groups/parent/child/action.
+ *
+ * @since 1.0.0
+ *
+ * @param  int   $group_id ID of the group.
+ *
+ * @return string Slug for group, empty if no slug found.
+ */
+function hgbp_build_hierarchical_slug( $group_id = 0 ) {
+
+	if ( ! $group_id ) {
+		$group_id = bp_get_current_group_id();
+	}
+	if ( ! $group_id ) {
+		return '';
+	}
+
+	$group = groups_get_group( $group_id );
+	$path = array( bp_get_group_slug( $group ) );
+
+	while ( $group->parent_id != 0 ) {
+		$group  = groups_get_group( $group->parent_id );
+		$path[] = bp_get_group_slug( $group );
+	}
+
+	return implode( '/', array_reverse( $path ) );
+}

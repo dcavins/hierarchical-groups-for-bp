@@ -527,4 +527,66 @@ class HGBP_Tests extends HGBP_TestCase {
 		$this->assertEqualSets( array( $g5, $g6 ), $found );
 	}
 
+	/**
+	 * @group hgbp_build_hierarchical_slug
+	 */
+	public function test_hgbp_build_hierarchical_slug_top_level() {
+		$slugs = array( 'cero', 'uno', 'dos', 'tres', 'cuatro' );
+		$g1 = $this->factory->group->create( array(
+			'slug' => $slugs[1]
+		) );
+		$g2 = $this->factory->group->create( array(
+			'slug' => $slugs[2],
+			'parent_id' => $g1,
+		) );
+		$g3 = $this->factory->group->create( array(
+			'slug' => $slugs[3],
+			'parent_id'  => $g2,
+		) );
+
+		$path = hgbp_build_hierarchical_slug( $g1 );
+		$this->assertEquals( $slugs[1], $path );
+	}
+
+	/**
+	 * @group hgbp_build_hierarchical_slug
+	 */
+	public function test_hgbp_build_hierarchical_slug_two_levels() {
+		$slugs = array( 'cero', 'uno', 'dos', 'tres', 'cuatro' );
+		$g1 = $this->factory->group->create( array(
+			'slug' => $slugs[1]
+		) );
+		$g2 = $this->factory->group->create( array(
+			'slug' => $slugs[2],
+			'parent_id' => $g1,
+		) );
+		$g3 = $this->factory->group->create( array(
+			'slug' => $slugs[3],
+			'parent_id'  => $g2,
+		) );
+
+		$path = hgbp_build_hierarchical_slug( $g2 );
+		$this->assertEquals( $slugs[1] . '/' . $slugs[2], $path );
+	}
+
+	/**
+	 * @group hgbp_build_hierarchical_slug
+	 */
+	public function test_hgbp_build_hierarchical_slug_three_levels() {
+		$slugs = array( 'cero', 'uno', 'dos', 'tres', 'cuatro' );
+		$g1 = $this->factory->group->create( array(
+			'slug' => $slugs[1]
+		) );
+		$g2 = $this->factory->group->create( array(
+			'slug' => $slugs[2],
+			'parent_id' => $g1,
+		) );
+		$g3 = $this->factory->group->create( array(
+			'slug' => $slugs[3],
+			'parent_id'  => $g2,
+		) );
+
+		$path = hgbp_build_hierarchical_slug( $g3 );
+		$this->assertEquals( $slugs[1] . '/' . $slugs[2] . '/' . $slugs[3], $path );
+	}
 }

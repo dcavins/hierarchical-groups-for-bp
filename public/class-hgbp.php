@@ -170,7 +170,7 @@ class HGBP_Public {
 	 *
 	 * @param int    $group_id   ID of the group to update.
 	 */
-	function save_allowed_subgroups_creators( $group_id ) {
+	public function save_allowed_subgroups_creators( $group_id ) {
 		if ( isset( $_POST['allowed-subgroup-creators'] ) &&
 			 in_array( $_POST['allowed-subgroup-creators'], array( 'noone', 'admin', 'mod', 'member' ) ) ) {
 			groups_update_groupmeta( $group_id, 'allowed_subgroup_creators', $_POST['allowed-subgroup-creators'] );
@@ -182,7 +182,7 @@ class HGBP_Public {
 	 *
 	 * @since 1.0.0
 	 */
-	function save_allowed_subgroups_creators_create_step() {
+	public function save_allowed_subgroups_creators_create_step() {
 		$group_id = buddypress()->groups->new_group_id;
 		$this->save_allowed_subgroups_creators( $group_id );
 	}
@@ -201,7 +201,7 @@ class HGBP_Public {
 	 *
 	 * @return bool
 	 */
-	function user_can_create_subgroups( $retval, $user_id, $capability, $site_id, $args ) {
+	public function user_can_create_subgroups( $retval, $user_id, $capability, $site_id, $args ) {
 		if ( 'create_subgroups' != $capability ) {
 			return $retval;
 		}
@@ -243,6 +243,17 @@ class HGBP_Public {
 		return $retval;
 	}
 
+	/**
+	 * Filter a child group's permalink to take the form
+	 * /groups/parent-group/child-group.
+	 *
+	 * @since 1.0.0
+	 *
+ 	 * @param string $permalink Permalink for the current group in the loop.
+	 * @param object $group     Group object.
+	 *
+	 * @return string Filtered permalink for the group.
+	 */
 	public function make_permalink_hierarchical( $permalink, $group ) {
 		// We only need to filter if this not a top-level group.
 		if ( $group->parent_id != 0 ) {

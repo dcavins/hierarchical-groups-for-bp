@@ -88,6 +88,12 @@ class HGBP_Public {
 
 		// Filters. Change BP Actions and behaviors.
 		add_filter( 'bp_get_group_permalink', array( $this, 'make_permalink_hierarchical' ), 10, 2 );
+
+		/*
+		 * Update the current action and action variables, after the table name is set,
+		 * but before BP Groups Component sets the current group, action and variables.
+		 */
+		add_action( 'bp_groups_setup_globals', array( $this, 'reset_action_variables' ) );
 	}
 
 	/**
@@ -261,7 +267,41 @@ class HGBP_Public {
 			$permalink  = trailingslashit( bp_get_groups_directory_permalink() . $group_path . '/' );
 		}
 		return $permalink;
+	}
 
+	/**
+	 * Filter $bp->current_action and $bp->action_variables before the single
+	 * group details are set up in the Single Group Globals section of
+	 * BP_Groups_Component::setup_globals() to ignore the hierarchical
+	 * piece of the URL for child groups.
+	 *
+	 * @since 1.0.0
+	 *
+	 */
+	public function reset_action_variables() {
+		if ( bp_is_groups_component() ) {
+			$bp = buddypress();
+
+			// We're looking for group slugs masquerading as action variables.
+			$action_variables = bp_action_variables();
+			if ( ! $action_variables || ! is_array( $action_variables ) ) {
+				return;
+			}
+
+			/*
+			 * The Single Group Globals section of BP_Groups_Component::setup_globals()
+			 * uses the current action to set up the current group. Pull found
+			 * group slugs out of the action variables array.
+			 */
+			foreach ( $action_variables as $maybe_slug ) {
+				if ( groups_get_id( $maybe_slug ) ) {
+					$bp->current_action = array_shift( $bp->action_variables );
+				} else {
+					// If we've gotten into real action variables, stop.
+					break;
+				}
+			}
+		}
 	}
 
 }

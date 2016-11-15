@@ -131,7 +131,15 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 			}
 		}
 
-		return apply_filters( 'hgbp_nav_item_visibility', $nav_item_vis );
+		/**
+		 * Fires before the calculated navigation item visibility is passed back to the constructor.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $nav_item_vis Access and visibility level.
+		 * @param int    $group_id     ID of the current group.
+		 */
+		return apply_filters( 'hgbp_nav_item_visibility', $nav_item_vis, $group_id );
 	}
 
 }

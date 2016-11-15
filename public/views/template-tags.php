@@ -35,28 +35,29 @@ function hgbp_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) 
 		if ( empty( $group ) ) {
 			$group = $groups_template->group;
 		}
+		$user_id = bp_loggedin_user_id();
 
 		// Create the base group's entry.
-		$item = '<a href="' . bp_get_group_permalink() . '">' . bp_get_group_name() . '</a>';
+		$item        = '<a href="' . bp_get_group_permalink( $group ) . '">' . bp_get_group_name( $group ) . '</a>';
 		$breadcrumbs = array( $item );
-		$parent_id   = hgbp_get_parent_group_id( $group->id, bp_loggedin_user_id() );
+		$parent_id   = hgbp_get_parent_group_id( $group->id, $user_id );
 
 		// Add breadcrumbs for the ancestors.
 		while ( $parent_id ) {
-			$parent_group = groups_get_group( $parent_id );
+			$parent_group  = groups_get_group( $parent_id );
 			$breadcrumbs[] = '<a href="' . bp_get_group_permalink( $parent_group ) . '">' . bp_get_group_name( $parent_group ) . '</a>';
-			$parent_id   = hgbp_get_parent_group_id( $parent_group->id, bp_loggedin_user_id() );
+			$parent_id     = hgbp_get_parent_group_id( $parent_group->id, $user_id );
 		}
 
 		$breadcrumbs = implode( $separator, array_reverse( $breadcrumbs ) );
 
 		/**
-		 * Filters the permalink for the current group in the loop.
+		 * Filters the breadcrumb trail for the current group in the loop.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param string $breadcrumb String of breadcrumb links.
-		 * @param object $group Group object.
+		 * @param string          $breadcrumb String of breadcrumb links.
+		 * @param BP_Groups_Group $group      Group object.
 		 */
 		return apply_filters( 'hgbp_get_group_permalink_breadcrumbs', $breadcrumbs, $group );
 	}

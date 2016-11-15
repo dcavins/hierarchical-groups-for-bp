@@ -86,7 +86,7 @@ class HGBP_Public {
 		// Determine whether a specific user can create a subgroup of a particular group.
 		add_filter( 'bp_user_can', array( $this, 'user_can_create_subgroups' ), 10, 5 );
 
-		// Filters. Change BP Actions and behaviors.
+		// Modify group permalinks to reflect hierarchy
 		add_filter( 'bp_get_group_permalink', array( $this, 'make_permalink_hierarchical' ), 10, 2 );
 
 		/*

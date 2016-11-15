@@ -414,3 +414,47 @@ function hgbp_build_hierarchical_slug( $group_id = 0 ) {
 
 	return implode( '/', array_reverse( $path ) );
 }
+
+/**
+ * Fetch and parse the saved global settings.
+ *
+ * @since 1.0.0
+ *
+ * @return bool
+ */
+function hgbp_get_activity_syndication_setting( $setting = 'up' ) {
+	if ( $setting !== 'up' ) {
+		$setting = 'down';
+	}
+	return (bool) get_option( "hgbp-syndicate-activity-{$setting}" );
+}
+
+/**
+ * Fetch and parse the saved global settings.
+ *
+ * @since 1.0.0
+ *
+ * @return string Level of enforcement for overriding the default settings.
+ */
+function hgbp_get_activity_syndication_enforce_setting( $setting = 'up' ) {
+	if ( $setting !== 'up' ) {
+		$setting = 'down';
+	}
+	$option = get_option( "hgbp-syndicate-activity-{$setting}-enforce" );
+	return hgbp_sanitize_syndication_enforce( $option );
+}
+
+/**
+ * Filter the syndication enforcement setting against a whitelist.
+ *
+ * @since 1.0.0
+ *
+ * @return string Level of enforcement for overriding the default settings.
+ */
+function hgbp_sanitize_syndication_enforce( $value ) {
+	$valid_enforce = array( 'group-admins', 'site-admins', 'strict' );
+	if ( ! in_array( $value, $valid_enforce, true ) ) {
+		$value = 'group-admins';
+	}
+	return $value;
+}

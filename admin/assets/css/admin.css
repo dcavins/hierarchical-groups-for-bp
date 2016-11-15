@@ -11,4 +11,27 @@
 	vertical-align: middle;
 	line-height: 2em;
 }
-/* Changes to the single group admin screen in WP Admin */
+
+/* Changes to the settings screen in WP Admin */
+.groups_page_hierarchical-groups-for-bp legend {
+	margin-top: 1em;
+	font-weight: bold;
+	font-size: 115%;
+	line-height: 1.6em;
+}
+.groups_page_hierarchical-groups-for-bp label {
+	clear: left;
+	display: block;
+	float: left;
+	vertical-align: middle;
+	line-height: 2em;
+	margin-left: 1.5em;
+}
+.hierarchy-settings .settings-section-header {
+	clear: left;
+	display: block;
+	float: left;
+	vertical-align: middle;
+	margin-bottom: .5em;
+	margin-left: 1.5em;
+}

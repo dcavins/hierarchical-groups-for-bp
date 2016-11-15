@@ -51,6 +51,7 @@ class HGBP_Admin extends HGBP_Public {
 		// Add the options page and menu item.
 		// add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
 		add_action( bp_core_admin_hook(), array( $this, 'add_plugin_admin_menu' ), 99 );
+		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ), 99 );
 
 		// Add an action link pointing to the options page.
 		// $plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_slug . '.php' );
@@ -114,13 +115,137 @@ class HGBP_Admin extends HGBP_Public {
 	}
 
 	/**
-	 * Render the settings page for this plugin.
+	 * Register the settings and set up the sections and fields for the
+	 * global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function settings_init() {
+		add_settings_section(
+			'hgbp_activity_syndication',
+			__( 'Group Activity Propagation', 'hierarchical-groups-for-bp' ),
+			array( $this, 'activity_propagation_section_callback' ),
+			$this->plugin_slug
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-syndicate-activity-up', 'absint' );
+		add_settings_field(
+			'hgbp-syndicate-activity-up',
+			__( 'Include child group activity in ancestor group activity streams.', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_syndicate_activity_up' ),
+			$this->plugin_slug,
+			'hgbp_activity_syndication'
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-syndicate-activity-up-enforce', 'hgbp_sanitize_syndication_enforce' );
+		add_settings_field(
+			'hgbp-syndicate-activity-up-enforce',
+			__( 'Global setting enforcement: Upward syndication', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_syndicate_activity_up_enforce' ),
+			$this->plugin_slug,
+			'hgbp_activity_syndication'
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-syndicate-activity-down', 'absint' );
+		add_settings_field(
+			'hgbp-syndicate-activity-down',
+			__( 'Include parent group activity in descendent group activity streams.', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_syndicate_activity_down' ),
+			$this->plugin_slug,
+			'hgbp_activity_syndication'
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-syndicate-activity-down-enforce', 'hgbp_sanitize_syndication_enforce' );
+		add_settings_field(
+			'hgbp-syndicate-activity-down-enforce',
+			__( 'Global setting enforcement: Downward syndication', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_syndicate_activity_down_enforce' ),
+			$this->plugin_slug,
+			'hgbp_activity_syndication'
+		);
+	}
+
+	/**
+	 * Provide a section description for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function activity_propagation_section_callback() {
+		_e( 'Hierarchy settings can be set per-group or globally. Set global defaults here.', 'hierarchical-groups-for-bp' );
+	}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_syndicate_activity_up() {
+		$setting = hgbp_get_activity_syndication_setting( 'up' );
+		?>
+		<label for="syndicate-activity-up-yes"><input type="radio" id="syndicate-activity-up-yes" name="hgbp-syndicate-activity-up" value="1"<?php checked( true, $setting ); ?>> <?php _ex( 'Yes', 'Affirmative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-up-no"><input type="radio" id="syndicate-activity-up-no" name="hgbp-syndicate-activity-up" value="0"<?php checked( false, $setting ); ?>> <?php _ex( 'No', 'Negative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<?php
+	}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_syndicate_activity_up_enforce() {
+		$setting = hgbp_get_activity_syndication_enforce_setting( 'up' )
+		?>
+		<label for="syndicate-activity-up-enforce-group-admins"><input type="radio" id="syndicate-activity-up-enforce-group-admins" name="hgbp-syndicate-activity-up-enforce" value="group-admins"<?php checked( 'group-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by group admins.', 'Response for allow overrides of child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-up-enforce-site-admins"><input type="radio" id="syndicate-activity-up-enforce-site-admins" name="hgbp-syndicate-activity-up-enforce" value="site-admins"<?php checked( 'site-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by site admins.', 'Response for allow overrides of child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-up-enforce-strict"><input type="radio" id="syndicate-activity-up-enforce-strict" name="hgbp-syndicate-activity-up-enforce" value="strict"<?php checked( 'strict', $setting ); ?>> <?php _ex( 'Enforce setting for all groups.', 'Response for allow overrides of child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<?php
+	}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_syndicate_activity_down() {
+		$setting = hgbp_get_activity_syndication_setting( 'down' );
+		?>
+		<label for="syndicate-activity-down-yes"><input type="radio" id="syndicate-activity-down-yes" name="hgbp-syndicate-activity-down" value="1"<?php checked( true, $setting ); ?>> <?php _ex( 'Yes', 'Affirmative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-down-no"><input type="radio" id="syndicate-activity-down-no" name="hgbp-syndicate-activity-down" value="0"<?php checked( false, $setting ); ?>> <?php _ex( 'No', 'Negative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<?php
+	}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_syndicate_activity_down_enforce() {
+		$setting = hgbp_get_activity_syndication_enforce_setting( 'down' )
+		?>
+		<label for="syndicate-activity-down-enforce-group-admins"><input type="radio" id="syndicate-activity-down-enforce-group-admins" name="hgbp-syndicate-activity-down-enforce" value="group-admins"<?php checked( 'group-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by group admins.', 'Response for allow overrides of parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-down-enforce-site-admins"><input type="radio" id="syndicate-activity-down-enforce-site-admins" name="hgbp-syndicate-activity-down-enforce" value="site-admins"<?php checked( 'site-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by site admins.', 'Response for allow overrides of parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-down-enforce-strict"><input type="radio" id="syndicate-activity-down-enforce-strict" name="hgbp-syndicate-activity-down-enforce" value="strict"<?php checked( 'strict', $setting ); ?>> <?php _ex( 'Enforce setting for all groups.', 'Response for allow overrides of parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<?php
+	}
+
+	/**
+	 * Render the global settings screen for this plugin.
 	 *
 	 * @since    1.0.0
 	 */
 	public function display_plugin_admin_page() {
-		echo "the thingy";
-		include_once( 'views/admin.php' );
+		?>
+		<form action="<?php echo admin_url( 'options.php' ) ?>" method='post'>
+			<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
+
+			<?php
+			settings_fields( $this->plugin_slug );
+			do_settings_sections( $this->plugin_slug );
+			submit_button();
+			?>
+
+		</form>
+		<?php
 	}
 
 }

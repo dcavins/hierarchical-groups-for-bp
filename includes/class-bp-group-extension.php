@@ -72,7 +72,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 			<legend><?php _e( 'Which members of this group are allowed to create subgroups?', 'hierarchical-groups-for-bp' ); ?></legend>
 
 			<?php
-			$subgroup_creators = groups_get_groupmeta( $group_id, 'allowed_subgroup_creators' );
+			$subgroup_creators = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
 			if ( ! $subgroup_creators ) {
 				$subgroup_creators = 'noone';
 			}
@@ -108,7 +108,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		}
 
 		$allowed_creators = isset( $_POST['allowed-subgroup-creators'] ) ? $_POST['allowed-subgroup-creators'] : '';
-		$subgroup_creators = groups_update_groupmeta( $group_id, 'allowed_subgroup_creators', $allowed_creators );
+		$subgroup_creators = groups_update_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators', $allowed_creators );
 	}
 
 	/**

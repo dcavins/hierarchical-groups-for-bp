@@ -179,7 +179,7 @@ class HGBP_Public {
 	public function save_allowed_subgroups_creators( $group_id ) {
 		if ( isset( $_POST['allowed-subgroup-creators'] ) &&
 			 in_array( $_POST['allowed-subgroup-creators'], array( 'noone', 'admin', 'mod', 'member' ) ) ) {
-			groups_update_groupmeta( $group_id, 'allowed_subgroup_creators', $_POST['allowed-subgroup-creators'] );
+			groups_update_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators', $_POST['allowed-subgroup-creators'] );
 		}
 	}
 
@@ -224,7 +224,7 @@ class HGBP_Public {
 		$group_id = (int) $args['group_id'];
 
 		// Possible settings for the group meta setting 'allowed_subgroup_creators'
-		$creator_setting = groups_get_groupmeta( $group_id, 'allowed_subgroup_creators' );
+		$creator_setting = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
 		switch ( $creator_setting ) {
 			case 'admin' :
 				$retval = groups_is_user_admin( $user_id, $group_id );

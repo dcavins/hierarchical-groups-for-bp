@@ -327,7 +327,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		$g6 = $this->factory->group->create();
 
 		// Members can create subgroups.
-		groups_update_groupmeta( $g6, 'allowed_subgroup_creators', 'member' );
+		groups_update_groupmeta( $g6, 'hgbp-allowed-subgroup-creators', 'member' );
 
 		$groups = hgbp_get_possible_parent_groups( $g1, $u1 );
 		$found = wp_list_pluck( $groups, 'id' );
@@ -354,7 +354,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		$this->add_user_to_group( $u1, $g6 );
 
 		// Members can create subgroups.
-		groups_add_groupmeta( $g6, 'allowed_subgroup_creators', 'member' );
+		groups_add_groupmeta( $g6, 'hgbp-allowed-subgroup-creators', 'member' );
 
 		$groups = hgbp_get_possible_parent_groups( $g1, $u1 );
 		$found = wp_list_pluck( $groups, 'id' );
@@ -381,7 +381,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		$this->add_user_to_group( $u1, $g6 );
 
 		// Members can create subgroups.
-		groups_update_groupmeta( $g6, 'allowed_subgroup_creators', 'mod' );
+		groups_update_groupmeta( $g6, 'hgbp-allowed-subgroup-creators', 'mod' );
 
 		$groups = hgbp_get_possible_parent_groups( $g1, $u1 );
 		$found = wp_list_pluck( $groups, 'id' );
@@ -410,7 +410,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		$m1->promote( 'mod' );
 
 		// Members can create subgroups.
-		groups_update_groupmeta( $g6, 'allowed_subgroup_creators', 'mod' );
+		groups_update_groupmeta( $g6, 'hgbp-allowed-subgroup-creators', 'mod' );
 
 		$groups = hgbp_get_possible_parent_groups( $g1, $u1 );
 		$found = wp_list_pluck( $groups, 'id' );
@@ -439,7 +439,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		$m1->promote( 'mod' );
 
 		// Members can create subgroups.
-		groups_update_groupmeta( $g6, 'allowed_subgroup_creators', 'admin' );
+		groups_update_groupmeta( $g6, 'hgbp-allowed-subgroup-creators', 'admin' );
 
 		$groups = hgbp_get_possible_parent_groups( $g1, $u1 );
 		$found = wp_list_pluck( $groups, 'id' );
@@ -468,7 +468,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		$m1->promote( 'admin' );
 
 		// Members can create subgroups.
-		groups_update_groupmeta( $g6, 'allowed_subgroup_creators', 'admin' );
+		groups_update_groupmeta( $g6, 'hgbp-allowed-subgroup-creators', 'admin' );
 
 		$groups = hgbp_get_possible_parent_groups( $g1, $u1 );
 		$found = wp_list_pluck( $groups, 'id' );
@@ -497,7 +497,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		$m1->promote( 'admin' );
 
 		// Members can create subgroups.
-		groups_update_groupmeta( $g6, 'allowed_subgroup_creators', 'noone' );
+		groups_update_groupmeta( $g6, 'hgbp-allowed-subgroup-creators', 'noone' );
 
 		$groups = hgbp_get_possible_parent_groups( $g1, $u1 );
 		$found = wp_list_pluck( $groups, 'id' );

@@ -420,13 +420,15 @@ function hgbp_build_hierarchical_slug( $group_id = 0 ) {
  *
  * @since 1.0.0
  *
- * @return bool
+ * @param string $setting Which direction to check.
+ *
+ * @return string|bool "yes" or "no" if it's set, false if unknown.
  */
 function hgbp_get_global_activity_setting( $setting = 'children' ) {
 	if ( $setting !== 'children' ) {
 		$setting = 'parents';
 	}
-	return (bool) get_option( "hgbp-include-activity-from-{$setting}" );
+	return get_option( "hgbp-include-activity-from-{$setting}" );
 }
 
 /**

@@ -128,7 +128,7 @@ class HGBP_Admin extends HGBP_Public {
 			$this->plugin_slug
 		);
 
-		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-children', 'absint' );
+		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-children', array( $this, 'sanitize_yes_no' ) );
 		add_settings_field(
 			'hgbp-include-activity-from-children',
 			__( 'Include child group activity in parent group activity streams.', 'hierarchical-groups-for-bp' ),
@@ -146,7 +146,7 @@ class HGBP_Admin extends HGBP_Public {
 			'hgbp_activity_syndication'
 		);
 
-		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-parents', 'absint' );
+		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-parents', array( $this, 'sanitize_yes_no' ) );
 		add_settings_field(
 			'hgbp-include-activity-from-parents',
 			__( 'Include parent group activity in child group activity streams.', 'hierarchical-groups-for-bp' ),
@@ -183,8 +183,8 @@ class HGBP_Admin extends HGBP_Public {
 		$setting  = hgbp_get_global_activity_setting( 'children' );
 		$selected = ( $setting == 'yes' ) ? true : false;
 		?>
-		<label for="syndicate-activity-up-yes"><input type="radio" id="syndicate-activity-up-yes" name="hgbp-include-activity-from-children" value="1"<?php checked( 'yes', $selected ); ?>> <?php _ex( 'Yes', 'Affirmative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="syndicate-activity-up-no"><input type="radio" id="syndicate-activity-up-no" name="hgbp-include-activity-from-children" value="0"<?php checked( false, $selected ); ?>> <?php _ex( 'No', 'Negative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-up-yes"><input type="radio" id="syndicate-activity-up-yes" name="hgbp-include-activity-from-children" value="yes"<?php checked( 'yes', $selected ); ?>> <?php _ex( 'Yes', 'Affirmative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="syndicate-activity-up-no"><input type="radio" id="syndicate-activity-up-no" name="hgbp-include-activity-from-children" value="no"<?php checked( false, $selected ); ?>> <?php _ex( 'No', 'Negative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
 	}
 
@@ -211,8 +211,8 @@ class HGBP_Admin extends HGBP_Public {
 		$setting = hgbp_get_global_activity_setting( 'parents' );
 		$selected = ( $setting == 'yes' ) ? true : false;
 		?>
-		<label for="hgbp-include-activity-from-parents-yes"><input type="radio" id="hgbp-include-activity-from-parents-yes" name="hgbp-include-activity-from-parents" value="1"<?php checked( true, $selected ); ?>> <?php _ex( 'Yes', 'Affirmative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="hgbp-include-activity-from-parents-no"><input type="radio" id="hgbp-include-activity-from-parents-no" name="hgbp-include-activity-from-parents" value="0"<?php checked( false, $selected ); ?>> <?php _ex( 'No', 'Negative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="hgbp-include-activity-from-parents-yes"><input type="radio" id="hgbp-include-activity-from-parents-yes" name="hgbp-include-activity-from-parents" value="yes"<?php checked( true, $selected ); ?>> <?php _ex( 'Yes', 'Affirmative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="hgbp-include-activity-from-parents-no"><input type="radio" id="hgbp-include-activity-from-parents-no" name="hgbp-include-activity-from-parents" value="no"<?php checked( false, $selected ); ?>> <?php _ex( 'No', 'Negative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
 	}
 
@@ -248,6 +248,18 @@ class HGBP_Admin extends HGBP_Public {
 
 		</form>
 		<?php
+	}
+
+	/**
+	 * Sanitize saved input for yes or no questions.
+	 *
+	 * @since    1.0.0
+	 */
+	public function sanitize_yes_no( $input ) {
+		if ( 'yes' != $input ) {
+			$input = 'no';
+		}
+		return $input;
 	}
 
 }

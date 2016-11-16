@@ -96,6 +96,8 @@ class HGBP_Public {
 		add_action( 'bp_groups_setup_globals', array( $this, 'reset_action_variables' ) );
 
 		add_filter( 'bp_user_can', array( $this, 'check_user_caps' ), 10, 5 );
+
+		add_filter( 'bp_ajax_querystring', array( $this, 'activity_aggregation' ), 90, 2 );
 	}
 
 	/**
@@ -257,7 +259,7 @@ class HGBP_Public {
 	 *
 	 * @since 1.0.0
 	 *
- 	 * @param string $permalink Permalink for the current group in the loop.
+	 * @param string $permalink Permalink for the current group in the loop.
 	 * @param object $group     Group object.
 	 *
 	 * @return string Filtered permalink for the group.
@@ -311,7 +313,7 @@ class HGBP_Public {
 	 *
 	 * @since 1.0.0
 	 *
- 	 * @param bool   $retval     Whether or not the current user has the capability.
+	 * @param bool   $retval     Whether or not the current user has the capability.
 	 * @param int    $user_id
 	 * @param string $capability The capability being checked for.
 	 * @param int    $site_id    Site ID. Defaults to the BP root blog.
@@ -355,6 +357,52 @@ class HGBP_Public {
 		}
 
 		return $retval;
+	}
+
+	/**
+	 * Filter bp_ajax_querystring to add hierarchically related groups of
+	 * the current group that user has access to.
+	 *
+	 * @since 1.0.0
+	 *
+ 	 * @param string $query_string Current query string.
+	 * @param string $object       Current template component.
+	 *
+	 * @return string
+	 */
+	public function activity_aggregation( $query_string, $object ) {
+		// Only fire on group activity streams.
+		if ( ! bp_is_group() || $object != 'activity' ) {
+			return $query_string;
+		}
+
+		$group_id = bp_get_current_group_id();
+
+		// Check if this group is set to aggregate child group activity.
+		$include_child_activity = hgbp_group_include_hierarchical_activity( $group_id, 'children' );
+		$include_parent_activity = hgbp_group_include_hierarchical_activity( $group_id, 'parents' );
+
+		if ( ! $include_child_activity && ! $include_parent_activity ) {
+			return $query_string;
+		}
+
+		$include = array( $group_id );
+		if ( $include_parent_activity ) {
+			$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
+			$include = array_merge( $include, $parents );
+		}
+
+		if ( $include_child_activity ) {
+			$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
+			$child_ids = wp_list_pluck( $children, 'id' );
+			$include   = array_merge( $include, $child_ids );
+		}
+
+		if ( ! empty( $include ) ) {
+			$query_string .= '&primary_id=' . implode( ',', $include );
+		}
+
+		return $query_string;
 	}
 
 }

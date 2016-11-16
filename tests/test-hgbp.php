@@ -589,4 +589,92 @@ class HGBP_Tests extends HGBP_TestCase {
 		$path = hgbp_build_hierarchical_slug( $g3 );
 		$this->assertEquals( $slugs[1] . '/' . $slugs[2] . '/' . $slugs[3], $path );
 	}
+
+	/**
+	 * @group hgbp_group_include_hierarchical_activity
+	 */
+	public function test_hgbp_group_include_hierarchical_activity_global_yes_strict() {
+		$g1 = $this->factory->group->create();
+
+		// Set global options.
+		update_option( 'hgbp-include-activity-from-children', 'yes' );
+		update_option( 'hgbp-include-activity-from-children-enforce', 'strict' );
+		update_option( 'hgbp-include-activity-from-parents', 'yes' );
+		update_option( 'hgbp-include-activity-from-parents-enforce', 'strict' );
+
+		// Set conflicting group settings.
+		groups_update_groupmeta( $g1, 'hgbp-include-activity-from-children', 'no' );
+
+		// Group settings should be ignored.
+		$this->assertTrue( hgbp_group_include_hierarchical_activity( $g1, 'children' ) );
+		$this->assertTrue( hgbp_group_include_hierarchical_activity( $g1, 'parents' ) );
+	}
+
+	/**
+	 * @group hgbp_group_include_hierarchical_activity
+	 */
+	public function test_hgbp_group_include_hierarchical_activity_global_no_strict() {
+		$g1 = $this->factory->group->create();
+
+		// Set global options.
+		update_option( 'hgbp-include-activity-from-children', 'no' );
+		update_option( 'hgbp-include-activity-from-children-enforce', 'strict' );
+		// Setting no option for from-parents should still yield false.
+		delete_option( 'hgbp-include-activity-from-parents' );
+		update_option( 'hgbp-include-activity-from-parents-enforce', 'strict' );
+
+		// Set conflicting group settings.
+		groups_update_groupmeta( $g1, 'hgbp-include-activity-from-children', 'yes' );
+		groups_update_groupmeta( $g1, 'hgbp-include-activity-from-parents', 'yes' );
+
+		// Group settings should be ignored.
+		$this->assertFalse( hgbp_group_include_hierarchical_activity( $g1, 'children' ) );
+		$this->assertFalse( hgbp_group_include_hierarchical_activity( $g1, 'parents' ) );
+	}
+
+	/**
+	 * @group hgbp_group_include_hierarchical_activity
+	 */
+	public function test_hgbp_group_include_hierarchical_activity_global_no_group_admins() {
+		$g1 = $this->factory->group->create();
+
+		// Set global options.
+		update_option( 'hgbp-include-activity-from-children', 'no' );
+		update_option( 'hgbp-include-activity-from-children-enforce', 'group-admins' );
+		update_option( 'hgbp-include-activity-from-parents', 'yes' );
+		update_option( 'hgbp-include-activity-from-parents-enforce', 'group-admins' );
+
+		// Set conflicting group settings.
+		groups_update_groupmeta( $g1, 'hgbp-include-activity-from-children', 'yes' );
+
+		// Group settings should be respected, unless not set.
+		$this->assertTrue( hgbp_group_include_hierarchical_activity( $g1, 'children' ) );
+		$this->assertTrue( hgbp_group_include_hierarchical_activity( $g1, 'parents' ) );
+	}
+
+	/**
+	 * @group hgbp_group_include_hierarchical_activity
+	 */
+	public function test_hgbp_group_include_hierarchical_activity_unset_is_false() {
+		$g1 = $this->factory->group->create();
+
+		// If nothing is set, return false.
+		$this->assertFalse( hgbp_group_include_hierarchical_activity( $g1, 'children' ) );
+		$this->assertFalse( hgbp_group_include_hierarchical_activity( $g1, 'parents' ) );
+	}
+
+	/**
+	 * @group hgbp_group_include_hierarchical_activity
+	 */
+	public function test_hgbp_group_include_hierarchical_activity_unset_global_is_false() {
+		$g1 = $this->factory->group->create();
+
+		// Set permissive group settings.
+		groups_update_groupmeta( $g1, 'hgbp-include-activity-from-children', 'yes' );
+		groups_update_groupmeta( $g1, 'hgbp-include-activity-from-parents', 'yes' );
+
+		// Unset globals should yield false.
+		$this->assertFalse( hgbp_group_include_hierarchical_activity( $g1, 'children' ) );
+		$this->assertFalse( hgbp_group_include_hierarchical_activity( $g1, 'parents' ) );
+	}
 }

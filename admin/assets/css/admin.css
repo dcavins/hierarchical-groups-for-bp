@@ -1,10 +1,12 @@
 /* Styles for the single group admin screen in WP Admin */
-.hierarchy-allowed-subgroup-creators legend {
+.hierarchy-allowed-subgroup-creators legend,
+.hierarchy-syndicate-activity legend {
 	margin-top: 10px;
 	font-weight: bold;
 	line-height: 1.6em;
 }
-.hierarchy-allowed-subgroup-creators label {
+.hierarchy-allowed-subgroup-creators label,
+.hierarchy-syndicate-activity label {
 	clear: left;
 	display: block;
 	float: left;

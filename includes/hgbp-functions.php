@@ -448,6 +448,26 @@ function hgbp_get_global_activity_enforce_setting( $setting = 'children' ) {
 	return hgbp_sanitize_group_setting_enforce( $option );
 }
 
+/**
+ * Fetch and parse the saved global settings.
+ *
+ * @since 1.0.0
+ *
+ * @param int $group_id Which group ID's meta to fetch.
+ *
+ * @return string Which members of a group are allowed to associate subgroups with it.
+ */
+function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
+	if ( ! $group_id ) {
+		$group_id = bp_get_current_group_id();
+	}
+
+	$value = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
+	$valid_options = array( 'member', 'mod', 'admin', 'noone' );
+	if ( ! in_array( $value, $valid_enforce, true ) ) {
+		$value = 'noone';
+	}
+	return $value;
 }
 
 /**
@@ -460,7 +480,51 @@ function hgbp_get_global_activity_enforce_setting( $setting = 'children' ) {
 function hgbp_sanitize_group_setting_enforce( $value ) {
 	$valid_enforce = array( 'group-admins', 'site-admins', 'strict' );
 	if ( ! in_array( $value, $valid_enforce, true ) ) {
-		$value = 'group-admins';
+		$value = 'strict';
 	}
 	return $value;
+}
+
+/**
+ * Should a group's activity stream include parent or child group activity?
+ *
+ * @since 1.0.0
+ *
+ * @param string $setting Which direction to check.
+ *
+ * @return bool True to include the related activity.
+ */
+function hgbp_group_include_hierarchical_activity( $group_id = 0, $setting = 'children' ) {
+	if ( ! $group_id ) {
+		$group_id = bp_get_current_group_id();
+	}
+	if ( $setting !== 'children' ) {
+		$setting = 'parents';
+	}
+	$include = false;
+
+	/*
+	 * This is a calculated result that has to check the global setting first.
+	 * First, we check which setting has priority.
+	 */
+	$enforce = hgbp_get_global_activity_enforce_setting( $setting );
+	if ( 'site-admins' == $enforce || 'group-admins' == $enforce ) {
+		// Check the group's raw setting first.
+		$include = groups_get_groupmeta( $group_id, "hgbp-include-activity-from-{$setting}" );
+		// If unknown (neither yes nor no), fall back to the global setting.
+		if ( ! $include ) {
+			$include = hgbp_get_global_activity_setting( $include );
+		}
+	} else {
+		/*
+		 * $enforce is strict or unknown.
+		 * We know the global setting is the only setting to consider.
+		 */
+		$include = hgbp_get_global_activity_setting( $setting );
+	}
+
+	// Convert a yes, no or false to a boolean.
+	$include = ( 'yes' == $include ) ? true : false;
+
+	return apply_filters( 'hgbp_group_include_hierarchical_activity', $include, $group_id, $setting );
 }

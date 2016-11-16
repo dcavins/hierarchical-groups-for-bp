@@ -43,7 +43,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	 */
 	function settings_screen( $group_id = NULL ) {
 		?>
-		<label for="parent-id">Parent Group</label>
+		<label for="parent-id"><?php _ex( 'Parent Group', 'Label for the parent group select on a single group manage screen', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
 		$current_parent_group_id = hgbp_get_parent_group_id( $group_id );
 		$possible_parent_groups = hgbp_get_possible_parent_groups( $group_id, bp_loggedin_user_id() );

@@ -422,11 +422,11 @@ function hgbp_build_hierarchical_slug( $group_id = 0 ) {
  *
  * @return bool
  */
-function hgbp_get_activity_syndication_setting( $setting = 'up' ) {
-	if ( $setting !== 'up' ) {
-		$setting = 'down';
+function hgbp_get_global_activity_setting( $setting = 'children' ) {
+	if ( $setting !== 'children' ) {
+		$setting = 'parents';
 	}
-	return (bool) get_option( "hgbp-syndicate-activity-{$setting}" );
+	return (bool) get_option( "hgbp-include-activity-from-{$setting}" );
 }
 
 /**
@@ -434,14 +434,18 @@ function hgbp_get_activity_syndication_setting( $setting = 'up' ) {
  *
  * @since 1.0.0
  *
+ * @param string $setting Which direction to check.
+ *
  * @return string Level of enforcement for overriding the default settings.
  */
-function hgbp_get_activity_syndication_enforce_setting( $setting = 'up' ) {
-	if ( $setting !== 'up' ) {
-		$setting = 'down';
+function hgbp_get_global_activity_enforce_setting( $setting = 'children' ) {
+	if ( $setting !== 'children' ) {
+		$setting = 'parents';
 	}
-	$option = get_option( "hgbp-syndicate-activity-{$setting}-enforce" );
-	return hgbp_sanitize_syndication_enforce( $option );
+	$option = get_option( "hgbp-include-activity-from-{$setting}-enforce" );
+	return hgbp_sanitize_group_setting_enforce( $option );
+}
+
 }
 
 /**
@@ -451,7 +455,7 @@ function hgbp_get_activity_syndication_enforce_setting( $setting = 'up' ) {
  *
  * @return string Level of enforcement for overriding the default settings.
  */
-function hgbp_sanitize_syndication_enforce( $value ) {
+function hgbp_sanitize_group_setting_enforce( $value ) {
 	$valid_enforce = array( 'group-admins', 'site-admins', 'strict' );
 	if ( ! in_array( $value, $valid_enforce, true ) ) {
 		$value = 'group-admins';

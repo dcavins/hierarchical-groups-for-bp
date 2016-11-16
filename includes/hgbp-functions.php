@@ -176,10 +176,12 @@ function hgbp_group_has_children( $group_id = false, $user_id = false ) {
  *
  * @param  int   $group_id ID of the group.
  * @param  int   $user_id  ID of a user to check group visibility for.
+ * @param  string $context  'normal' filters hidden groups only; 'activity' includes
+ *                          only groups for which the user should see the activity streams.
  *
  * @return array Array of group objects.
  */
-function hgbp_get_descendent_groups( $group_id = false, $user_id = false ) {
+function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $context = 'normal' ) {
 	/*
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
@@ -193,10 +195,10 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false ) {
 	}
 
 	// Check the cache first.
-	$cache_key   = 'descendants_of_' . $group_id;
-	$descendants = bp_core_get_incremented_cache( $cache_key, 'hgbp' );
+	$cache_key      = 'descendants_of_' . $group_id;
+	$descendant_ids = bp_core_get_incremented_cache( $cache_key, 'hgbp' );
 
-	if ( false === $descendants ) {
+	if ( false === $descendant_ids ) {
 		// Start from the group specified.
 		$parents = array( $group_id );
 		$descendants = array();
@@ -217,22 +219,39 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false ) {
 			$parents = wp_list_pluck( $children['groups'], 'id' );
 		}
 
-		// Set the cache to avoid duplicate requests.
-		bp_core_set_incremented_cache( $cache_key, 'hgbp', $descendants );
+		// Save the IDs to the cache to avoid duplicate requests.
+		$descendant_ids = wp_list_pluck( $descendants, 'id' );
+		bp_core_set_incremented_cache( $cache_key, 'hgbp', $descendant_ids );
 	}
 
+	// Prepare the return set.
+	$groups = array();
 	// If a user ID has been specified, we filter hidden groups accordingly.
-	if ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) ) {
-		foreach ( $descendants as $k => $group ) {
-			// Check whether the user should be able to see this group.
+	$run_filters = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) );
+
+	foreach ( $descendant_ids as $group_id ) {
+		// Check whether the user should be able to see this group.
+		$group = groups_get_group( $group_id );
+
+		if ( $run_filters ) {
 			// @TODO: Use group capabilities for this when possible.
-			if ( 'hidden' == $group->status && ! groups_is_user_member( $user_id, $group->id ) ) {
-				unset( $descendants[$k] );
+			if ( 'activity' == $context ) {
+				// For activity stream inclusion, require public status or membership.
+				if ( 'public' == $group->status || groups_is_user_member( $user_id, $group->id ) ) {
+					$groups[$group_id] = $group;
+				}
+			} else {
+				// For unspecified uses, hide hidden groups.
+				if ( 'hidden' != $group->status || groups_is_user_member( $user_id, $group->id ) ) {
+					$groups[$group_id] = $group;
+				}
 			}
+		} else {
+			$groups[$group_id] = $group;
 		}
 	}
 
-	return $descendants;
+	return $groups;
 }
 
 /**
@@ -244,12 +263,14 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false ) {
  *
  * @since 1.0.0
  *
- * @param  int   $group_id ID of the group.
- * @param  int   $user_id  ID of a user to check group visibility for.
+ * @param  int    $group_id ID of the group.
+ * @param  int    $user_id  ID of a user to check group visibility for.
+ * @param  string $context  'normal' filters hidden groups only; 'activity' includes
+ *                          only groups for which the user should see the activity streams.
  *
  * @return int ID of parent group.
  */
-function hgbp_get_parent_group_id( $group_id = false, $user_id = false ) {
+function hgbp_get_parent_group_id( $group_id = false, $user_id = false, $context = 'normal' ) {
 	/*
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
@@ -269,9 +290,18 @@ function hgbp_get_parent_group_id( $group_id = false, $user_id = false ) {
 	// @TODO: This could make use of group visibility when available.
 	if ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) ) {
 		$parent_group = groups_get_group( $parent_id );
-		if ( 'hidden' == $parent_group->status && ! groups_is_user_member( $user_id, $parent_group->id ) ) {
-			// If the group is not visible to the user, break the chain.
-			$parent_id = 0;
+		if ( 'activity' == $context ) {
+			// For activity stream inclusion, require public status or membership.
+			if ( 'public' != $parent_group->status && ! groups_is_user_member( $user_id, $parent_group->id ) ) {
+				// If the group's activity stream is not visible to the user, break the chain.
+				$parent_id = 0;
+			}
+		} else {
+			// For unspecified uses, hide hidden groups.
+			if ( 'hidden' == $parent_group->status && ! groups_is_user_member( $user_id, $parent_group->id ) ) {
+				// If the group is not visible to the user, break the chain.
+				$parent_id = 0;
+			}
 		}
 	}
 
@@ -291,10 +321,12 @@ function hgbp_get_parent_group_id( $group_id = false, $user_id = false ) {
  *
  * @param  int   $group_id ID of the group.
  * @param  int   $user_id  ID of a user to check group visibility for.
+ * @param  string $context  'normal' filters hidden groups only; 'activity' includes
+ *                          only groups for which the user should see the activity streams.
  *
- * @return array Array of group objects.
+ * @return array Array of group IDs.
  */
-function hgbp_get_ancestor_group_ids( $group_id = false, $user_id = false ) {
+function hgbp_get_ancestor_group_ids( $group_id = false, $user_id = false, $context = 'normal' ) {
 	/*
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
@@ -311,7 +343,7 @@ function hgbp_get_ancestor_group_ids( $group_id = false, $user_id = false ) {
 
 	// We work up the tree until no new parent is found.
 	while ( $group_id ) {
-		$parent_group_id = hgbp_get_parent_group_id( $group_id, $user_id );
+		$parent_group_id = hgbp_get_parent_group_id( $group_id, $user_id, $context );
 		if ( $parent_group_id ) {
 			$ancestors[] = $parent_group_id;
 		}

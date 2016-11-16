@@ -94,6 +94,8 @@ class HGBP_Public {
 		 * but before BP Groups Component sets the current group, action and variables.
 		 */
 		add_action( 'bp_groups_setup_globals', array( $this, 'reset_action_variables' ) );
+
+		add_filter( 'bp_user_can', array( $this, 'check_user_caps' ), 10, 5 );
 	}
 
 	/**
@@ -302,6 +304,57 @@ class HGBP_Public {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Check for user capabilities specific to this plugin.
+	 *
+	 * @since 1.0.0
+	 *
+ 	 * @param bool   $retval     Whether or not the current user has the capability.
+	 * @param int    $user_id
+	 * @param string $capability The capability being checked for.
+	 * @param int    $site_id    Site ID. Defaults to the BP root blog.
+	 * @param array  $args       Array of extra arguments passed.
+	 *
+	 * @return bool
+	 */
+	public function check_user_caps( $retval, $user_id, $capability, $site_id, $args ) {
+		$hgbp_caps = array(
+			'hgbp_change_include_activity_from_parents',
+			'hgbp_change_include_activity_from_children'
+		);
+		if ( in_array( $capability, $hgbp_caps ) ) {
+
+			$global_setting = 'group-admins';
+			if ( $capability == 'hgbp_change_include_activity_from_parents' ) {
+				$global_setting = hgbp_get_global_activity_enforce_setting( 'parents' );
+			} elseif ( $capability == 'hgbp_change_include_activity_from_children' ) {
+				$global_setting = hgbp_get_global_activity_enforce_setting( 'children' );
+			}
+
+			$retval = false;
+			switch ( $global_setting ) {
+				case 'site-admins':
+					if ( bp_user_can( $user_id, 'bp_moderate' ) ) {
+						$retval = true;
+					}
+					break;
+				case 'group-admins':
+					if ( bp_user_can( $user_id, 'bp_moderate' )
+						 || groups_is_user_admin( $user_id, bp_get_current_group_id() ) ) {
+						$retval = true;
+					}
+					break;
+				case 'strict':
+				default:
+					$retval = false;
+					break;
+			}
+
+		}
+
+		return $retval;
 	}
 
 }

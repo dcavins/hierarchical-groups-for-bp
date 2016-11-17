@@ -78,6 +78,8 @@ class HGBP_Public {
 
 		// Potentially override the groups loop template.
 		add_filter( 'bp_get_template_part', array( $this, 'filter_groups_loop_template'), 10, 3 );
+			// Add hierarchically related activity to group activity streams.
+		add_filter( 'bp_after_has_groups_parse_args', array( $this, 'filter_has_groups_args' ) );
 
 		// Save a group's allowed_subgroup_creators setting as group metadata.
 		add_action( 'groups_group_settings_edited', array( $this, 'save_allowed_subgroups_creators' ) );
@@ -167,9 +169,9 @@ class HGBP_Public {
 	 * @return array $templates
 	 */
 	public function filter_groups_loop_template( $templates, $slug, $name ) {
-		if ( 'groups/groups-loop' == $slug ) {
-			// if ( $setting for use the tree loop ){}
+		if ( 'groups/groups-loop' == $slug && hgbp_get_global_directory_setting() ) {
 			// If ( not searching or applying other filters ) {}
+
 			// Add our setting to the front of the array.
 			array_unshift( $templates, 'groups/groups-loop-tree.php' );
 		}
@@ -369,10 +371,9 @@ class HGBP_Public {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $query_string Current query string.
-	 * @param string $object       Current template component.
+	 * @param $args Array of parsed arguments.
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function add_activity_aggregation( $args ) {
 

@@ -503,6 +503,17 @@ function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
 }
 
 /**
+ * Fetch and parse the saved global settings.
+ *
+ * @since 1.0.0
+ *
+ * @return bool Which members of a group are allowed to associate subgroups with it.
+ */
+function hgbp_get_global_directory_setting() {
+	return (bool) get_option( 'hgbp-groups-directory-show-tree' );
+}
+
+/**
  * Filter the syndication enforcement setting against a whitelist.
  *
  * @since 1.0.0

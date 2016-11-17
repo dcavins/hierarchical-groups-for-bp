@@ -76,6 +76,9 @@ class HGBP_Public {
 		// Add our templates to BuddyPress' template stack.
 		add_filter( 'bp_get_template_stack', array( $this, 'add_template_stack'), 10, 1 );
 
+		// Potentially override the groups loop template.
+		add_filter( 'bp_get_template_part', array( $this, 'filter_groups_loop_template'), 10, 3 );
+
 		// Save a group's allowed_subgroup_creators setting as group metadata.
 		add_action( 'groups_group_settings_edited', array( $this, 'save_allowed_subgroups_creators' ) );
 		add_action( 'bp_group_admin_edit_after',    array( $this, 'save_allowed_subgroups_creators' ) );
@@ -149,6 +152,28 @@ class HGBP_Public {
 		if ( bp_is_current_component( 'groups' ) ) {
 			$templates[] = plugin_dir_path( __FILE__ ) . 'views/templates';
 		}
+		return $templates;
+	}
+
+	/**
+	 * Potentially override the groups loop template.
+	 *
+	 * @since    1.0.0
+	 *
+	 * @param array  $templates Array of templates located.
+	 * @param string $slug      Template part slug requested.
+	 * @param string $name      Template part name requested.
+	 *
+	 * @return array $templates
+	 */
+	public function filter_groups_loop_template( $templates, $slug, $name ) {
+		if ( 'groups/groups-loop' == $slug ) {
+			// if ( $setting for use the tree loop ){}
+			// If ( not searching or applying other filters ) {}
+			// Add our setting to the front of the array.
+			array_unshift( $templates, 'groups/groups-loop-tree.php' );
+		}
+
 		return $templates;
 	}
 

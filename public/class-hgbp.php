@@ -83,9 +83,6 @@ class HGBP_Public {
 		// Save a group's allowed_subgroup_creators setting from the create group screen.
 		add_action( 'groups_create_group_step_save_group-settings', array( $this, 'save_allowed_subgroups_creators_create_step' ) );
 
-		// Determine whether a specific user can create a subgroup of a particular group.
-		add_filter( 'bp_user_can', array( $this, 'user_can_create_subgroups' ), 10, 5 );
-
 		// Modify group permalinks to reflect hierarchy
 		add_filter( 'bp_get_group_permalink', array( $this, 'make_permalink_hierarchical' ), 10, 2 );
 
@@ -95,8 +92,10 @@ class HGBP_Public {
 		 */
 		add_action( 'bp_groups_setup_globals', array( $this, 'reset_action_variables' ) );
 
+		// Filter user capabilities.
 		add_filter( 'bp_user_can', array( $this, 'check_user_caps' ), 10, 5 );
 
+		// Add hierarchically related activity to group activity streams.
 		add_filter( 'bp_after_has_activities_parse_args', array( $this, 'add_activity_aggregation' ) );
 	}
 
@@ -197,62 +196,6 @@ class HGBP_Public {
 		$this->save_allowed_subgroups_creators( $group_id );
 	}
 
-
-	/**
-	 * Determine whether a specific user can create a subgroup of a particular group.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param bool   $retval     Whether or not the current user has the capability.
-	 * @param int    $user_id    ID of user to check.
-	 * @param string $capability The capability being checked for.
-	 * @param int    $site_id    Site ID. Defaults to the BP root blog.
-	 * @param array  $args       Array of extra arguments passed.
-	 *
-	 * @return bool
-	 */
-	public function user_can_create_subgroups( $retval, $user_id, $capability, $site_id, $args ) {
-		if ( 'create_subgroups' != $capability ) {
-			return $retval;
-		}
-
-		// If group creation is restricted, respect that setting.
-		if ( bp_restrict_group_creation() && ! bp_user_can( $user_id, 'bp_moderate' ) ) {
-			return false;
-		}
-
-		// We need to know which group is in question.
-		if ( empty( $args['group_id'] ) ) {
-			return false;
-		}
-		$group_id = (int) $args['group_id'];
-
-		// Possible settings for the group meta setting 'allowed_subgroup_creators'
-		$creator_setting = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
-		switch ( $creator_setting ) {
-			case 'admin' :
-				$retval = groups_is_user_admin( $user_id, $group_id );
-				break;
-
-			case 'mod' :
-				$retval = ( groups_is_user_mod( $user_id, $group_id ) ||
-							groups_is_user_admin( $user_id, $group_id ) );
-				break;
-
-			case 'member' :
-				$retval = groups_is_user_member( $user_id, $group_id );
-				break;
-
-			case 'noone' :
-			default :
-				// @TODO: This seems weird, but I can imagine situations where only site admins should be able to associate groups.
-				$retval = bp_user_can( $user_id, 'bp_moderate' );
-				break;
-		}
-
-		return $retval;
-	}
-
 	/**
 	 * Filter a child group's permalink to take the form
 	 * /groups/parent-group/child-group.
@@ -322,11 +265,11 @@ class HGBP_Public {
 	 * @return bool
 	 */
 	public function check_user_caps( $retval, $user_id, $capability, $site_id, $args ) {
-		$hgbp_caps = array(
+		$activity_caps = array(
 			'hgbp_change_include_activity_from_parents',
 			'hgbp_change_include_activity_from_children'
 		);
-		if ( in_array( $capability, $hgbp_caps ) ) {
+		if ( in_array( $capability, $activity_caps ) ) {
 
 			$global_setting = 'group-admins';
 			if ( $capability == 'hgbp_change_include_activity_from_parents' ) {
@@ -356,6 +299,42 @@ class HGBP_Public {
 
 		}
 
+		if ( 'create_subgroups' == $capability ) {
+			// If group creation is restricted, respect that setting.
+			if ( bp_restrict_group_creation() && ! bp_user_can( $user_id, 'bp_moderate' ) ) {
+				return false;
+			}
+
+			// We need to know which group is in question.
+			if ( empty( $args['group_id'] ) ) {
+				return false;
+			}
+			$group_id = (int) $args['group_id'];
+
+			// Possible settings for the group meta setting 'allowed_subgroup_creators'
+			$creator_setting = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
+			switch ( $creator_setting ) {
+				case 'admin' :
+					$retval = groups_is_user_admin( $user_id, $group_id );
+					break;
+
+				case 'mod' :
+					$retval = ( groups_is_user_mod( $user_id, $group_id ) ||
+								groups_is_user_admin( $user_id, $group_id ) );
+					break;
+
+				case 'member' :
+					$retval = groups_is_user_member( $user_id, $group_id );
+					break;
+
+				case 'noone' :
+				default :
+					// @TODO: This seems weird, but I can imagine situations where only site admins should be able to associate groups.
+					$retval = bp_user_can( $user_id, 'bp_moderate' );
+					break;
+			}
+		}
+
 		return $retval;
 	}
 
@@ -365,7 +344,7 @@ class HGBP_Public {
 	 *
 	 * @since 1.0.0
 	 *
- 	 * @param string $query_string Current query string.
+	 * @param string $query_string Current query string.
 	 * @param string $object       Current template component.
 	 *
 	 * @return string

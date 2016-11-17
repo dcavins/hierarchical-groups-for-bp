@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 			},
 			styles: {
 				files: ['public/less/*.less'],
-				tasks: ['less:cleancss', 'autoprefixer']
+				tasks: ['less:convertcss', 'postcss']
 			}
 		},
 

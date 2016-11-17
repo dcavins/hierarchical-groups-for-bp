@@ -97,7 +97,7 @@ class HGBP_Public {
 
 		add_filter( 'bp_user_can', array( $this, 'check_user_caps' ), 10, 5 );
 
-		add_filter( 'bp_ajax_querystring', array( $this, 'activity_aggregation' ), 90, 2 );
+		add_filter( 'bp_after_has_activities_parse_args', array( $this, 'add_activity_aggregation' ) );
 	}
 
 	/**
@@ -360,7 +360,7 @@ class HGBP_Public {
 	}
 
 	/**
-	 * Filter bp_ajax_querystring to add hierarchically related groups of
+	 * Filter has_activities parameters to add hierarchically related groups of
 	 * the current group that user has access to.
 	 *
 	 * @since 1.0.0
@@ -370,10 +370,11 @@ class HGBP_Public {
 	 *
 	 * @return string
 	 */
-	public function activity_aggregation( $query_string, $object ) {
+	public function add_activity_aggregation( $args ) {
+
 		// Only fire on group activity streams.
-		if ( ! bp_is_group() || $object != 'activity' ) {
-			return $query_string;
+		if ( $args['object'] != 'groups' ) {
+			return $args;
 		}
 
 		$group_id = bp_get_current_group_id();
@@ -383,7 +384,7 @@ class HGBP_Public {
 		$include_parent_activity = hgbp_group_include_hierarchical_activity( $group_id, 'parents' );
 
 		if ( ! $include_child_activity && ! $include_parent_activity ) {
-			return $query_string;
+			return $args;
 		}
 
 		$include = array( $group_id );
@@ -399,10 +400,10 @@ class HGBP_Public {
 		}
 
 		if ( ! empty( $include ) ) {
-			$query_string .= '&primary_id=' . implode( ',', $include );
+			$args['primary_id'] = $include;
 		}
 
-		return $query_string;
+		return $args;
 	}
 
 }

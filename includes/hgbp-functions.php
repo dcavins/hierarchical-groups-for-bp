@@ -17,7 +17,7 @@
  *
  * @return bool True if the current page is a group's directory of subgroups.
  */
-function hgbp_is_group_subgroups() {
+function hgbp_is_hierarchy_screen() {
 	$screen_slug = hgbp_get_subgroups_screen_slug();
 	return (bool) ( bp_is_groups_component() && bp_is_current_action( $screen_slug ) );
 }

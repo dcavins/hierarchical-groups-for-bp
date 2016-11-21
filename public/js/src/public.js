@@ -10,26 +10,25 @@
 		 */
 		$( '#buddypress' ).on( 'click', '.toggle-child-groups', function( e ) {
 			e.preventDefault();
-			console.log( 'about to fire toggle' );
-			toggle_child_groups( $( this ) );
-			$( this ).closest( '.child-groups-container' ).toggleClass( 'open' );
+
+			// Show or hide the child groups div.
+			toggle_results_pane( $( this ) );
+
+			// Send for the results.
+			fetch_child_groups( $( this ) );
 		} );
 	} );
 
 	/**
-	 * Fetch the first set of results in a folder,
-	 * if the folder isn't already populated.
+	 * Fetch the child groups of a group,
+	 * if the container isn't already populated.
 	 */
-	function toggle_child_groups( anchor ) {
-		var container = $( anchor ).closest( '.child-groups-container' ),
-			target = container.find( '.child-groups' ),
+	function fetch_child_groups( anchor ) {
+		var target = anchor.closest( '.child-groups-container' ).find( '.child-groups' ).first(),
 			length = $.trim( target.text() ).length;
-
-		console.log( container );
 
 		// If the folder content has already been populated, do nothing.
 		if ( length ) {
-			console.log( length );
 			return;
 		}
 
@@ -38,36 +37,46 @@
 			return;
 		}
 		fetching_child_groups = true;
-		container.addClass( 'loading' );
-			console.log( 'about to send ajax' );
+		target.addClass( 'loading' );
 
 		// Make the AJAX request and populate the list.
-		$.ajax( {
+		$.ajax({
 			url: ajaxurl,
 			type: 'GET',
 			data: {
-				group_id: $( anchor ).data( 'group-id' ),
+				parent_id: anchor.data( 'group-id' ),
 				action: 'hgbp_get_child_groups',
 			},
 			success: function( response ) {
 				console.log( 'runnning success' );
 				$( target ).html( response );
-				fetching_child_groups = false;
-				container.removeClass( 'loading' );
 			},
 			error: function( response ) {
 				console.log( 'runnning error' );
-				fetching_child_groups = false;
-				container.removeClass( 'loading' );
-			},
-			done: function( response ) {
+			}
+		})
+		.done( function( response ) {
 				console.log( 'runnning done' );
 				fetching_child_groups = false;
-				container.removeClass( 'loading' );
-			},
+				target.removeClass( 'loading' );
+		});
 
-		} );
+	}
 
+	/**
+	 * Toggle the child groups pane and indicators.
+	 */
+	function toggle_results_pane( anchor ) {
+		// Toggle the class.
+		anchor.siblings( ".child-groups" ).toggleClass( "open" );
+		anchor.toggleClass( "open" );
+
+		// Update the aria-expanded atribute on the related control.
+		if ( anchor.siblings( ".child-groups" ).hasClass( "open" ) ) {
+			anchor.attr( "aria-expanded", true );
+		} else {
+			anchor.attr( "aria-expanded", false );
+		}
 	}
 
 }(jQuery));

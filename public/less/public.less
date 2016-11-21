@@ -1,10 +1,65 @@
 /* This stylesheet is used to style the public-facing components of the plugin. */
 @import "less-mixins";
+@font-face {
+    font-family: 'Genericons';
+    src: url('font/genericons-regular-webfont.eot');
+    src: url('font/genericons-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('font/genericons-regular-webfont.woff') format('woff'),
+         url('font/genericons-regular-webfont.ttf') format('truetype'),
+         url('font/genericons-regular-webfont.svg#genericonsregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
 
+}
 .some-cool-class {
 	.font-size(4);
 }
 
+// Override some BuddyPress styles.
+#buddypress ul.item-list li {
+	// padding-left: 26px;
+	&.has-children {
+		// background-color: #FAB;
+		// &:before {
+		// 	content: '\f431'; //f432 is collapse.
+		// 	display: block;
+		// 	-webkit-font-smoothing: antialiased;
+		// 	font: normal 16px/1 'Genericons';
+		// 	vertical-align: top;
+		// 	margin-left: -26px;
+		// 	margin-top: 18px;
+		// 	float: left;
+		// }
+	}
+	.child-groups-container {
+		clear: both;
+		overflow: auto;
+		width: 100%;
+		&.open {
+			.toggle-child-groups:before {
+				transform: rotate(0deg);
+			}
+		}
+	}
+	.toggle-child-groups {
+		display: block;
+		width: 100%;
+	}
+	.toggle-child-groups:before {
+		content: "";
+	    position: relative;
+		display: inline-block;
+	    vertical-align: middle;
+	    width: 16px;
+	    height: 16px;
+	    margin-right: .25em;
+	    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='#231F20' d='M8 12.7L1.3 6l1.4-1.4L8 9.9l5.3-5.3L14.7 6'/%3E%3C/svg%3E");
+	    // background-color: #EEE;
+	    background-size: contain;
+	    transition: transform 0.25s linear;
+	    transform: rotate(-90deg);
+	}
+}
 @media screen and (min-width:600px), print {
 }
 @media screen and (min-width:768px), print {

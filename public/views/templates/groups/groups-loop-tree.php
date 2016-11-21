@@ -53,7 +53,9 @@ do_action( 'bp_before_groups_loop' ); ?>
 	<ul id="groups-list" class="item-list" aria-live="assertive" aria-atomic="true" aria-relevant="all">
 
 	<?php while ( bp_groups() ) : bp_the_group(); ?>
-
+		<?php
+		$has_children = hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id() );
+		?>
 		<li <?php bp_group_class(); ?>>
 			<?php if ( ! bp_disable_group_avatar_uploads() ) : ?>
 				<div class="item-avatar">
@@ -96,6 +98,13 @@ do_action( 'bp_before_groups_loop' ); ?>
 				</div>
 
 			</div>
+
+			<?php if ( hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id() ) ) : ?>
+				<div class="child-groups-container">
+					<a href="<?php echo bp_get_group_permalink() . hgbp_get_subgroups_screen_slug(); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>"><?php _e( 'Show child groups', 'hierarchical-groups-for-bp' ); ?></a>
+					<div class="child-groups"></div>
+				</div>
+			<?php endif; ?>
 
 			<div class="clear"></div>
 		</li>

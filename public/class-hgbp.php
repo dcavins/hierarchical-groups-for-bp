@@ -71,7 +71,7 @@ class HGBP_Public {
 		add_action( 'bp_groups_delete_group', array( $this, 'reset_cache_incrementor' ) );
 
 		// Load public-facing style sheet and JavaScript.
-		// add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles_scripts' ) );
 
 		// Add our templates to BuddyPress' template stack.
 		add_filter( 'bp_get_template_stack', array( $this, 'add_template_stack'), 10, 1 );
@@ -80,6 +80,7 @@ class HGBP_Public {
 		add_filter( 'bp_get_template_part', array( $this, 'filter_groups_loop_template'), 10, 3 );
 			// Add hierarchically related activity to group activity streams.
 		add_filter( 'bp_after_has_groups_parse_args', array( $this, 'filter_has_groups_args' ) );
+		add_filter( 'bp_get_group_class', array( $this, 'filter_group_classes' ) );
 
 		// Save a group's allowed_subgroup_creators setting as group metadata.
 		add_action( 'groups_group_settings_edited', array( $this, 'save_allowed_subgroups_creators' ) );
@@ -102,6 +103,10 @@ class HGBP_Public {
 
 		// Add hierarchically related activity to group activity streams.
 		add_filter( 'bp_after_has_activities_parse_args', array( $this, 'add_activity_aggregation' ) );
+
+		// Handle AJAX requests for subgroups
+		add_action( 'wp_ajax_hgbp_get_child_groups', array( $this, 'ajax_subgroups_response_cb' ) );
+		add_action( 'wp_ajax_nopriv_hgbp_get_child_groups', array( $this, 'ajax_subgroups_response_cb' ) );
 	}
 
 	/**
@@ -177,6 +182,49 @@ class HGBP_Public {
 		}
 
 		return $templates;
+	}
+
+	/**
+	 * Filter has_groups parameters to change results for groups directory.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param $args Array of parsed arguments.
+	 *
+	 * @return array
+ 	 */
+	public function filter_has_groups_args( $args ) {
+		if ( hgbp_get_global_directory_setting() ) {
+			// Don't filter if search is active.
+			// @TODO: Don't filter if orderby?
+			if ( ! isset( $args['parent_id'] ) && empty( $args['search_terms'] ) ) {
+				$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? intval( $_REQUEST['parent_id'] ) : 0;
+				// $args['parent_id'] = isset( $_GET['parent_id'] ) ? intval( $_GET['parent_id'] ) : 0;
+			}
+			// $parent_id = isset( $_POST['parent_id'] ) ? intval( $_POST['parent_id'] ) : 0;
+			$towrite = PHP_EOL . 'args: ' . print_r( $args, TRUE );
+			// $towrite .= PHP_EOL . 'parent_id: ' . print_r( $parent_id, TRUE );
+			$fp = fopen('has_groups.txt', 'a');
+			fwrite($fp, $towrite);
+			fclose($fp);
+		}
+
+		return $args;
+	}
+	/**
+	 * Filter has_groups parameters to change results for groups directory.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $classes Array of determined classes for the group.
+	 *
+	 * @return array
+ 	 */
+	public function filter_group_classes( $classes ) {
+		if ( $has_children = hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id() ) ) {
+			$classes[] = 'has-children';
+		}
+		return $classes;
 	}
 
 	/**
@@ -411,4 +459,17 @@ class HGBP_Public {
 		return $args;
 	}
 
+	/**
+	 * Generate the subgroups response.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return html
+	 */
+	public function ajax_subgroups_response_cb() {
+		echo "yes, we hear you: ";
+		var_dump( $_REQUEST['group_id'] );
+		bp_locate_template( 'groups/single/subgroups-loop.php', true, true );
+		exit;
+	}
 }

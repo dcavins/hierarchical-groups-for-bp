@@ -8,10 +8,6 @@
  * @subpackage bp-legacy
  */
 
-?>
-IN the plugin!
-<?php
-
 /**
  * Fires before the display of groups from the groups loop.
  *

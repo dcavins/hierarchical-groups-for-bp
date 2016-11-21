@@ -32,7 +32,21 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	 * @since 1.0.0
 	 */
 	function display( $group_id = null ) {
+		global $groups_template;
+		$parent_groups_template = $groups_template;
+
+		/*
+		 * groups/single/subgroups-loop is a shell that calls groups-loop-tree,
+		 * to make it possible to override the subgroups loop using the
+		 * BuddyPress template hierarchy.
+		 */
 		bp_get_template_part( 'groups/single/subgroups-loop' );
+
+		/*
+		 * Reset the $groups_template global, so that the wrapper group
+		 * is restored after the has_groups() loop is completed.
+		 */
+		$groups_template = $parent_groups_template;
 	}
 
 	/**

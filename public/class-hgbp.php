@@ -460,16 +460,20 @@ class HGBP_Public {
 	}
 
 	/**
-	 * Generate the subgroups response.
+	 * Generate the response for the AJAX hgbp_get_child_groups action.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @return html
 	 */
 	public function ajax_subgroups_response_cb() {
-		echo "yes, we hear you: ";
-		var_dump( $_REQUEST['group_id'] );
-		bp_locate_template( 'groups/single/subgroups-loop.php', true, true );
+		// Within a single group, prefer the subgroups loop template.
+		if ( hgbp_is_hierarchy_screen() ) {
+			bp_get_template_part( 'groups/single/subgroups-loop' );
+		} else {
+			bp_get_template_part( 'groups/groups-loop-tree' );
+		}
+
 		exit;
 	}
 }

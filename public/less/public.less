@@ -3,9 +3,11 @@
 
 // Override some BuddyPress styles.
 #buddypress ul.item-list li {
+	// Subsequent lists need to flex their widths.
 	.item-list,
 	.pagination {
 		margin-left: 2%;
+		width: auto;
 	}
 	&.has-children {
 	}
@@ -15,7 +17,7 @@
 .child-groups-container {
 	clear: both;
 	overflow: auto;
-	width: 100%;
+	width: auto;
 }
 
 .toggle-child-groups {

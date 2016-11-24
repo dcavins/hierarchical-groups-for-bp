@@ -95,7 +95,7 @@ do_action( 'bp_before_groups_loop' ); ?>
 
 			</div>
 
-			<?php if ( hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id() ) ) : ?>
+			<?php if ( hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id(), 'directory' ) ) : ?>
 				<div class="child-groups-container">
 					<a href="<?php echo bp_get_group_permalink() . hgbp_get_subgroups_screen_slug(); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php _ex( 'Child groups', 'Label for the control on group directories that shows or hides the child groups.', 'hierarchical-groups-for-bp' ); ?></a>
 					<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>

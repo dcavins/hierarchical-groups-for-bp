@@ -53,12 +53,13 @@ function hgbp_get_subgroups_nav_item_name() {
  *
  * @since 1.0.0
  *
- * @param  int   $group_id ID of the group.
- * @param  int   $user_id  ID of a user to check group visibility for.
+ * @param int    $group_id ID of the group.
+ * @param int    $user_id  ID of a user to check group visibility for.
+ * @param string $context  Context can change what groups should be returned.
  *
  * @return array Array of group objects.
  */
-function hgbp_get_child_groups( $group_id = false, $user_id = false ) {
+function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 'normal' ) {
 	$retval = array();
 
 	/*
@@ -81,8 +82,13 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false ) {
 	foreach ( $child_ids as $child_id ) {
 		// The child groups will be built from the cache.
 		$child_group = groups_get_group( $child_id );
-		if ( $filter && 'hidden' == $child_group->status && ! groups_is_user_member( $user_id, $child_id ) ) {
-			continue;
+		if ( $filter && 'hidden' == $child_group->status ) {
+			// exclude_hidden is useful on directories, where hidden groups are excluded by BP.
+			if ( 'exclude_hidden' == $context  ) {
+				continue;
+			} elseif ( ! groups_is_user_member( $user_id, $child_id ) ) {
+				continue;
+			}
 		}
 		$retval[] = $child_group;
 	}
@@ -144,12 +150,14 @@ function hgbp_get_child_group_ids( $group_id = false ) {
  *
  * @since 1.0.0
  *
- * @param  int   $group_id ID of the group.
- * @param  int   $user_id  ID of a user to check group visibility for.
+ * @param int    $group_id ID of the group.
+ * @param int    $user_id  ID of a user to check group visibility for.
+ * @param string $context  Context can change what groups should be returned.
  *
  * @return bool True if true, false if not.
  */
-function hgbp_group_has_children( $group_id = false, $user_id = false ) {
+function hgbp_group_has_children( $group_id = false, $user_id = false, $context = 'normal' ) {
+
 	/*
 	 * Passing a group id of 0 finds all top-level groups, which could be
 	 * intentional. Try to find the current group only when the $group_id is false.
@@ -162,7 +170,24 @@ function hgbp_group_has_children( $group_id = false, $user_id = false ) {
 		}
 	}
 
-	$children = hgbp_get_child_groups( $group_id, $user_id );
+	// We may need to adjust the context, based on what kind of directory we're on.
+	if ( 'directory' == $context ) {
+		if ( bp_is_groups_directory() ) {
+			// If the directory is AJAX powered, we have to check cookies.
+			if ( isset( $_COOKIE['bp-groups-scope'] ) && 'personal' == $_COOKIE['bp-groups-scope'] ) {
+				// Hidden groups are included in this directory.
+				$context = 'normal';
+			} else {
+				// Hidden groups are not included here.
+				$context = 'exclude_hidden';
+			}
+		} elseif ( bp_is_user_groups() ) {
+			// Hidden groups are included in this directory.
+			$context = 'normal';
+		}
+	}
+
+	$children = hgbp_get_child_groups( $group_id, $user_id, $context );
 	return ! empty ( $children ) ? true : false;
 }
 
@@ -174,10 +199,12 @@ function hgbp_group_has_children( $group_id = false, $user_id = false ) {
  *
  * @since 1.0.0
  *
- * @param  int   $group_id ID of the group.
- * @param  int   $user_id  ID of a user to check group visibility for.
- * @param  string $context  'normal' filters hidden groups only; 'activity' includes
- *                          only groups for which the user should see the activity streams.
+ * @param int    $group_id ID of the group.
+ * @param int    $user_id  ID of a user to check group visibility for.
+ * @param string $context  'normal' filters hidden groups only that the user doesn't belong to.
+ *                         'activity' includes only groups for which the user should see
+ *                          the activity streams.
+ *                         'exclude_hidden' filters all hidden groups out (for directories).
  *
  * @return array Array of group objects.
  */
@@ -240,8 +267,13 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 				if ( 'public' == $group->status || groups_is_user_member( $user_id, $group->id ) ) {
 					$groups[$group_id] = $group;
 				}
+			} elseif ( 'exclude_hidden' == $context ) {
+				// For use on directories, hide all hidden groups.
+				if ( 'hidden' != $group->status ) {
+					$groups[$group_id] = $group;
+				}
 			} else {
-				// For unspecified uses, hide hidden groups.
+				// For unspecified uses, hide hidden groups that the user doesn't belong to.
 				if ( 'hidden' != $group->status || groups_is_user_member( $user_id, $group->id ) ) {
 					$groups[$group_id] = $group;
 				}
@@ -263,10 +295,10 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
  *
  * @since 1.0.0
  *
- * @param  int    $group_id ID of the group.
- * @param  int    $user_id  ID of a user to check group visibility for.
- * @param  string $context  'normal' filters hidden groups only; 'activity' includes
- *                          only groups for which the user should see the activity streams.
+ * @param int    $group_id ID of the group.
+ * @param int    $user_id  ID of a user to check group visibility for.
+ * @param string $context  'normal' filters hidden groups only; 'activity' includes
+ *                         only groups for which the user should see the activity streams.
  *
  * @return int ID of parent group.
  */

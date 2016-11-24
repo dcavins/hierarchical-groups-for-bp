@@ -249,7 +249,7 @@ class HGBP_Public {
 			 */
 			do_action( 'hgbp_using_flat_groups_directory' );
 
-		} elseif ( bp_is_groups_directory() ) {
+		} elseif ( bp_is_groups_directory() || bp_is_user_groups() ) {
 			$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? intval( $_REQUEST['parent_id'] ) : 0;
 
 		} elseif ( hgbp_is_hierarchy_screen() ) {

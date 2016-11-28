@@ -61,3 +61,31 @@ function hgbp_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) 
 		 */
 		return apply_filters( 'hgbp_get_group_permalink_breadcrumbs', $breadcrumbs, $group );
 	}
+
+/**
+ * Output the URL of the hierarchy page of the current group in the loop.
+ *
+ * @since 1.0.0
+ */
+function hgbp_group_hierarchy_permalink() {
+	echo hgbp_get_group_hierarchy_permalink();
+}
+	/**
+	 * Generate the URL of the hierarchy page of the current group in the loop.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object|bool $group Optional. Group object.
+	 *                           Default: current group in loop.
+	 * @return string
+	 */
+	function hgbp_get_group_hierarchy_permalink( $group = false ) {
+		global $groups_template;
+
+		if ( empty( $group ) ) {
+			$group =& $groups_template->group;
+		}
+
+		// Filter the slug via the 'hgbp_screen_slug' filter.
+		return trailingslashit( bp_get_group_permalink( $group ) . hgbp_get_hierarchy_screen_slug() );
+	}

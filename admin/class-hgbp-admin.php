@@ -49,9 +49,8 @@ class HGBP_Admin extends HGBP_Public {
 		// add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
 		// Add the options page and menu item.
-		// add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
 		add_action( bp_core_admin_hook(), array( $this, 'add_plugin_admin_menu' ), 99 );
-		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ), 99 );
+		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ) );
 
 		// Add an action link pointing to the options page.
 		// $plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_slug . '.php' );
@@ -124,50 +123,32 @@ class HGBP_Admin extends HGBP_Public {
 		add_settings_section(
 			'hgbp_activity_syndication',
 			__( 'Group Activity Propagation', 'hierarchical-groups-for-bp' ),
-			array( $this, 'activity_propagation_section_callback' ),
+			array( $this, 'activity_syndication_section_callback' ),
 			$this->plugin_slug
 		);
 
-		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-children', array( $this, 'sanitize_yes_no' ) );
+		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-relatives', 'hgbp_sanitize_include_setting' );
 		add_settings_field(
-			'hgbp-include-activity-from-children',
-			__( 'Include child group activity in parent group activity streams.', 'hierarchical-groups-for-bp' ),
-			array( $this, 'render_syndicate_activity_up' ),
+			'hgbp-include-activity-from-relatives',
+			__( 'Include related group activity in group activity streams.', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_include_activity_input' ),
 			$this->plugin_slug,
 			'hgbp_activity_syndication'
 		);
 
-		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-children-enforce', 'hgbp_sanitize_group_setting_enforce' );
+		register_setting( $this->plugin_slug, 'hgbp-include-activity-enforce', 'hgbp_sanitize_include_setting_enforce' );
 		add_settings_field(
-			'hgbp-include-activity-from-children-enforce',
-			__( 'Global setting enforcement: Upward syndication', 'hierarchical-groups-for-bp' ),
-			array( $this, 'render_syndicate_activity_up_enforce' ),
+			'hgbp-include-activity-enforce',
+			__( 'Who can override this setting for each group?', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_include_activity_enforce_input' ),
 			$this->plugin_slug,
 			'hgbp_activity_syndication'
 		);
 
-		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-parents', array( $this, 'sanitize_yes_no' ) );
-		add_settings_field(
-			'hgbp-include-activity-from-parents',
-			__( 'Include parent group activity in child group activity streams.', 'hierarchical-groups-for-bp' ),
-			array( $this, 'render_syndicate_activity_down' ),
-			$this->plugin_slug,
-			'hgbp_activity_syndication'
-		);
-
-		register_setting( $this->plugin_slug, 'hgbp-include-activity-from-parents-enforce', 'hgbp_sanitize_group_setting_enforce' );
-		add_settings_field(
-			'hgbp-include-activity-from-parents-enforce',
-			__( 'Global setting enforcement: Downward syndication', 'hierarchical-groups-for-bp' ),
-			array( $this, 'render_syndicate_activity_down_enforce' ),
-			$this->plugin_slug,
-			'hgbp_activity_syndication'
-		);
-
-		// Show groups directory as tree
+		// Setting for showing groups directory as tree.
 		add_settings_section(
 			'hgbp_use_tree_directory_template',
-			__( 'Show the main groups directory as a hierarchical tree.', 'hierarchical-groups-for-bp' ),
+			__( 'Show the groups directories as a hierarchical tree.', 'hierarchical-groups-for-bp' ),
 			array( $this, 'group_tree_section_callback' ),
 			$this->plugin_slug
 		);
@@ -187,7 +168,7 @@ class HGBP_Admin extends HGBP_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function activity_propagation_section_callback() {
+	public function activity_syndication_section_callback() {
 		_e( 'Hierarchy settings can be set per-group or globally. Set global defaults here. Note that users will not see activity from groups they cannot visit.', 'hierarchical-groups-for-bp' );
 	}
 
@@ -196,12 +177,17 @@ class HGBP_Admin extends HGBP_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function render_syndicate_activity_up() {
-		$setting  = hgbp_get_global_activity_setting( 'children' );
-		$selected = ( $setting == 'yes' ) ? true : false;
+	public function render_include_activity_input() {
+		$setting  = hgbp_get_global_activity_setting();
 		?>
-		<label for="syndicate-activity-up-yes"><input type="radio" id="syndicate-activity-up-yes" name="hgbp-include-activity-from-children" value="yes"<?php checked( 'yes', $selected ); ?>> <?php _ex( 'Yes', 'Affirmative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="syndicate-activity-up-no"><input type="radio" id="syndicate-activity-up-no" name="hgbp-include-activity-from-children" value="no"<?php checked( false, $selected ); ?>> <?php _ex( 'No', 'Negative response for include child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="include-activity-from-parents"><input type="radio" id="include-activity-from-parents" name="hgbp-include-activity-from-relatives" value="include-from-parents"<?php checked( 'include-from-parents', $setting ); ?>> <?php _e( '<strong>Include parent group activity</strong> in every group activity stream.', 'hierarchical-groups-for-bp' ); ?></label>
+
+		<label for="include-activity-from-children"><input type="radio" id="include-activity-from-children" name="hgbp-include-activity-from-relatives" value="include-from-children"<?php checked( 'include-from-children', $setting ); ?>> <?php _e( '<strong>Include child group activity</strong> in every group activity stream.', 'hierarchical-groups-for-bp' ); ?></label>
+
+		<label for="include-activity-from-both"><input type="radio" id="include-activity-from-both" name="hgbp-include-activity-from-relatives" value="include-from-both"<?php checked( 'include-from-both', $setting ); ?>> <?php _e( '<strong>Include parent and child group activity</strong> in every group activity stream.', 'hierarchical-groups-for-bp' ); ?></label>
+
+		<label for="include-activity-from-none"><input type="radio" id="include-activity-from-none" name="hgbp-include-activity-from-relatives" value="include-from-none"<?php checked( 'include-from-none', $setting ); ?>> <?php _e( '<strong>Do not include related group activity</strong> in any group activity stream.', 'hierarchical-groups-for-bp' ); ?></label>
+
 		<?php
 	}
 
@@ -210,40 +196,14 @@ class HGBP_Admin extends HGBP_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function render_syndicate_activity_up_enforce() {
-		$setting = hgbp_get_global_activity_enforce_setting( 'children' );
+	public function render_include_activity_enforce_input() {
+		$setting = hgbp_get_global_activity_enforce_setting();
 		?>
-		<label for="hgbp-include-activity-from-children-enforce-group-admins"><input type="radio" id="hgbp-include-activity-from-children-enforce-group-admins" name="hgbp-include-activity-from-children-enforce" value="group-admins"<?php checked( 'group-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by group admins.', 'Response for allow overrides of child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="hgbp-include-activity-from-children-enforce-site-admins"><input type="radio" id="hgbp-include-activity-from-children-enforce-site-admins" name="hgbp-include-activity-from-children-enforce" value="site-admins"<?php checked( 'site-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by site admins.', 'Response for allow overrides of child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="hgbp-include-activity-from-children-enforce-strict"><input type="radio" id="hgbp-include-activity-from-children-enforce-strict" name="hgbp-include-activity-from-children-enforce" value="strict"<?php checked( 'strict', $setting ); ?>> <?php _ex( 'Enforce setting for all groups.', 'Response for allow overrides of child group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<?php
-	}
+		<label for="hgbp-include-activity-enforce-group-admins"><input type="radio" id="hgbp-include-activity-enforce-group-admins" name="hgbp-include-activity-enforce" value="group-admins"<?php checked( 'group-admins', $setting ); ?>> <?php _ex( '<strong>Group administrators</strong> can choose a setting for their group.', 'Response for allow overrides of include group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
 
-	/**
-	 * Set up the fields for the global settings screen.
-	 *
-	 * @since    1.0.0
-	 */
-	public function render_syndicate_activity_down() {
-		$setting = hgbp_get_global_activity_setting( 'parents' );
-		$selected = ( $setting == 'yes' ) ? true : false;
-		?>
-		<label for="hgbp-include-activity-from-parents-yes"><input type="radio" id="hgbp-include-activity-from-parents-yes" name="hgbp-include-activity-from-parents" value="yes"<?php checked( true, $selected ); ?>> <?php _ex( 'Yes', 'Affirmative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="hgbp-include-activity-from-parents-no"><input type="radio" id="hgbp-include-activity-from-parents-no" name="hgbp-include-activity-from-parents" value="no"<?php checked( false, $selected ); ?>> <?php _ex( 'No', 'Negative response for include parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<?php
-	}
+		<label for="hgbp-include-activity-enforce-site-admins"><input type="radio" id="hgbp-include-activity-enforce-site-admins" name="hgbp-include-activity-enforce" value="site-admins"<?php checked( 'site-admins', $setting ); ?>> <?php _ex( '<strong>Site administrators</strong> can choose a setting for each group.', 'Response for allow overrides of include group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
 
-	/**
-	 * Set up the fields for the global settings screen.
-	 *
-	 * @since    1.0.0
-	 */
-	public function render_syndicate_activity_down_enforce() {
-		$setting = hgbp_get_global_activity_enforce_setting( 'parents' );
-		?>
-		<label for="hgbp-include-activity-from-parents-enforce-group-admins"><input type="radio" id="hgbp-include-activity-from-parents-enforce-group-admins" name="hgbp-include-activity-from-parents-enforce" value="group-admins"<?php checked( 'group-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by group admins.', 'Response for allow overrides of parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="hgbp-include-activity-from-parents-enforce-site-admins"><input type="radio" id="hgbp-include-activity-from-parents-enforce-site-admins" name="hgbp-include-activity-from-parents-enforce" value="site-admins"<?php checked( 'site-admins', $setting ); ?>> <?php _ex( 'Allow setting to be overriden by site admins.', 'Response for allow overrides of parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
-		<label for="hgbp-include-activity-from-parents-enforce-strict"><input type="radio" id="hgbp-include-activity-from-parents-enforce-strict" name="hgbp-include-activity-from-parents-enforce" value="strict"<?php checked( 'strict', $setting ); ?>> <?php _ex( 'Enforce setting for all groups.', 'Response for allow overrides of parent group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="hgbp-include-activity-enforce-strict"><input type="radio" id="hgbp-include-activity-enforce-strict" name="hgbp-include-activity-enforce" value="strict"<?php checked( 'strict', $setting ); ?>> <?php _ex( '<strong>Enforce global setting</strong> for all groups.', 'Response for allow overrides of include group activity global setting', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
 	}
 
@@ -260,7 +220,7 @@ class HGBP_Admin extends HGBP_Public {
 	 * @since    1.0.0
 	 */
 	public function render_groups_directory_show_tree() {
-		$setting = hgbp_get_global_directory_setting();
+		$setting = hgbp_get_directory_as_tree_setting();
 		?>
 		<label for="hgbp-groups-directory-show-tree"><input type="checkbox" id="hgbp-groups-directory-show-tree" name="hgbp-groups-directory-show-tree" value="1"<?php checked( $setting ); ?>> <?php _ex( 'Show a hierarchical directory.', 'Response for use directory tree global setting', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
@@ -284,18 +244,6 @@ class HGBP_Admin extends HGBP_Public {
 
 		</form>
 		<?php
-	}
-
-	/**
-	 * Sanitize saved input for yes or no questions.
-	 *
-	 * @since    1.0.0
-	 */
-	public function sanitize_yes_no( $input ) {
-		if ( 'yes' != $input ) {
-			$input = 'no';
-		}
-		return $input;
 	}
 
 }

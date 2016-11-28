@@ -484,39 +484,6 @@ function hgbp_build_hierarchical_slug( $group_id = 0 ) {
  *
  * @since 1.0.0
  *
- * @param string $setting Which direction to check.
- *
- * @return string|bool "yes" or "no" if it's set, false if unknown.
- */
-function hgbp_get_global_activity_setting( $setting = 'children' ) {
-	if ( $setting !== 'children' ) {
-		$setting = 'parents';
-	}
-	return get_option( "hgbp-include-activity-from-{$setting}" );
-}
-
-/**
- * Fetch and parse the saved global settings.
- *
- * @since 1.0.0
- *
- * @param string $setting Which direction to check.
- *
- * @return string Level of enforcement for overriding the default settings.
- */
-function hgbp_get_global_activity_enforce_setting( $setting = 'children' ) {
-	if ( $setting !== 'children' ) {
-		$setting = 'parents';
-	}
-	$option = get_option( "hgbp-include-activity-from-{$setting}-enforce" );
-	return hgbp_sanitize_group_setting_enforce( $option );
-}
-
-/**
- * Fetch and parse the saved global settings.
- *
- * @since 1.0.0
- *
  * @param int $group_id Which group ID's meta to fetch.
  *
  * @return string Which members of a group are allowed to associate subgroups with it.
@@ -539,9 +506,33 @@ function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
  *
  * @since 1.0.0
  *
+ * @return string|bool "yes" or "no" if it's set, false if unknown.
+ */
+function hgbp_get_global_activity_setting() {
+	$option = get_option( 'hgbp-include-activity-from-relatives' );
+	return hgbp_sanitize_include_setting( $option );
+}
+
+/**
+ * Fetch and parse the saved global settings.
+ *
+ * @since 1.0.0
+ *
+ * @return string Level of enforcement for overriding the default settings.
+ */
+function hgbp_get_global_activity_enforce_setting() {
+	$option = get_option( 'hgbp-include-activity-enforce' );
+	return hgbp_sanitize_include_setting_enforce( $option );
+}
+
+/**
+ * Fetch and parse the saved global settings.
+ *
+ * @since 1.0.0
+ *
  * @return bool Which members of a group are allowed to associate subgroups with it.
  */
-function hgbp_get_global_directory_setting() {
+function hgbp_get_directory_as_tree_setting() {
 	return (bool) get_option( 'hgbp-groups-directory-show-tree' );
 }
 
@@ -552,9 +543,33 @@ function hgbp_get_global_directory_setting() {
  *
  * @return string Level of enforcement for overriding the default settings.
  */
-function hgbp_sanitize_group_setting_enforce( $value ) {
-	$valid_enforce = array( 'group-admins', 'site-admins', 'strict' );
-	if ( ! in_array( $value, $valid_enforce, true ) ) {
+function hgbp_sanitize_include_setting( $value ) {
+	$valid = array(
+		'include-from-parents',
+		'include-from-children',
+		'include-from-both',
+		'include-from-none'
+	);
+	if ( ! in_array( $value, $valid, true ) ) {
+		$value = 'include-from-none';
+	}
+	return $value;
+}
+
+/**
+ * Filter the syndication enforcement setting against a whitelist.
+ *
+ * @since 1.0.0
+ *
+ * @return string Level of enforcement for overriding the default settings.
+ */
+function hgbp_sanitize_include_setting_enforce( $value ) {
+	$valid = array(
+		'group-admins',
+		'site-admins',
+		'strict'
+	);
+	if ( ! in_array( $value, $valid, true ) ) {
 		$value = 'strict';
 	}
 	return $value;
@@ -565,41 +580,34 @@ function hgbp_sanitize_group_setting_enforce( $value ) {
  *
  * @since 1.0.0
  *
- * @param string $setting Which direction to check.
+ * @param int $group_id Group to fetch setting for.
  *
- * @return bool True to include the related activity.
+ * @return string Setting to use.
  */
-function hgbp_group_include_hierarchical_activity( $group_id = 0, $setting = 'children' ) {
+function hgbp_group_include_hierarchical_activity( $group_id = 0 ) {
 	if ( ! $group_id ) {
 		$group_id = bp_get_current_group_id();
-	}
-	if ( $setting !== 'children' ) {
-		$setting = 'parents';
 	}
 	$include = false;
 
 	/*
-	 * This is a calculated result that has to check the global setting first.
 	 * First, we check which setting has priority.
 	 */
-	$enforce = hgbp_get_global_activity_enforce_setting( $setting );
+	$enforce = hgbp_get_global_activity_enforce_setting();
 	if ( 'site-admins' == $enforce || 'group-admins' == $enforce ) {
-		// Check the group's raw setting first.
-		$include = groups_get_groupmeta( $group_id, "hgbp-include-activity-from-{$setting}" );
-		// If unknown (neither yes nor no), fall back to the global setting.
-		if ( ! $include ) {
-			$include = hgbp_get_global_activity_setting( $include );
+		// Groups can override, so check the group's raw setting first.
+		$include = groups_get_groupmeta( $group_id, 'hgbp-include-activity-from-relatives' );
+
+		if ( $include ) {
+			// Only run this if not empty. We want to pass empty values to the next check.
+			$include = hgbp_sanitize_include_setting( $include );
 		}
-	} else {
-		/*
-		 * $enforce is strict or unknown.
-		 * We know the global setting is the only setting to consider.
-		 */
-		$include = hgbp_get_global_activity_setting( $setting );
 	}
 
-	// Convert a yes, no or false to a boolean.
-	$include = ( 'yes' == $include ) ? true : false;
+	// If include hasn't yet been set, check the global setting.
+	if ( ! $include ) {
+		$include = hgbp_get_global_activity_setting();
+	}
 
-	return apply_filters( 'hgbp_group_include_hierarchical_activity', $include, $group_id, $setting );
+	return apply_filters( 'hgbp_group_include_hierarchical_activity', $include, $group_id );
 }

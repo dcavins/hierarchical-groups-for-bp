@@ -36,9 +36,11 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		$parent_groups_template = $groups_template;
 
 		/*
-		 * groups/single/subgroups-loop is a shell that calls groups-loop-tree,
+		 * groups/single/subgroups-loop is a shell that calls groups-loop,
 		 * to make it possible to override the subgroups loop using the
 		 * BuddyPress template hierarchy.
+		 * Note that groups-loop will load groups-loop-tree if
+		 * 'use hierarchical template' is set to true.
 		 */
 		bp_get_template_part( 'groups/single/subgroups-loop' );
 
@@ -103,37 +105,24 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 
 			<?php
 			// Only display the syndication sections if the current user can change it.
-			$can_change_synd_from_parents  = bp_current_user_can( 'hgbp_change_include_activity_from_parents' );
-			$can_change_synd_from_children = bp_current_user_can( 'hgbp_change_include_activity_from_children' );
-
-			if ( $can_change_synd_from_parents ) :
-				$include_from_parents  = groups_get_groupmeta( $group_id, "hgbp-include-activity-from-parents" );
-				if ( ! $include_from_parents ) {
-					$include_from_parents = 'inherit';
+			if ( bp_current_user_can( 'hgbp_change_include_activity' ) ) :
+				$setting = groups_get_groupmeta( $group_id, 'hgbp-include-activity-from-relatives' );
+				if ( ! $setting ) {
+					$setting = 'inherit';
 				}
 			?>
-				<fieldset class="hierarchy-syndicate-activity checkbox">
-					<legend><?php _e( 'Include activity from parent groups in this group&rsquo;s activity stream', 'hierarchical-groups-for-bp' ); ?></legend>
+				<fieldset class="hierarchy-syndicate-activity radio">
+					<legend><?php _e( 'Include activity from parent and child groups in this group&rsquo;s activity stream.', 'hierarchical-groups-for-bp' ); ?></legend>
 
-					<label for="hgbp-include-activity-from-parents-yes"><input type="radio" name="hgbp-include-activity-from-parents" id="hgbp-include-activity-from-parents-yes" value="yes" <?php checked( $include_from_parents, 'yes' ); ?> /> <?php _e( 'Include activity from parent groups.', 'hierarchical-groups-for-bp' ); ?></label>
-					<label for="hgbp-include-activity-from-parents-no"><input type="radio" name="hgbp-include-activity-from-parents" id="hgbp-include-activity-from-parents-no" value="no" <?php checked( $include_from_parents, 'no' ); ?> /> <?php _e( 'Do not include activity from parent groups.', 'hierarchical-groups-for-bp' ); ?></label>
-					<label for="hgbp-include-activity-from-parents-inherit"><input type="radio" name="hgbp-include-activity-from-parents" id="hgbp-include-activity-from-parents-inherit" value="inherit" <?php checked( $include_from_parents, 'inherit' ); ?> /> <?php _e( 'Inherit global setting.', 'hierarchical-groups-for-bp' ); ?></label>
+					<label for="include-activity-from-parents"><input type="radio" id="include-activity-from-parents" name="hgbp-include-activity-from-relatives" value="include-from-parents"<?php checked( 'include-from-parents', $setting ); ?>> <?php _e( 'Include parent group activity.', 'hierarchical-groups-for-bp' ); ?></label>
 
-				</fieldset>
-			<?php endif; ?>
+					<label for="include-activity-from-children"><input type="radio" id="include-activity-from-children" name="hgbp-include-activity-from-relatives" value="include-from-children"<?php checked( 'include-from-children', $setting ); ?>> <?php _e( 'Include child group activity.', 'hierarchical-groups-for-bp' ); ?></label>
 
-			<?php if ( $can_change_synd_from_children ) :
-				$include_from_children = groups_get_groupmeta( $group_id, "hgbp-include-activity-from-children" );
-				if ( ! $include_from_children ) {
-					$include_from_children = 'inherit';
-				}
-			?>
-				<fieldset class="hierarchy-syndicate-activity checkbox">
-					<legend><?php _e( 'Include activity from child groups in this group&rsquo;s activity stream', 'hierarchical-groups-for-bp' ); ?></legend>
+					<label for="include-activity-from-both"><input type="radio" id="include-activity-from-both" name="hgbp-include-activity-from-relatives" value="include-from-both"<?php checked( 'include-from-both', $setting ); ?>> <?php _e( 'Include parent and child group activity.', 'hierarchical-groups-for-bp' ); ?></label>
 
-					<label for="hgbp-include-activity-from-children-yes"><input type="radio" name="hgbp-include-activity-from-children" id="hgbp-include-activity-from-children-yes" value="yes" <?php checked( $include_from_children, 'yes' ); ?> /> <?php _e( 'Include activity from child groups.', 'hierarchical-groups-for-bp' ); ?></label>
-					<label for="hgbp-include-activity-from-children-no"><input type="radio" name="hgbp-include-activity-from-children" id="hgbp-include-activity-from-children-no" value="no" <?php checked( $include_from_children, 'no' ); ?> /> <?php _e( 'Do not include activity from child groups.', 'hierarchical-groups-for-bp' ); ?></label>
-					<label for="hgbp-include-activity-from-children-inherit"><input type="radio" name="hgbp-include-activity-from-children" id="hgbp-include-activity-from-children-inherit" value="inherit" <?php checked( $include_from_children, 'inherit' ); ?> /> <?php _e( 'Inherit global setting.', 'hierarchical-groups-for-bp' ); ?></label>
+					<label for="include-activity-from-none"><input type="radio" id="include-activity-from-none" name="hgbp-include-activity-from-relatives" value="include-from-none"<?php checked( 'include-from-none', $setting ); ?>> <?php _e( 'Do not include related group activity.', 'hierarchical-groups-for-bp' ); ?></label>
+
+					<label for="hgbp-include-activity-from-relatives-inherit"><input type="radio" name="hgbp-include-activity-from-relatives" id="hgbp-include-activity-from-relatives-inherit" value="inherit" <?php checked( 'inherit', $setting ); ?> /> <?php _e( 'Inherit global setting.', 'hierarchical-groups-for-bp' ); ?></label>
 				</fieldset>
 			<?php endif; ?>
 	<?php
@@ -156,15 +145,13 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		$subgroup_creators = groups_update_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators', $allowed_creators );
 
 		// Syndication settings.
-		$inputs_to_save = array( 'hgbp-include-activity-from-children', 'hgbp-include-activity-from-parents' );
-		foreach ( $inputs_to_save as $posted ) {
-			if ( isset( $_POST[ $posted ] ) ) {
-				if ( in_array( $_POST[ $posted ], array( 'yes', 'no' ), true ) ) {
-					$success = groups_update_groupmeta( $group_id, $posted, $_POST[ $posted ] );
-				} else {
-					// The other option is "inherit", so let's delete the group meta.
-					$success = groups_delete_groupmeta( $group_id, $posted );
-				}
+		if ( isset( $_POST['hgbp-include-activity-from-relatives'] ) ) {
+			if ( 'inherit' == $_POST['hgbp-include-activity-from-relatives'] ) {
+				// If "inherit", delete the group meta.
+				$success = groups_delete_groupmeta( $group_id, $posted );
+			} else {
+				$setting = hgbp_sanitize_include_setting( $_POST['hgbp-include-activity-from-relatives'] );
+				$success = groups_update_groupmeta( $group_id, 'hgbp-include-activity-from-relatives', $setting );
 			}
 		}
 	}

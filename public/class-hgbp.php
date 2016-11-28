@@ -181,11 +181,10 @@ class HGBP_Public {
 	 * @return array $templates
 	 */
 	public function filter_groups_loop_template( $templates, $slug, $name ) {
-		if ( 'groups/groups-loop' == $slug && hgbp_get_global_directory_setting() ) {
+		if ( 'groups/groups-loop' == $slug && hgbp_get_directory_as_tree_setting() ) {
 			// Add our setting to the front of the array.
 			array_unshift( $templates, 'groups/groups-loop-tree.php' );
 		}
-
 		return $templates;
 	}
 
@@ -235,12 +234,15 @@ class HGBP_Public {
 	 * @return array
  	 */
 	public function filter_has_groups_args( $args ) {
+		$use_tree = hgbp_get_directory_as_tree_setting();
 		/*
 		 * Don't filter if a parent id (including, zero, which is meanignful)
 		 * has been specified or if the user has specified a search.
 		 * @TODO: Don't filter if orderby? Other conditions where hierarchy would yield strange results?
 		 */
-		if ( ! is_null( $args['parent_id'] ) || ! empty( $args['search_terms'] ) || ! hgbp_get_global_directory_setting() ) {
+		if ( ! is_null( $args['parent_id'] ) ) {
+			// Do nothing.
+		} elseif ( ! empty( $args['search_terms'] ) || ! $use_tree ) {
 			/**
 			 * Fires when the groups loop will not be displayed hierarchically,
 			 * like when browsing group search results.
@@ -248,11 +250,11 @@ class HGBP_Public {
 			 * @since 1.0.0
 			 */
 			do_action( 'hgbp_using_flat_groups_directory' );
-
 		} elseif ( bp_is_groups_directory() || bp_is_user_groups() ) {
 			$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? intval( $_REQUEST['parent_id'] ) : 0;
+		}
 
-		} elseif ( hgbp_is_hierarchy_screen() ) {
+		if ( hgbp_is_hierarchy_screen() ) {
 			/*
 			 * Change some of the default args to generate a directory-style loop.
 			 *
@@ -262,13 +264,7 @@ class HGBP_Public {
 			$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? intval( $_REQUEST['parent_id'] ) : bp_get_current_group_id();
 			// Unset the type and slug set in bp_has_groups() when in a single group.
 			$args['type'] = $args['slug'] = null;
-		}
-
-		if ( hgbp_is_hierarchy_screen() ) {
-			/*
-			 * Set update_admin_cache to true, because this is actually a directory,
-			 * whether shown flat or hierarchically.
-			 */
+			// Set update_admin_cache to true, because this is actually a directory.
 			$args['update_admin_cache'] = true;
 		}
 
@@ -404,18 +400,9 @@ class HGBP_Public {
 	 * @return bool
 	 */
 	public function check_user_caps( $retval, $user_id, $capability, $site_id, $args ) {
-		$activity_caps = array(
-			'hgbp_change_include_activity_from_parents',
-			'hgbp_change_include_activity_from_children'
-		);
-		if ( in_array( $capability, $activity_caps ) ) {
+		if ( 'hgbp_change_include_activity' == $capability ) {
 
-			$global_setting = 'group-admins';
-			if ( $capability == 'hgbp_change_include_activity_from_parents' ) {
-				$global_setting = hgbp_get_global_activity_enforce_setting( 'parents' );
-			} elseif ( $capability == 'hgbp_change_include_activity_from_children' ) {
-				$global_setting = hgbp_get_global_activity_enforce_setting( 'children' );
-			}
+			$global_setting = hgbp_get_global_activity_enforce_setting();
 
 			$retval = false;
 			switch ( $global_setting ) {
@@ -497,23 +484,31 @@ class HGBP_Public {
 		$group_id = bp_get_current_group_id();
 
 		// Check if this group is set to aggregate child group activity.
-		$include_child_activity = hgbp_group_include_hierarchical_activity( $group_id, 'children' );
-		$include_parent_activity = hgbp_group_include_hierarchical_activity( $group_id, 'parents' );
+		$include_activity = hgbp_group_include_hierarchical_activity( $group_id );
 
-		if ( ! $include_child_activity && ! $include_parent_activity ) {
-			return $args;
-		}
-
-		$include = array( $group_id );
-		if ( $include_parent_activity ) {
-			$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
-			$include = array_merge( $include, $parents );
-		}
-
-		if ( $include_child_activity ) {
-			$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
-			$child_ids = wp_list_pluck( $children, 'id' );
-			$include   = array_merge( $include, $child_ids );
+		switch ( $include_activity ) {
+			case 'include-from-both':
+				$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
+				$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
+				$child_ids = wp_list_pluck( $children, 'id' );
+				$include   = array_merge( array( $group_id ), $parents, $child_ids );
+				break;
+			case 'include-from-parents':
+				$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
+				// Add the parent IDs to the main group ID.
+				$include = array_merge( array( $group_id ), $parents );
+				break;
+			case 'include-from-children':
+				$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
+				$child_ids = wp_list_pluck( $children, 'id' );
+				// Add the child IDs to the main group ID.
+				$include   = array_merge( array( $group_id ), $child_ids );
+				break;
+			case 'include-from-none':
+			default:
+				// Do nothing.
+				$include = false;
+				break;
 		}
 
 		if ( ! empty( $include ) ) {

@@ -8,4 +8,4 @@
  * @package HierarchicalGroupsForBP
  */
 
-bp_get_template_part( 'groups/groups-loop-tree' );
+bp_get_template_part( 'groups/groups-loop' );

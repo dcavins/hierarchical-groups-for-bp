@@ -12,8 +12,8 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		$nav_item_visibility = $this->nav_item_visibility();
 
 		$args = array(
-			'slug'              => hgbp_get_subgroups_screen_slug(),
-			'name'              => hgbp_get_subgroups_nav_item_name(),
+			'slug'              => hgbp_get_hierarchy_screen_slug(),
+			'name'              => hgbp_get_hierarchy_nav_item_name(),
 			'nav_item_position' => 61,
 			'access'            => $nav_item_visibility,
 			'show_tab'          => $nav_item_visibility,
@@ -83,7 +83,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 
 		<fieldset class="hierarchy-allowed-subgroup-creators radio">
 
-			<legend><?php _e( 'Which members of this group are allowed to create subgroups?', 'hierarchical-groups-for-bp' ); ?></legend>
+			<legend><?php _e( 'Which members of this group are allowed to select this group as the parent group of another group?', 'hierarchical-groups-for-bp' ); ?></legend>
 
 			<?php
 			$subgroup_creators = hgbp_get_allowed_subgroup_creators();

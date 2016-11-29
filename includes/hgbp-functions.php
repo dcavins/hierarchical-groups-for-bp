@@ -76,18 +76,33 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 
 	$child_ids = hgbp_get_child_group_ids( $group_id );
 
-	// If a user ID has been specified, we filter hidden groups accordingly.
+	// If a user ID has been specified, we filter groups accordingly.
 	$filter = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) ) ? true : false;
 
 	foreach ( $child_ids as $child_id ) {
 		// The child groups will be built from the cache.
 		$child_group = groups_get_group( $child_id );
-		if ( $filter && 'hidden' == $child_group->status ) {
-			// exclude_hidden is useful on directories, where hidden groups are excluded by BP.
-			if ( 'exclude_hidden' == $context  ) {
-				continue;
-			} elseif ( ! groups_is_user_member( $user_id, $child_id ) ) {
-				continue;
+		if ( $filter ) {
+			/*
+			 * 'exclude_hidden' is useful on directories, where hidden groups
+			 * are excluded by BP.
+			 */
+			if ( 'exclude_hidden' == $context ) {
+				if ( 'hidden' == $child_group->status ) {
+					continue;
+				}
+			/*
+			 * 'mygroups' is useful on user-specific directories, where only groups the
+			 * user belongs to are returned, and the group status is irrelevant.
+			 */
+			} elseif ( 'mygroups' == $context ) {
+				if ( ! groups_is_user_member( $user_id, $child_id ) ) {
+					continue;
+				}
+			} elseif ( 'normal' == $context ) {
+				if ( 'hidden' == $child_group->status && ! groups_is_user_member( $user_id, $child_id ) ) {
+					continue;
+				}
 			}
 		}
 		$retval[] = $child_group;
@@ -97,8 +112,9 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 }
 
 /**
- * Get the child group IDs for a specific group.
- *
+ * Get the child group IDs for a specific group. This returns an unfiltered list
+ * of all groups, regardless of status. Use hgbp_get_child_groups() to fetch a
+ * user-context-sensitive set of groups.
  *
  * @since 1.0.0
  *
@@ -176,14 +192,14 @@ function hgbp_group_has_children( $group_id = false, $user_id = false, $context 
 			// If the directory is AJAX powered, we have to check cookies.
 			if ( isset( $_COOKIE['bp-groups-scope'] ) && 'personal' == $_COOKIE['bp-groups-scope'] ) {
 				// Hidden groups are included in this directory.
-				$context = 'normal';
+				$context = 'mygroups';
 			} else {
-				// Hidden groups are not included here.
+				// Hidden groups are not included in standard directories.
 				$context = 'exclude_hidden';
 			}
 		} elseif ( bp_is_user_groups() ) {
 			// Hidden groups are included in this directory.
-			$context = 'normal';
+			$context = 'mygroups';
 		}
 	}
 
@@ -254,13 +270,13 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 	// Prepare the return set.
 	$groups = array();
 	// If a user ID has been specified, we filter hidden groups accordingly.
-	$run_filters = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) );
+	$filter = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) );
 
 	foreach ( $descendant_ids as $group_id ) {
 		// Check whether the user should be able to see this group.
 		$group = groups_get_group( $group_id );
 
-		if ( $run_filters ) {
+		if ( $filter ) {
 			// @TODO: Use group capabilities for this when possible.
 			if ( 'activity' == $context ) {
 				// For activity stream inclusion, require public status or membership.
@@ -272,7 +288,7 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 				if ( 'hidden' != $group->status ) {
 					$groups[$group_id] = $group;
 				}
-			} else {
+			} elseif ( 'normal' == $context ) {
 				// For unspecified uses, hide hidden groups that the user doesn't belong to.
 				if ( 'hidden' != $group->status || groups_is_user_member( $user_id, $group->id ) ) {
 					$groups[$group_id] = $group;

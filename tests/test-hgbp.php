@@ -191,6 +191,423 @@ class HGBP_Tests extends HGBP_TestCase {
 		$this->assertEqualSets( array( $g2, $g3, $g4 ), $found );
 	}
 
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_no_user_scope_public_group() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+
+		$this->assertTrue( hgbp_group_has_children( $g1 ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_no_user_scope_private_group() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+
+		$this->assertTrue( hgbp_group_has_children( $g1 ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_no_user_scope_hidden_group() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+
+		// Filtering isn't set, so all should be returned.
+		$this->assertTrue( hgbp_group_has_children( $g1 ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_public_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_private_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_hidden_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+
+		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_public_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+		$u1 = $this->factory->user->create();
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_private_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+		$u1 = $this->factory->user->create();
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_hidden_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+		$u1 = $this->factory->user->create();
+
+		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_public_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_private_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_hidden_group_context_normal() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_public_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+		// Only return true if I'm a member of the child group.
+		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_private_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+		// Only return true if I'm a member of the child group.
+		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_hidden_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+		// Only return true if I'm a member of the child group.
+		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_public_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+		$u1 = $this->factory->user->create();
+		// Only return true if I'm a member of the child group.
+		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_private_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+		$u1 = $this->factory->user->create();
+		// Only return true if I'm a member of the child group.
+		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_hidden_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+		$u1 = $this->factory->user->create();
+		// Only return true if I'm a member of the child group.
+		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_public_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_private_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_hidden_group_context_mygroups() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_public_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_private_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_logged_out_hidden_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+
+		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_public_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+		$u1 = $this->factory->user->create();
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_private_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+		$u1 = $this->factory->user->create();
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_not_group_member_hidden_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+		$u1 = $this->factory->user->create();
+
+		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_public_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_private_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'private',
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+	}
+
+	/**
+	 * @group hgbp_group_has_children
+	 */
+	public function test_hgbp_group_has_children_user_scope_group_member_hidden_group_context_exclude_hidden() {
+		$g1 = $this->factory->group->create();
+		$g2 = $this->factory->group->create( array(
+			'parent_id' => $g1,
+			'status'    => 'hidden',
+		) );
+		$u1 = $this->factory->user->create();
+		// Make $u1 a member.
+		$this->add_user_to_group( $u1, $g2 );
+		// Always exlude hidden groups in this case.
+		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+	}
+
 	public function test_hgbp_get_ancestor_group_ids_no_user_scope() {
 		$g1 = $this->factory->group->create();
 		$g2 = $this->factory->group->create( array(

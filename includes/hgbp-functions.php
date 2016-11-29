@@ -55,12 +55,12 @@ function hgbp_get_hierarchy_nav_item_name() {
  *
  * @param int    $group_id ID of the group.
  * @param int    $user_id  ID of a user to check group visibility for.
- * @param string $context  Context can change what groups should be returned.
+ * @param string $context  See hgbp_include_group_by_context() for description.
  *
  * @return array Array of group objects.
  */
 function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 'normal' ) {
-	$retval = array();
+	$groups = array();
 
 	/*
 	 * Passing a group id of 0 would find all top-level groups, which could be
@@ -82,33 +82,17 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 	foreach ( $child_ids as $child_id ) {
 		// The child groups will be built from the cache.
 		$child_group = groups_get_group( $child_id );
+
 		if ( $filter ) {
-			/*
-			 * 'exclude_hidden' is useful on directories, where hidden groups
-			 * are excluded by BP.
-			 */
-			if ( 'exclude_hidden' == $context ) {
-				if ( 'hidden' == $child_group->status ) {
-					continue;
-				}
-			/*
-			 * 'mygroups' is useful on user-specific directories, where only groups the
-			 * user belongs to are returned, and the group status is irrelevant.
-			 */
-			} elseif ( 'mygroups' == $context ) {
-				if ( ! groups_is_user_member( $user_id, $child_id ) ) {
-					continue;
-				}
-			} elseif ( 'normal' == $context ) {
-				if ( 'hidden' == $child_group->status && ! groups_is_user_member( $user_id, $child_id ) ) {
-					continue;
-				}
+			if ( hgbp_include_group_by_context( $child_group, $user_id, $context ) ) {
+				$groups[] = $child_group;
 			}
+		} else {
+			$groups[] = $child_group;
 		}
-		$retval[] = $child_group;
 	}
 
-	return $retval;
+	return $groups;
 }
 
 /**
@@ -168,7 +152,7 @@ function hgbp_get_child_group_ids( $group_id = false ) {
  *
  * @param int    $group_id ID of the group.
  * @param int    $user_id  ID of a user to check group visibility for.
- * @param string $context  Context can change what groups should be returned.
+ * @param string $context  See hgbp_include_group_by_context() for description.
  *
  * @return bool True if true, false if not.
  */
@@ -217,10 +201,7 @@ function hgbp_group_has_children( $group_id = false, $user_id = false, $context 
  *
  * @param int    $group_id ID of the group.
  * @param int    $user_id  ID of a user to check group visibility for.
- * @param string $context  'normal' filters hidden groups only that the user doesn't belong to.
- *                         'activity' includes only groups for which the user should see
- *                          the activity streams.
- *                         'exclude_hidden' filters all hidden groups out (for directories).
+ * @param string $context  See hgbp_include_group_by_context() for description.
  *
  * @return array Array of group objects.
  */
@@ -303,6 +284,70 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 }
 
 /**
+ * Determine whether a group should be included in results sets for a
+ * user in a specific context.
+ *
+ * @since 1.0.0
+ *
+ * @param object $group   BP_Groups_Group object to check.
+ * @param int    $user_id ID of a user to check group visibility for.
+ * @param string $context 'normal' filters hidden groups only that the user doesn't belong to.
+ *                        'activity' includes only groups for which the user should see
+ *                        the activity streams.
+ *                        'exclude_hidden' filters all hidden groups out (for directories).
+ *
+ * @return bool True if group meets context requirements.
+ */
+function hgbp_include_group_by_context( $group = false, $user_id = false, $context = 'normal' ) {
+	$include = false;
+	if ( ! isset( $group->id ) ) {
+		return $include;
+	}
+	/*
+	 * 'exclude_hidden' is useful on directories, where hidden groups
+	 * are excluded by BP.
+	 */
+	if ( 'exclude_hidden' == $context ) {
+		if ( 'hidden' != $group->status ) {
+			$include = true;
+		}
+	/*
+	 * 'mygroups' is useful on user-specific directories, where only groups the
+	 * user belongs to are returned, and the group status is irrelevant.
+	 */
+	} elseif ( 'mygroups' == $context ) {
+		if ( groups_is_user_member( $user_id, $group->id ) ) {
+			$include = true;
+		}
+	/*
+	 * 'activity' includes only groups for which the user can view the activity streams.
+	 */
+	} elseif ( 'activity' == $context ) {
+		// For activity stream inclusion, require public status or membership.
+		if ( 'public' == $group->status || groups_is_user_member( $user_id, $group->id ) ) {
+			$include = true;
+		}
+	} elseif ( 'normal' == $context ) {
+		if ( 'hidden' != $group->status || groups_is_user_member( $user_id, $group->id ) ) {
+			$include = true;
+		}
+	}
+
+	/**
+	 * Filters whether this group should be included for this user and context combination.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param bool            $include Whether to include this group.
+	 * @param BP_Groups_Group $group   The group object in question.
+	 * @param int             $user_id ID of user to check.
+	 * @param string          $user_id Current context.
+	 */
+
+	return apply_filters( 'hgbp_include_group_by_context', $include, $group, $user_id, $context );
+}
+
+/**
  * Get the parent group ID for a specific group.
  *
  * To return the parent group regardless of visibility, leave the $user_id
@@ -313,8 +358,7 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
  *
  * @param int    $group_id ID of the group.
  * @param int    $user_id  ID of a user to check group visibility for.
- * @param string $context  'normal' filters hidden groups only; 'activity' includes
- *                         only groups for which the user should see the activity streams.
+ * @param string $context  See hgbp_include_group_by_context() for description.
  *
  * @return int ID of parent group.
  */
@@ -338,18 +382,8 @@ function hgbp_get_parent_group_id( $group_id = false, $user_id = false, $context
 	// @TODO: This could make use of group visibility when available.
 	if ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) ) {
 		$parent_group = groups_get_group( $parent_id );
-		if ( 'activity' == $context ) {
-			// For activity stream inclusion, require public status or membership.
-			if ( 'public' != $parent_group->status && ! groups_is_user_member( $user_id, $parent_group->id ) ) {
-				// If the group's activity stream is not visible to the user, break the chain.
-				$parent_id = 0;
-			}
-		} else {
-			// For unspecified uses, hide hidden groups.
-			if ( 'hidden' == $parent_group->status && ! groups_is_user_member( $user_id, $parent_group->id ) ) {
-				// If the group is not visible to the user, break the chain.
-				$parent_id = 0;
-			}
+		if ( ! hgbp_include_group_by_context( $parent_group, $user_id, $context ) ) {
+			$parent_id = 0;
 		}
 	}
 

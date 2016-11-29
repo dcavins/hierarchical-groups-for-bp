@@ -119,24 +119,15 @@ function hgbp_get_child_group_ids( $group_id = false ) {
 		}
 	}
 
-	// Check the cache first.
-	$cache_key = 'bp_groups_child_groups_of_' . $group_id;
-	$child_ids = bp_core_get_incremented_cache( $cache_key, 'hgbp' );
-
-	if ( false === $child_ids ) {
-		// Fetch all child groups.
-		$child_args = array(
-			'parent_id'   => $group_id,
-			'show_hidden' => true,
-			'per_page'    => false,
-			'page'        => false,
-		);
-		$children  = groups_get_groups( $child_args );
-		$child_ids = wp_list_pluck( $children['groups'], 'id' );
-
-		// Set the cache to avoid duplicate requests.
-		bp_core_set_incremented_cache( $cache_key, 'hgbp', $child_ids );
-	}
+	// Fetch all child groups.
+	$child_args = array(
+		'parent_id'   => $group_id,
+		'show_hidden' => true,
+		'per_page'    => false,
+		'page'        => false,
+	);
+	$children  = groups_get_groups( $child_args );
+	$child_ids = wp_list_pluck( $children['groups'], 'id' );
 
 	return $child_ids;
 }
@@ -218,65 +209,35 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 		}
 	}
 
-	// Check the cache first.
-	$cache_key      = 'descendants_of_' . $group_id;
-	$descendant_ids = bp_core_get_incremented_cache( $cache_key, 'hgbp' );
-
-	if ( false === $descendant_ids ) {
-		// Start from the group specified.
-		$parents = array( $group_id );
-		$descendants = array();
-
-		// We work down the tree until no new children are found.
-		while ( $parents ) {
-			// Fetch all child groups.
-			$child_args = array(
-				'parent_id' => $parents,
-				'show_hidden' => true,
-			);
-			$children = groups_get_groups( $child_args );
-
-			// Add groups to the set of found groups.
-			$descendants = array_merge( $descendants, $children['groups'] );
-
-			// Set up the next set of parents.
-			$parents = wp_list_pluck( $children['groups'], 'id' );
-		}
-
-		// Save the IDs to the cache to avoid duplicate requests.
-		$descendant_ids = wp_list_pluck( $descendants, 'id' );
-		bp_core_set_incremented_cache( $cache_key, 'hgbp', $descendant_ids );
-	}
-
 	// Prepare the return set.
 	$groups = array();
 	// If a user ID has been specified, we filter hidden groups accordingly.
 	$filter = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) );
 
-	foreach ( $descendant_ids as $group_id ) {
-		// Check whether the user should be able to see this group.
-		$group = groups_get_group( $group_id );
+	// Start from the group specified.
+	$parents = array( $group_id );
+	$descendants = array();
 
-		if ( $filter ) {
-			// @TODO: Use group capabilities for this when possible.
-			if ( 'activity' == $context ) {
-				// For activity stream inclusion, require public status or membership.
-				if ( 'public' == $group->status || groups_is_user_member( $user_id, $group->id ) ) {
-					$groups[$group_id] = $group;
+	// We work down the tree until no new children are found.
+	while ( $parents ) {
+		// Fetch all child groups.
+		$child_args = array(
+			'parent_id' => $parents,
+			'show_hidden' => true,
+		);
+		$children = groups_get_groups( $child_args );
+		// Reset parents array to rebuild for next round.
+		$parents = array();
+		foreach ( $children['groups'] as $group ) {
+			if ( $filter ) {
+				if ( hgbp_include_group_by_context( $group, $user_id, $context ) ) {
+					$groups[] = $group;
+					$parents[] = $group->id;
 				}
-			} elseif ( 'exclude_hidden' == $context ) {
-				// For use on directories, hide all hidden groups.
-				if ( 'hidden' != $group->status ) {
-					$groups[$group_id] = $group;
-				}
-			} elseif ( 'normal' == $context ) {
-				// For unspecified uses, hide hidden groups that the user doesn't belong to.
-				if ( 'hidden' != $group->status || groups_is_user_member( $user_id, $group->id ) ) {
-					$groups[$group_id] = $group;
-				}
+			} else {
+				$groups[] = $group;
+				$parents[] = $group->id;
 			}
-		} else {
-			$groups[$group_id] = $group;
 		}
 	}
 

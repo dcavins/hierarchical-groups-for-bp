@@ -64,12 +64,6 @@ class HGBP_Public {
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
-		// Caching
-		add_action( 'init', array( $this, 'add_cache_groups' ) );
-		// Reset the cache group's incrementor when groups are added, changed or deleted.
-		add_action( 'groups_group_after_save', array( $this, 'reset_cache_incrementor' ) );
-		add_action( 'bp_groups_delete_group', array( $this, 'reset_cache_incrementor' ) );
-
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles_scripts' ) );
 
@@ -137,24 +131,6 @@ class HGBP_Public {
 		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 
 		load_textdomain( $domain, trailingslashit( WP_LANG_DIR ) . $domain . '/' . $domain . '-' . $locale . '.mo' );
-	}
-
-	/**
-	 * Set up a group for cache usage.
-	 *
-	 * @since    1.0.0
-	 */
-	public function add_cache_groups() {
-		wp_cache_add_global_groups( 'hgbp' );
-	}
-
-	/**
-	 * Reset the cache group's incrementor when groups are added, changed or deleted.
-	 *
-	 * @since    1.0.0
-	 */
-	public function reset_cache_incrementor() {
-		bp_core_reset_incrementor( 'hgbp' );
 	}
 
 	/**

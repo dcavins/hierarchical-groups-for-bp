@@ -257,7 +257,7 @@ class HGBP_Public {
 	 * @return array
  	 */
 	public function filter_group_classes( $classes ) {
-		if ( $has_children = hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id() ) ) {
+		if ( $has_children = hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id(), 'directory' ) ) {
 			$classes[] = 'has-children';
 		}
 		return $classes;

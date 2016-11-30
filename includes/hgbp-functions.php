@@ -485,7 +485,7 @@ function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
 
 	$value = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
 	$valid_options = array( 'member', 'mod', 'admin', 'noone' );
-	if ( ! in_array( $value, $valid_enforce, true ) ) {
+	if ( ! in_array( $value, $valid_options, true ) ) {
 		$value = 'noone';
 	}
 	return $value;

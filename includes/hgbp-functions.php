@@ -82,21 +82,17 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 		'page'        => false,
 	);
 	$children  = groups_get_groups( $child_args );
-	$child_ids = wp_list_pluck( $children['groups'], 'id' );
 
 	// If a user ID has been specified, we filter groups accordingly.
 	$filter = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) );
 
-	foreach ( $child_ids as $child_id ) {
-		// The child groups will be built from the cache.
-		$child_group = groups_get_group( $child_id );
-
+	foreach ( $children['groups'] as $child ) {
 		if ( $filter ) {
-			if ( hgbp_include_group_by_context( $child_group, $user_id, $context ) ) {
-				$groups[] = $child_group;
+			if ( hgbp_include_group_by_context( $child, $user_id, $context ) ) {
+				$groups[] = $child;
 			}
 		} else {
-			$groups[] = $child_group;
+			$groups[] = $child;
 		}
 	}
 

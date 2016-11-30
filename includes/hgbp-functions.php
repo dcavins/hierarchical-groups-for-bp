@@ -74,10 +74,18 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 		}
 	}
 
-	$child_ids = hgbp_get_child_group_ids( $group_id );
+	// Fetch all child groups.
+	$child_args = array(
+		'parent_id'   => $group_id,
+		'show_hidden' => true,
+		'per_page'    => false,
+		'page'        => false,
+	);
+	$children  = groups_get_groups( $child_args );
+	$child_ids = wp_list_pluck( $children['groups'], 'id' );
 
 	// If a user ID has been specified, we filter groups accordingly.
-	$filter = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) ) ? true : false;
+	$filter = ( false !== $user_id && ! bp_user_can( $user_id, 'bp_moderate' ) );
 
 	foreach ( $child_ids as $child_id ) {
 		// The child groups will be built from the cache.
@@ -93,43 +101,6 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 	}
 
 	return $groups;
-}
-
-/**
- * Get the child group IDs for a specific group. This returns an unfiltered list
- * of all groups, regardless of status. Use hgbp_get_child_groups() to fetch a
- * user-context-sensitive set of groups.
- *
- * @since 1.0.0
- *
- * @param  int   $group_id ID of the group.
- *
- * @return array Array of group IDs.
- */
-function hgbp_get_child_group_ids( $group_id = false ) {
-	/*
-	 * Passing a group id of 0 would find all top-level groups, which could be
-	 * intentional. We only try to find the current group when the $group_id is false.
-	 */
-	if ( $group_id === false ) {
-		$group_id = bp_get_current_group_id();
-		if ( ! $group_id ) {
-			// If we can't resolve the group_id, don't proceed with a zero value.
-			return array();
-		}
-	}
-
-	// Fetch all child groups.
-	$child_args = array(
-		'parent_id'   => $group_id,
-		'show_hidden' => true,
-		'per_page'    => false,
-		'page'        => false,
-	);
-	$children  = groups_get_groups( $child_args );
-	$child_ids = wp_list_pluck( $children['groups'], 'id' );
-
-	return $child_ids;
 }
 
 /**

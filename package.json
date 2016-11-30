@@ -1,7 +1,7 @@
 {
   "name": "hierarchicalGroupsForBp",
   "devDependencies": {
-    "grunt": "~0.4.5",
+    "grunt": "latest",
     "grunt-postcss": "latest",
     "autoprefixer": "latest",
     "grunt-cssnano": "latest",
@@ -11,6 +11,7 @@
     "grunt-contrib-watch": "latest",
     "grunt-jsvalidate": "latest",
     "grunt-contrib-less": "latest",
+    "grunt-rtlcss": "latest",
     "load-grunt-tasks": "latest",
     "matchdep": "latest"
   },

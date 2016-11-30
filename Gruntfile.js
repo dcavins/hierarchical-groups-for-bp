@@ -32,6 +32,26 @@ module.exports = function(grunt) {
 			}
 		},
 
+		// Generate RTL stylesheet.
+		rtlcss: {
+			basic: {
+				options: {
+					opts: {
+						processUrls: false,
+						autoRename: false,
+						clean: false
+					},
+					saveUnmodified: false
+				},
+				expand: true,
+				ext: '-rtl.css',
+				src: [
+					'public/css/public.css',
+					'admin/css/admin.css'
+				]
+			}
+		},
+
 		// PostCSS handles post-processing on CSS files. Used here to autoprefix and minify.
 		postcss: {
 			options: {

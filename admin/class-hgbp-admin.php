@@ -72,7 +72,11 @@ class HGBP_Admin extends HGBP_Public {
 
 		$screen = get_current_screen();
 		if ( isset( $screen->id ) && in_array( $screen->id, array( $this->plugin_screen_hook_suffix, 'toplevel_page_bp-groups' ) ) ) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), $this->version );
+			if ( is_rtl() ) {
+				wp_enqueue_style( $this->plugin_slug .'-admin-styles-rtl', plugins_url( 'assets/css/admin-rtl.css', __FILE__ ), array(), $this->version );
+			} else {
+				wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), $this->version );
+			}
 		}
 
 	}

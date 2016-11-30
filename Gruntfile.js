@@ -17,15 +17,17 @@ module.exports = function(grunt) {
 				tasks: ['jshint', 'uglify']
 			},
 			styles: {
-				files: ['public/less/*.less'],
+				files: ['public/css/src/*.less', 'admin/css/src/*.less'],
 				tasks: ['less:convertcss', 'postcss']
 			}
 		},
 
+		// Convert less files to css.
 		less: {
 			convertcss: {
 				files: {
-					'public/css/public.css': 'public/less/public.less',
+					'public/css/public.css': 'public/css/src/public.less',
+					'admin/css/admin.css': 'admin/css/src/admin.less',
 				}
 			}
 		},
@@ -33,17 +35,16 @@ module.exports = function(grunt) {
 		// PostCSS handles post-processing on CSS files. Used here to autoprefix and minify.
 		postcss: {
 			options: {
-				map: {
-					inline: false, // save all sourcemaps as separate files...
-					annotation: 'public/css/' // ...to the specified directory
-				},
 				processors: [
 					require('autoprefixer')(),
-					require('cssnano')
+					require('cssnano')()
 				]
 			},
 			dist: {
-				src: 'public/css/*.css'
+				src: [
+					'public/css/*.css',
+					'admin/css/*.css'
+				]
 			}
 		},
 

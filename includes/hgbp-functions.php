@@ -142,6 +142,9 @@ function hgbp_group_has_children( $group_id = false, $user_id = false, $context 
 		} elseif ( bp_is_user_groups() ) {
 			// Hidden groups are included in this directory.
 			$context = 'mygroups';
+		} else {
+			// Fallback: Hidden groups are not included in standard directories.
+			$context = 'exclude_hidden';
 		}
 	}
 

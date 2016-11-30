@@ -168,11 +168,12 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		// The nav item should only be enabled when the groups loop would return subgroups.
 		$has_children = hgbp_group_has_children( $group_id, bp_loggedin_user_id(), 'exclude_hidden' );
 		if ( $has_children ) {
-			// If this group is not public, make the tab visible to members only.
-			if ( 'public' == bp_get_group_status( groups_get_group( $group_id ) ) ) {
-				$nav_item_vis = 'anyone';
-			} else {
+			// If this group is hidden, make the tab visible to members only.
+			if ( 'hidden' == bp_get_group_status( groups_get_group( $group_id ) ) ) {
 				$nav_item_vis = 'member';
+			} else {
+				// Else, anyone can see how public and private groups are related.
+				$nav_item_vis = 'anyone';
 			}
 		}
 

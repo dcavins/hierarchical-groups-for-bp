@@ -76,6 +76,10 @@ class HGBP_Public {
 		// Hook the has_groups_parse_args filters
 		add_action( 'bp_before_groups_loop', array( $this, 'add_has_group_parse_arg_filters' ) );
 
+		// Add pagination blocks to the groups-loop-tree directory.
+		add_action( 'bp_before_directory_groups_list_tree', 'hgbp_groups_loop_pagination_top' );
+		add_action( 'bp_after_directory_groups_list_tree', 'hgbp_groups_loop_pagination_bottom' );
+
 		// Add the "has-children" class to a group item that has children.
 		add_filter( 'bp_get_group_class', array( $this, 'filter_group_classes' ) );
 

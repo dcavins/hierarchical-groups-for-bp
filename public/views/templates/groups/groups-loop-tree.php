@@ -11,7 +11,7 @@
 /**
  * Fires before the display of groups from the groups loop.
  *
- * @since 1.2.0
+ * @since 1.2.0 (BuddyPress)
  */
 do_action( 'bp_before_groups_loop' ); ?>
 
@@ -21,37 +21,29 @@ do_action( 'bp_before_groups_loop' ); ?>
 
 <?php if ( bp_has_groups( bp_ajax_querystring( 'groups' ) ) ) : ?>
 
-	<div id="pag-top" class="pagination">
+	<?php
 
-		<div class="pag-count" id="group-dir-count-top">
-
-			<?php bp_groups_pagination_count(); ?>
-
-		</div>
-
-		<div class="pagination-links" id="group-dir-pag-top">
-			<?php // pagination links are going to be a problem on subgroups loops. ?>
-			<?php bp_groups_pagination_links(); ?>
-
-		</div>
-
-	</div>
+	/**
+	 * Fires before the listing of the groups tree.
+	 * Specific to the Hierarchical Groups for BP plugin.
+	 *
+	 * @since 1.0.0
+	 */
+	do_action( 'bp_before_directory_groups_list_tree' ); ?>
 
 	<?php
 
 	/**
 	 * Fires before the listing of the groups list.
 	 *
-	 * @since 1.1.0
+	 * @since 1.1.0 (BuddyPress)
 	 */
 	do_action( 'bp_before_directory_groups_list' ); ?>
 
 	<ul id="groups-list" class="item-list" aria-live="assertive" aria-atomic="true" aria-relevant="all">
 
 	<?php while ( bp_groups() ) : bp_the_group(); ?>
-		<?php
-		$has_children = hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id() );
-		?>
+
 		<li <?php bp_group_class(); ?>>
 			<?php if ( ! bp_disable_group_avatar_uploads() ) : ?>
 				<div class="item-avatar">
@@ -70,7 +62,7 @@ do_action( 'bp_before_groups_loop' ); ?>
 				/**
 				 * Fires inside the listing of an individual group listing item.
 				 *
-				 * @since 1.1.0
+				 * @since 1.1.0 (BuddyPress)
 				 */
 				do_action( 'bp_directory_groups_item' ); ?>
 
@@ -83,7 +75,7 @@ do_action( 'bp_before_groups_loop' ); ?>
 				/**
 				 * Fires inside the action section of an individual group listing item.
 				 *
-				 * @since 1.1.0
+				 * @since 1.1.0 (BuddyPress)
 				 */
 				do_action( 'bp_directory_groups_actions' ); ?>
 
@@ -95,7 +87,12 @@ do_action( 'bp_before_groups_loop' ); ?>
 
 			</div>
 
-			<?php if ( hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id(), 'directory' ) ) : ?>
+			<?php
+			/*
+			 * Show the 'show child groups' toggle only if the group has child
+			 * groups that should be visible in this context.
+			 */
+			if ( hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id(), 'directory' ) ) : ?>
 				<div class="child-groups-container">
 					<a href="<?php hgbp_group_hierarchy_permalink(); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php _ex( 'Child groups', 'Label for the control on group directories that shows or hides the child groups.', 'hierarchical-groups-for-bp' ); ?></a>
 					<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>
@@ -114,25 +111,19 @@ do_action( 'bp_before_groups_loop' ); ?>
 	/**
 	 * Fires after the listing of the groups list.
 	 *
-	 * @since 1.1.0
+	 * @since 1.1.0 (BuddyPress)
 	 */
 	do_action( 'bp_after_directory_groups_list' ); ?>
 
-	<div id="pag-bottom" class="pagination">
+	<?php
 
-		<div class="pag-count" id="group-dir-count-bottom">
-
-			<?php bp_groups_pagination_count(); ?>
-
-		</div>
-
-		<div class="pagination-links" id="group-dir-pag-bottom">
-
-			<?php bp_groups_pagination_links(); ?>
-
-		</div>
-
-	</div>
+	/**
+	 * Fires before the listing of the groups tree.
+	 * Specific to the Hierarchical Groups for BP plugin.
+	 *
+	 * @since 1.0.0
+	 */
+	do_action( 'bp_after_directory_groups_list_tree' ); ?>
 
 <?php else: ?>
 
@@ -147,6 +138,6 @@ do_action( 'bp_before_groups_loop' ); ?>
 /**
  * Fires after the display of groups from the groups loop.
  *
- * @since 1.2.0
+ * @since 1.2.0 (BuddyPress)
  */
 do_action( 'bp_after_groups_loop' ); ?>

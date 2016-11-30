@@ -244,6 +244,14 @@ function hgbp_include_group_by_context( $group = false, $user_id = false, $conte
 			$include = true;
 		}
 	/*
+	 * 'exclude_private' includes only groups for which the user can view the activity streams.
+	 */
+	} elseif ( 'exclude_private' == $context ) {
+		// For activity stream inclusion, require public status or membership.
+		if ( 'public' == $group->status || groups_is_user_member( $user_id, $group->id ) ) {
+			$include = true;
+		}
+	/*
 	 * 'mygroups' is useful on user-specific directories, where only groups the
 	 * user belongs to are returned, and the group status is irrelevant.
 	 */

@@ -600,3 +600,27 @@ function hgbp_group_include_hierarchical_activity( $group_id = 0 ) {
 
 	return apply_filters( 'hgbp_group_include_hierarchical_activity', $include, $group_id );
 }
+
+/**
+ * Is this a user's "My Groups" view? This can happen on the main directory or
+ * at a user's profile (/members/username/groups/).
+ *
+ * @since 1.0.0
+ *
+ * @return bool True if yes.
+ */
+function hgbp_is_my_groups_view() {
+	$retval = false;
+
+	// Could be the user profile groups pane.
+	if ( bp_is_user_groups() ) {
+		$retval = true;
+	} elseif ( bp_is_groups_directory() ) {
+		// Could be the "my groups" filter on the main directory?
+		if ( isset( $_COOKIE['bp-groups-scope'] ) && 'personal' == $_COOKIE['bp-groups-scope'] ) {
+			$retval = true;
+		}
+	}
+
+	return $retval;
+}

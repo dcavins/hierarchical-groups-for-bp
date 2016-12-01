@@ -162,8 +162,14 @@ class HGBP_Public {
 	 */
 	public function filter_groups_loop_template( $templates, $slug, $name ) {
 		if ( 'groups/groups-loop' == $slug && hgbp_get_directory_as_tree_setting() ) {
-			// Add our setting to the front of the array.
-			array_unshift( $templates, 'groups/groups-loop-tree.php' );
+			/*
+			 * Add our setting to the front of the array, for the main groups
+			 * directory and a single group's hierarchy screen.
+			 * On the main directory, make sure this isn't the "my groups" view.
+			 */
+			if ( ! hgbp_is_my_groups_view() ) {
+				array_unshift( $templates, 'groups/groups-loop-tree.php' );
+			}
 		}
 		return $templates;
 	}
@@ -214,15 +220,51 @@ class HGBP_Public {
 	 * @return array
  	 */
 	public function filter_has_groups_args( $args ) {
-		$use_tree = hgbp_get_directory_as_tree_setting();
 		/*
-		 * Don't filter if a parent id (including, zero, which is meanignful)
-		 * has been specified or if the user has specified a search.
-		 * @TODO: Don't filter if orderby? Other conditions where hierarchy would yield strange results?
+		 * Should we filter this groups loop at all?
+		 * We only want to filter if this is an otherwise unfiltered view.
+		 * Basically, if the user wants to order by most members, it's unlikely
+		 * they mean, "sort the top level groups by the number of members".
+		 * They probably mean, "Show me the largest/smallest group".
+		 * One thing we can't know is if type => popular and orderby => last_activity
+		 * are intentionally set or just the defaults.
+		 * This is a guess.
+		 * Feel free to customize the guess for your site using the
+		 * 'hgbp_enable_has_group_args_filter' filter.
 		 */
-		if ( ! is_null( $args['parent_id'] ) ) {
-			// Do nothing.
-		} elseif ( ! empty( $args['search_terms'] ) || ! $use_tree ) {
+		$use_tree = hgbp_get_directory_as_tree_setting();
+		$filter = false;
+		if ( $use_tree ) {
+			// Check that the incoming args are basically defaults.
+			if ( ( ! isset( $args['type'] ) || 'active' == $args['type'] )
+					&& ( ! isset( $args['orderby'] ) || 'last_activity' == $args['orderby'] )
+					&& ( empty( $args['slug'] ) )
+					&& ( empty( $args['search_terms'] ) )
+					&& ( empty( $args['group_type'] ) )
+					&& ( empty( $args['group_type__in'] ) )
+					&& ( empty( $args['group_type__not_in'] ) )
+					&& ( empty( $args['meta_query'] ) )
+					&& ( empty( $args['include'] ) )
+					&& ( empty( $args['exclude'] ) )
+					&& ( empty( $args['parent_id'] ) )
+					&& ( ! isset( $args['scope'] ) || 'personal' != $args['scope'] )
+				) {
+				$filter = true;
+			}
+		}
+		$filter = apply_filters( 'hgbp_enable_has_group_args_filter', $filter, $args );
+
+		if ( $filter ) {
+
+			// Set the parent_id.
+			if ( is_null( $args['parent_id'] ) ) {
+				if ( bp_is_groups_directory() && ! hgbp_is_my_groups_view() ) {
+					$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : 0;
+				}
+			}
+
+		} else {
+
 			/**
 			 * Fires when the groups loop will not be displayed hierarchically,
 			 * like when browsing group search results.
@@ -230,10 +272,9 @@ class HGBP_Public {
 			 * @since 1.0.0
 			 */
 			do_action( 'hgbp_using_flat_groups_directory' );
-		} elseif ( bp_is_groups_directory() || bp_is_user_groups() ) {
-			$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? intval( $_REQUEST['parent_id'] ) : 0;
 		}
 
+		// We do have to filter some args on the single group 'hierarchy' screen.
 		if ( hgbp_is_hierarchy_screen() ) {
 			/*
 			 * Change some of the default args to generate a directory-style loop.
@@ -241,7 +282,7 @@ class HGBP_Public {
 			 * Use the current group id as the parent ID on a single group's
 			 * hierarchy screen.
 			 */
-			$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? intval( $_REQUEST['parent_id'] ) : bp_get_current_group_id();
+			$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : bp_get_current_group_id();
 			// Unset the type and slug set in bp_has_groups() when in a single group.
 			$args['type'] = $args['slug'] = null;
 			// Set update_admin_cache to true, because this is actually a directory.

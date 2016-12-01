@@ -149,7 +149,7 @@ function hgbp_groups_loop_pagination_bottom() {
 
 				// Provide a link to the parent group's hierarchy screen.
 				if ( ! empty( $_REQUEST['parent_id'] ) ) :
-					$parent_group = groups_get_group( absint( $_REQUEST['parent_id'] ) );
+					$parent_group = groups_get_group( (int) $_REQUEST['parent_id'] );
 				?>
 					<a href="<?php hgbp_group_hierarchy_permalink( $parent_group ); ?>" class="view-all-child-groups-link"><?php
 					printf( __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' ), bp_get_group_name( $parent_group ) ); ?></a>

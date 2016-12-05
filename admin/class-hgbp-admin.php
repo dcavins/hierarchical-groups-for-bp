@@ -124,9 +124,28 @@ class HGBP_Admin extends HGBP_Public {
 	 * @since    1.0.0
 	 */
 	public function settings_init() {
+
+		// Setting for showing groups directory as tree.
+		add_settings_section(
+			'hgbp_use_tree_directory_template',
+			__( 'Show the groups directories as a hierarchical tree.', 'hierarchical-groups-for-bp' ),
+			array( $this, 'group_tree_section_callback' ),
+			$this->plugin_slug
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-groups-directory-show-tree', 'absint' );
+		add_settings_field(
+			'hgbp-groups-directory-show-tree',
+			__( 'Replace the flat groups directory with a hierarchical directory.', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_groups_directory_show_tree' ),
+			$this->plugin_slug,
+			'hgbp_use_tree_directory_template'
+		);
+
+		// Setting for including activity in related groups.
 		add_settings_section(
 			'hgbp_activity_syndication',
-			__( 'Group Activity Propagation', 'hierarchical-groups-for-bp' ),
+			__( 'Group Activity Syndication', 'hierarchical-groups-for-bp' ),
 			array( $this, 'activity_syndication_section_callback' ),
 			$this->plugin_slug
 		);
@@ -149,22 +168,6 @@ class HGBP_Admin extends HGBP_Public {
 			'hgbp_activity_syndication'
 		);
 
-		// Setting for showing groups directory as tree.
-		add_settings_section(
-			'hgbp_use_tree_directory_template',
-			__( 'Show the groups directories as a hierarchical tree.', 'hierarchical-groups-for-bp' ),
-			array( $this, 'group_tree_section_callback' ),
-			$this->plugin_slug
-		);
-
-		register_setting( $this->plugin_slug, 'hgbp-groups-directory-show-tree', 'absint' );
-		add_settings_field(
-			'hgbp-groups-directory-show-tree',
-			__( 'Replace the flat groups directory with a hierarchical directory.', 'hierarchical-groups-for-bp' ),
-			array( $this, 'render_groups_directory_show_tree' ),
-			$this->plugin_slug,
-			'hgbp_use_tree_directory_template'
-		);
 	}
 
 	/**

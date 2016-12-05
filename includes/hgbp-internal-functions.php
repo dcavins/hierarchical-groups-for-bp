@@ -200,7 +200,7 @@ function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
 
 	$value = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
 
-	return hgbp_sanitize_child_group_associators_setting( $value );
+	return hgbp_sanitize_subgroup_creators_setting( $value );
 }
 
 /**
@@ -210,7 +210,7 @@ function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
  *
  * @return string Level of enforcement for overriding the default settings.
  */
-function hgbp_sanitize_child_group_associators_setting( $value ) {
+function hgbp_sanitize_subgroup_creators_setting( $value ) {
 	$valid = array( 'member', 'mod', 'admin', 'noone' );
 	if ( ! in_array( $value, $valid, true ) ) {
 		$value = 'noone';

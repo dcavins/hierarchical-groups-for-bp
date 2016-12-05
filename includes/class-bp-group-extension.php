@@ -142,6 +142,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		}
 
 		$allowed_creators = isset( $_POST['allowed-subgroup-creators'] ) ? $_POST['allowed-subgroup-creators'] : '';
+		$allowed_creators = hgbp_sanitize_child_group_associators_setting( $allowed_creators );
 		$subgroup_creators = groups_update_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators', $allowed_creators );
 
 		// Syndication settings.

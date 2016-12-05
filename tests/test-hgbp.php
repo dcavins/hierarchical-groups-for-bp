@@ -200,7 +200,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'parent_id' => $g1,
 		) );
 
-		$this->assertTrue( hgbp_group_has_children( $g1 ) );
+		$this->assertTrue( hgbp_group_has_children( $g1 ) > 0 );
 	}
 
 	/**
@@ -213,7 +213,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'status'    => 'private',
 		) );
 
-		$this->assertTrue( hgbp_group_has_children( $g1 ) );
+		$this->assertTrue( hgbp_group_has_children( $g1 ) > 0 );
 	}
 
 	/**
@@ -227,7 +227,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 
 		// Filtering isn't set, so all should be returned.
-		$this->assertTrue( hgbp_group_has_children( $g1 ) );
+		$this->assertTrue( hgbp_group_has_children( $g1 ) > 0 );
 	}
 
 	/**
@@ -239,7 +239,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'parent_id' => $g1,
 		) );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'normal' ) > 0 );
 	}
 
 	/**
@@ -252,7 +252,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'status'    => 'private',
 		) );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'normal' ) > 0 );
 	}
 
 	/**
@@ -265,7 +265,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'status'    => 'hidden',
 		) );
 
-		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'normal' ) == 0 );
 	}
 
 	/**
@@ -278,7 +278,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) > 0 );
 	}
 
 	/**
@@ -292,7 +292,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) > 0 );
 	}
 
 	/**
@@ -306,7 +306,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 
-		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) == 0 );
 	}
 
 	/**
@@ -321,7 +321,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) > 0 );
 	}
 
 	/**
@@ -337,7 +337,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) > 0 );
 	}
 
 	/**
@@ -353,7 +353,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'normal' ) > 0 );
 	}
 
 	/**
@@ -365,7 +365,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'parent_id' => $g1,
 		) );
 		// Only return true if I'm a member of the child group.
-		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'mygroups' ) );
+		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'mygroups' ) > 0 );
 	}
 
 	/**
@@ -378,7 +378,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'status'    => 'private',
 		) );
 		// Only return true if I'm a member of the child group.
-		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'mygroups' ) == 0 );
 	}
 
 	/**
@@ -391,7 +391,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'status'    => 'hidden',
 		) );
 		// Only return true if I'm a member of the child group.
-		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'mygroups' ) == 0 );
 	}
 
 	/**
@@ -404,7 +404,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 		// Only return true if I'm a member of the child group.
-		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) == 0 );
 	}
 
 	/**
@@ -418,7 +418,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 		// Only return true if I'm a member of the child group.
-		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) == 0 );
 	}
 
 	/**
@@ -432,7 +432,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 		// Only return true if I'm a member of the child group.
-		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) == 0 );
 	}
 
 	/**
@@ -447,7 +447,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) > 0 );
 	}
 
 	/**
@@ -463,7 +463,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) > 0 );
 	}
 
 	/**
@@ -479,7 +479,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'mygroups' ) > 0 );
 	}
 
 	/**
@@ -491,7 +491,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'parent_id' => $g1,
 		) );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) > 0 );
 	}
 
 	/**
@@ -504,7 +504,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'status'    => 'private',
 		) );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) > 0 );
 	}
 
 	/**
@@ -517,7 +517,7 @@ class HGBP_Tests extends HGBP_TestCase {
 			'status'    => 'hidden',
 		) );
 
-		$this->assertFalse( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, 0, 'exclude_hidden' ) == 0 );
 	}
 
 	/**
@@ -530,7 +530,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) > 0 );
 	}
 
 	/**
@@ -544,7 +544,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) > 0 );
 	}
 
 	/**
@@ -558,7 +558,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		) );
 		$u1 = $this->factory->user->create();
 
-		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) == 0 );
 	}
 
 	/**
@@ -573,7 +573,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) > 0 );
 	}
 
 	/**
@@ -589,7 +589,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 
-		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) > 0 );
 	}
 
 	/**
@@ -605,7 +605,7 @@ class HGBP_Tests extends HGBP_TestCase {
 		// Make $u1 a member.
 		$this->add_user_to_group( $u1, $g2 );
 		// Always exlude hidden groups in this case.
-		$this->assertFalse( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) );
+		$this->assertTrue( hgbp_group_has_children( $g1, $u1, 'exclude_hidden' ) == 0 );
 	}
 
 	public function test_hgbp_get_ancestor_group_ids_no_user_scope() {

@@ -151,7 +151,7 @@ function hgbp_group_has_children( $group_id = false, $user_id = false, $context 
 	}
 
 	$children = hgbp_get_child_groups( $group_id, $user_id, $context );
-	return ! empty ( $children ) ? true : false;
+	return count( $children );
 }
 
 /**

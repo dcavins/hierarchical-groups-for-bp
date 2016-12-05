@@ -29,7 +29,7 @@ function hgbp_get_hierarchy_screen_slug() {
  * @return string Label to use on the hierarchy navigation item.
  */
 function hgbp_get_hierarchy_nav_item_name() {
-	$name = _x( 'Hierarchy', 'Label for group navigation tab', 'hierarchical-groups-for-bp' );
+	$name =	sprintf( _x( 'Hierarchy %s', 'Label for group navigation tab', 'hierarchical-groups-for-bp' ), '<span>' . number_format( hgbp_group_has_children( bp_get_current_group_id(), bp_loggedin_user_id(), 'exclude_hidden' ) ) . '</span>' );
 	return apply_filters( 'hgbp_screen_nav_item_name', $name );
 }
 

@@ -83,9 +83,6 @@ class HGBP_Public {
 		// Add the "has-children" class to a group item that has children.
 		add_filter( 'bp_get_group_class', array( $this, 'filter_group_classes' ) );
 
-		// Add hierarchical breadcrumbs to the group item when shown as a flat results list.
-		add_action( 'hgbp_using_flat_groups_directory', array( $this, 'add_breadcrumb_action'), 10, 3 );
-
 		// Save a group's allowed_subgroup_creators setting as group metadata.
 		add_action( 'groups_group_settings_edited', array( $this, 'save_allowed_subgroups_creators' ) );
 		add_action( 'bp_group_admin_edit_after',    array( $this, 'save_allowed_subgroups_creators' ) );
@@ -175,26 +172,6 @@ class HGBP_Public {
 	}
 
 	/**
-	 * Add the output breadcrumbs action on non-hierarchical directories.
-	 *
-	 * @since    1.0.0
-	 */
-	public function add_breadcrumb_action() {
-		add_action( 'bp_directory_groups_item', array( $this, 'output_breadcrumbs' ) );
-	}
-
-	/**
-	 * Add a breadcrumb indicator of hierarchy action on non-hierarchical directories.
-	 *
-	 * @since    1.0.0
-	 */
-	public function output_breadcrumbs() {
-		?>
-		<div class="group-hierarchy-breadcrumbs"><?php hgbp_group_permalink_breadcrumbs(); ?></div>
-		<?php
-	}
-
-	/**
 	 * Add bp_has_groups filters right before the directory is rendered.
 	 * This helps avoid modifying the "single-group" use of bp_has_group() used
 	 * to render the group wrapper.
@@ -255,23 +232,10 @@ class HGBP_Public {
 		$filter = apply_filters( 'hgbp_enable_has_group_args_filter', $filter, $args );
 
 		if ( $filter ) {
-
 			// Set the parent_id.
-			if ( is_null( $args['parent_id'] ) ) {
-				if ( bp_is_groups_directory() && ! hgbp_is_my_groups_view() ) {
-					$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : 0;
-				}
+			if ( bp_is_groups_directory() && ! hgbp_is_my_groups_view() ) {
+				$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : 0;
 			}
-
-		} else {
-
-			/**
-			 * Fires when the groups loop will not be displayed hierarchically,
-			 * like when browsing group search results.
-			 *
-			 * @since 1.0.0
-			 */
-			do_action( 'hgbp_using_flat_groups_directory' );
 		}
 
 		// We do have to filter some args on the single group 'hierarchy' screen.

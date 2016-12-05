@@ -83,12 +83,7 @@ class HGBP_Public {
 		// Add the "has-children" class to a group item that has children.
 		add_filter( 'bp_get_group_class', array( $this, 'filter_group_classes' ) );
 
-		// Save a group's allowed_subgroup_creators setting as group metadata.
-		add_action( 'groups_group_settings_edited', array( $this, 'save_allowed_subgroups_creators' ) );
-		add_action( 'bp_group_admin_edit_after',    array( $this, 'save_allowed_subgroups_creators' ) );
 
-		// Save a group's allowed_subgroup_creators setting from the create group screen.
-		add_action( 'groups_create_group_step_save_group-settings', array( $this, 'save_allowed_subgroups_creators_create_step' ) );
 
 		// Modify group permalinks to reflect hierarchy
 		add_filter( 'bp_get_group_permalink', array( $this, 'make_permalink_hierarchical' ), 10, 2 );
@@ -291,28 +286,12 @@ class HGBP_Public {
 		}
 	}
 
-	/**
-	 * Save a group's allowed_subgroup_creators setting as group metadata.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int    $group_id   ID of the group to update.
 	 */
-	public function save_allowed_subgroups_creators( $group_id ) {
-		if ( isset( $_POST['allowed-subgroup-creators'] ) &&
-			 in_array( $_POST['allowed-subgroup-creators'], array( 'noone', 'admin', 'mod', 'member' ) ) ) {
-			groups_update_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators', $_POST['allowed-subgroup-creators'] );
 		}
-	}
 
-	/**
-	 * Save a group's allowed_subgroup_creators setting from the create group screen.
-	 *
-	 * @since 1.0.0
-	 */
-	public function save_allowed_subgroups_creators_create_step() {
-		$group_id = buddypress()->groups->new_group_id;
-		$this->save_allowed_subgroups_creators( $group_id );
 	}
 
 	/**

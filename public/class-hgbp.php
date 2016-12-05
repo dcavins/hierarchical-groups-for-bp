@@ -67,13 +67,15 @@ class HGBP_Public {
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles_scripts' ) );
 
+
+		/* Changes to the groups directory view. ******************************/
 		// Add our templates to BuddyPress' template stack.
 		add_filter( 'bp_get_template_stack', array( $this, 'add_template_stack'), 10, 1 );
 
 		// Potentially override the groups loop template.
 		add_filter( 'bp_get_template_part', array( $this, 'filter_groups_loop_template'), 10, 3 );
 
-		// Hook the has_groups_parse_args filters
+		// Hook bp_has_groups filters right before a group directory is rendered.
 		add_action( 'bp_before_groups_loop', array( $this, 'add_has_group_parse_arg_filters' ) );
 
 		// Add pagination blocks to the groups-loop-tree directory.
@@ -83,26 +85,30 @@ class HGBP_Public {
 		// Add the "has-children" class to a group item that has children.
 		add_filter( 'bp_get_group_class', array( $this, 'filter_group_classes' ) );
 
+		// Handle AJAX requests for subgroups.
+		add_action( 'wp_ajax_hgbp_get_child_groups', array( $this, 'ajax_subgroups_response_cb' ) );
+		add_action( 'wp_ajax_nopriv_hgbp_get_child_groups', array( $this, 'ajax_subgroups_response_cb' ) );
 
 
+		/* Changes to single group behavior. **********************************/
 		// Modify group permalinks to reflect hierarchy
 		add_filter( 'bp_get_group_permalink', array( $this, 'make_permalink_hierarchical' ), 10, 2 );
 
 		/*
 		 * Update the current action and action variables, after the table name is set,
 		 * but before BP Groups Component sets the current group, action and variables.
+		 * This change allows the URLs to be hierarchically written, but for
+		 * BuddyPress to know which group is really the current group.
 		 */
 		add_action( 'bp_groups_setup_globals', array( $this, 'reset_action_variables' ) );
-
-		// Filter user capabilities.
-		add_filter( 'bp_user_can', array( $this, 'check_user_caps' ), 10, 5 );
 
 		// Add hierarchically related activity to group activity streams.
 		add_filter( 'bp_after_has_activities_parse_args', array( $this, 'add_activity_aggregation' ) );
 
-		// Handle AJAX requests for subgroups.
-		add_action( 'wp_ajax_hgbp_get_child_groups', array( $this, 'ajax_subgroups_response_cb' ) );
-		add_action( 'wp_ajax_nopriv_hgbp_get_child_groups', array( $this, 'ajax_subgroups_response_cb' ) );
+
+		/* Add user capability checks. ****************************************/
+		// Filter user capabilities.
+		add_filter( 'bp_user_can', array( $this, 'check_user_caps' ), 10, 5 );
 
 	}
 
@@ -129,6 +135,27 @@ class HGBP_Public {
 		load_textdomain( $domain, trailingslashit( WP_LANG_DIR ) . $domain . '/' . $domain . '-' . $locale . '.mo' );
 	}
 
+	/**
+	 * Register and enqueue public-facing style sheet.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_styles_scripts() {
+		if ( bp_is_active( 'groups' ) ) {
+			// Styles
+			if ( is_rtl() ) {
+				wp_enqueue_style( $this->plugin_slug . '-plugin-styles-rtl', plugins_url( 'css/public-rtl.css', __FILE__ ), array(), $this->version );
+			} else {
+				wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'css/public.css', __FILE__ ), array(), $this->version );
+			}
+
+			// Scripts
+			wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'js/public.min.js', __FILE__ ), array( 'jquery' ), $this->version );
+		}
+	}
+
+
+	/* Changes to the groups directory view. **********************************/
 	/**
 	 * Add our templates to BuddyPress' template stack.
 	 *
@@ -157,7 +184,8 @@ class HGBP_Public {
 			/*
 			 * Add our setting to the front of the array, for the main groups
 			 * directory and a single group's hierarchy screen.
-			 * On the main directory, make sure this isn't the "my groups" view.
+			 * Make sure this isn't the "my groups" view on the main directory
+			 * or a user's groups screen--those directories must be flat.
 			 */
 			if ( ! hgbp_is_my_groups_view() ) {
 				array_unshift( $templates, 'groups/groups-loop-tree.php' );
@@ -183,7 +211,7 @@ class HGBP_Public {
 
 	/**
 	 * Filter has_groups parameters to change results on the main directory
-	 * and on the subgroups screen.
+	 * and on a single group's hierarchy screen.
 	 *
 	 * @since 1.0.0
 	 *
@@ -224,6 +252,15 @@ class HGBP_Public {
 				$filter = true;
 			}
 		}
+
+		/**
+		 * Filters whether or not to apply a parent_id to a groups loop.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param bool  $filter Whether to apply a parent_id to a groups loop.
+		 * @param array $args   Incoming bp_has_groups() args.
+		 */
 		$filter = apply_filters( 'hgbp_enable_has_group_args_filter', $filter, $args );
 
 		if ( $filter ) {
@@ -268,32 +305,25 @@ class HGBP_Public {
 	}
 
 	/**
-	 * Register and enqueue public-facing style sheet.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles_scripts() {
-		if ( bp_is_active( 'groups' ) ) {
-			// Styles
-			if ( is_rtl() ) {
-				wp_enqueue_style( $this->plugin_slug . '-plugin-styles-rtl', plugins_url( 'css/public-rtl.css', __FILE__ ), array(), $this->version );
-			} else {
-				wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'css/public.css', __FILE__ ), array(), $this->version );
-			}
-
-			// Scripts
-			wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'js/public.min.js', __FILE__ ), array( 'jquery' ), $this->version );
-		}
-	}
-
+	 * Generate the response for the AJAX hgbp_get_child_groups action.
 	 *
 	 * @since 1.0.0
 	 *
+	 * @return html
 	 */
+	public function ajax_subgroups_response_cb() {
+		// Within a single group, prefer the subgroups loop template.
+		if ( hgbp_is_hierarchy_screen() ) {
+			bp_get_template_part( 'groups/single/subgroups-loop' );
+		} else {
+			bp_get_template_part( 'groups/groups-loop' );
 		}
 
+		exit;
 	}
 
+
+	/* Changes to single group behavior. **************************************/
 	/**
 	 * Filter a child group's permalink to take the form
 	 * /groups/parent-group/child-group.
@@ -349,6 +379,62 @@ class HGBP_Public {
 		}
 	}
 
+	/**
+	 * Filter has_activities parameters to add hierarchically related groups of
+	 * the current group that user has access to.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param $args Array of parsed arguments.
+	 *
+	 * @return array
+	 */
+	public function add_activity_aggregation( $args ) {
+
+		// Only fire on group activity streams.
+		if ( $args['object'] != 'groups' ) {
+			return $args;
+		}
+
+		$group_id = bp_get_current_group_id();
+
+		// Check if this group is set to aggregate child group activity.
+		$include_activity = hgbp_group_include_hierarchical_activity( $group_id );
+
+		switch ( $include_activity ) {
+			case 'include-from-both':
+				$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
+				$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
+				$child_ids = wp_list_pluck( $children, 'id' );
+				$include   = array_merge( array( $group_id ), $parents, $child_ids );
+				break;
+			case 'include-from-parents':
+				$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
+				// Add the parent IDs to the main group ID.
+				$include = array_merge( array( $group_id ), $parents );
+				break;
+			case 'include-from-children':
+				$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
+				$child_ids = wp_list_pluck( $children, 'id' );
+				// Add the child IDs to the main group ID.
+				$include   = array_merge( array( $group_id ), $child_ids );
+				break;
+			case 'include-from-none':
+			default:
+				// Do nothing.
+				$include = false;
+				break;
+		}
+
+		if ( ! empty( $include ) ) {
+			$args['primary_id'] = $include;
+		}
+
+		return $args;
+	}
+
+
+	/* Add user capability checks. ********************************************/
 	/**
 	 * Check for user capabilities specific to this plugin.
 	 *
@@ -427,76 +513,6 @@ class HGBP_Public {
 		return $retval;
 	}
 
-	/**
-	 * Filter has_activities parameters to add hierarchically related groups of
-	 * the current group that user has access to.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param $args Array of parsed arguments.
-	 *
-	 * @return array
-	 */
-	public function add_activity_aggregation( $args ) {
 
-		// Only fire on group activity streams.
-		if ( $args['object'] != 'groups' ) {
-			return $args;
-		}
-
-		$group_id = bp_get_current_group_id();
-
-		// Check if this group is set to aggregate child group activity.
-		$include_activity = hgbp_group_include_hierarchical_activity( $group_id );
-
-		switch ( $include_activity ) {
-			case 'include-from-both':
-				$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
-				$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
-				$child_ids = wp_list_pluck( $children, 'id' );
-				$include   = array_merge( array( $group_id ), $parents, $child_ids );
-				break;
-			case 'include-from-parents':
-				$parents = hgbp_get_ancestor_group_ids( $group_id, bp_loggedin_user_id(), 'activity' );
-				// Add the parent IDs to the main group ID.
-				$include = array_merge( array( $group_id ), $parents );
-				break;
-			case 'include-from-children':
-				$children  = hgbp_get_descendent_groups( $group_id, bp_loggedin_user_id(), 'activity' );
-				$child_ids = wp_list_pluck( $children, 'id' );
-				// Add the child IDs to the main group ID.
-				$include   = array_merge( array( $group_id ), $child_ids );
-				break;
-			case 'include-from-none':
-			default:
-				// Do nothing.
-				$include = false;
-				break;
-		}
-
-		if ( ! empty( $include ) ) {
-			$args['primary_id'] = $include;
-		}
-
-		return $args;
-	}
-
-	/**
-	 * Generate the response for the AJAX hgbp_get_child_groups action.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return html
-	 */
-	public function ajax_subgroups_response_cb() {
-		// Within a single group, prefer the subgroups loop template.
-		if ( hgbp_is_hierarchy_screen() ) {
-			bp_get_template_part( 'groups/single/subgroups-loop' );
-		} else {
-			bp_get_template_part( 'groups/groups-loop-tree' );
-		}
-
-		exit;
-	}
 
 }

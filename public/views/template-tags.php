@@ -18,6 +18,7 @@
 function hgbp_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) {
 	echo hgbp_get_group_permalink_breadcrumbs( $group, $separator );
 }
+
 	/**
 	 * Return the permalink breadcrumbs for the current group in the loop.
 	 *
@@ -70,6 +71,7 @@ function hgbp_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) 
 function hgbp_group_hierarchy_permalink( $group = false ) {
 	echo hgbp_get_group_hierarchy_permalink( $group );
 }
+
 	/**
 	 * Generate the URL of the hierarchy page of the current group in the loop.
 	 *
@@ -90,7 +92,6 @@ function hgbp_group_hierarchy_permalink( $group = false ) {
 		return trailingslashit( bp_get_group_permalink( $group ) . hgbp_get_hierarchy_screen_slug() );
 	}
 
-
 /**
  * Output the upper pagination block for a group directory list.
  *
@@ -99,7 +100,6 @@ function hgbp_group_hierarchy_permalink( $group = false ) {
 function hgbp_groups_loop_pagination_top() {
 	return hgbp_groups_loop_pagination( 'top' );
 }
-
 
 /**
  * Output the lower pagination block for a group directory list.

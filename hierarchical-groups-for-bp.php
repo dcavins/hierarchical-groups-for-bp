@@ -36,6 +36,7 @@ function hierarchical_groups_for_bp_init() {
 	}
 
 	// Helper functions
+	require_once( plugin_dir_path( __FILE__ ) . 'includes/hgbp-internal-functions.php' );
 	require_once( plugin_dir_path( __FILE__ ) . 'includes/hgbp-functions.php' );
 
 	// Template output functions

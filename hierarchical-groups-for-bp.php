@@ -41,7 +41,6 @@ function hierarchical_groups_for_bp_init() {
 
 	// Template output functions
 	require_once( plugin_dir_path( __FILE__ ) . 'public/views/template-tags.php' );
-	require_once( plugin_dir_path( __FILE__ ) . 'public/views/shortcodes.php' );
 
 	// The BP_Group_Extension class
 	require_once( plugin_dir_path( __FILE__ ) . 'includes/class-bp-group-extension.php' );

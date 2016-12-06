@@ -13,7 +13,7 @@ module.exports = function(grunt) {
 				livereload: true
 			},
 			scripts: {
-				files: ['public/js/src/*.js','admin/js/src/*.js'],
+				files: ['public/js/src/*.js'],
 				tasks: ['jshint', 'uglify']
 			},
 			styles: {
@@ -71,8 +71,7 @@ module.exports = function(grunt) {
 		// JavaScript linting with jshint
 		jshint: {
 			all: [
-				'public/js/src/*.js',
-				'admin/js/src/*.js'
+				'public/js/src/*.js'
 				]
 		},
 
@@ -84,26 +83,8 @@ module.exports = function(grunt) {
 			},
 			common: {
 				files: {
-					'public/js/public.min.js': ['public/js/src/*.js'],
-					'admin/js/public.min.js': ['admin/js/src/*.js']
+					'public/js/public.min.js': ['public/js/src/*.js']
 				}
-			}
-		},
-
-		// Image optimization
-		imagemin: {
-			dist: {
-				options: {
-					optimizationLevel: 7,
-					progressive: true,
-					interlaced: true
-				},
-				files: [{
-					expand: true,
-					cwd: 'public/images/',
-					src: ['**/*.{png,jpg,gif}'],
-					dest: 'public/images/'
-				}]
 			}
 		},
 
@@ -136,7 +117,7 @@ module.exports = function(grunt) {
 	// Typical run, cleans up css and js, starts a watch task.
 	grunt.registerTask('default', ['less:convertcss', 'postcss', 'jshint', 'uglify:common', 'watch']);
 
-	// Before releasing a build, do above plus minimize all images.
-	grunt.registerTask('build', ['less:convertcss', 'postcss', 'rtlcss', 'jshint', 'uglify:common', 'imagemin', 'makepot']);
+	// Before releasing a build, also create the RTL CSS stylesheet and the language file.
+	grunt.registerTask('build', ['less:convertcss', 'postcss', 'rtlcss', 'jshint', 'uglify:common', 'makepot']);
 
 };

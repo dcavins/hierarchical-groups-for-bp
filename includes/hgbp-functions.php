@@ -194,8 +194,10 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 	while ( $parents ) {
 		// Fetch all child groups.
 		$child_args = array(
-			'parent_id' => $parents,
+			'parent_id'   => $parents,
 			'show_hidden' => true,
+			'per_page'    => false,
+			'page'        => false,
 		);
 		$children = groups_get_groups( $child_args );
 		// Reset parents array to rebuild for next round.

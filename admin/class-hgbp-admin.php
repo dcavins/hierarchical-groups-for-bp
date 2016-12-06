@@ -49,11 +49,15 @@ class HGBP_Admin extends HGBP_Public {
 
 		// Add the options page and menu item.
 		add_action( bp_core_admin_hook(), array( $this, 'add_plugin_admin_menu' ), 99 );
-		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ) );
 
 		// Add an action link pointing to the options page.
-		// $plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_slug . '.php' );
-		// add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
+		$plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_slug . '.php' );
+		add_filter( 'plugin_action_links_' . $plugin_basename, array( $this, 'add_action_links' ) );
+
+		// Add settings to the admin page.
+		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ) );
+
+
 	}
 
 	/**
@@ -93,6 +97,20 @@ class HGBP_Admin extends HGBP_Public {
 			'manage_options',
 			$this->plugin_slug,
 			array( $this, 'display_plugin_admin_page' )
+		);
+	}
+
+	/**
+	 * Add settings action link to the plugins page.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_action_links( $links ) {
+		return array_merge(
+			array(
+				'settings' => '<a href="' . admin_url( 'admin.php?page=' . $this->plugin_slug ) . '">' . __( 'Settings', 'hierarchical-groups-for-bp' ) . '</a>'
+			),
+			$links
 		);
 	}
 

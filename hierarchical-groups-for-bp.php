@@ -1,6 +1,6 @@
 <?php
 /**
- * Adds group hierarchy functionality to your BuddyPress-powered community site.
+ * Add hierarchical group functionality to your BuddyPress-powered community site.
  *
  * @package   HierarchicalGroupsForBP
  * @author    dcavins
@@ -9,8 +9,8 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Hierarchical Groups for BP
- * Plugin URI:        @TODO
- * Description:       Adds group hierarchy functionality to your BuddyPress-powered community site.
+ * Plugin URI:        https://github.com/dcavins/hierarchical-groups-for-bp
+ * Description:       Add hierarchical group functionality to your BuddyPress-powered community site.
  * Version:           1.0.0
  * Author:            dcavins
  * Text Domain:       hierarchical-groups-for-bp

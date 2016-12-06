@@ -8,7 +8,7 @@
 		 * Expand folders to show contents on click.
 		 * Contents are fetched via an AJAX request.
 		 */
-		$( '#buddypress' ).on( 'click', '.toggle-child-groups', function( e ) {
+		$( "#buddypress" ).on( "click", ".toggle-child-groups", function( e ) {
 			e.preventDefault();
 
 			// Show or hide the child groups div.
@@ -20,15 +20,30 @@
 	} );
 
 	/**
+	 * Toggle the child groups pane and indicators.
+	 */
+	function toggle_results_pane( anchor ) {
+		// Toggle the child groups pane and open indicator.
+		anchor.siblings( ".child-groups" ).toggleClass( "open" );
+		anchor.toggleClass( "open" );
+
+		// Update the aria-expanded attribute on the related control.
+		if ( anchor.siblings( ".child-groups" ).hasClass( "open" ) ) {
+			anchor.attr( "aria-expanded", true );
+		} else {
+			anchor.attr( "aria-expanded", false );
+		}
+	}
+
+	/**
 	 * Fetch the child groups of a group,
 	 * if the container isn't already populated.
 	 */
 	function fetch_child_groups( anchor ) {
-		var target = anchor.closest( '.child-groups-container' ).find( '.child-groups' ).first(),
-			length = $.trim( target.text() ).length;
+		var target = anchor.closest( ".child-groups-container" ).find( ".child-groups" ).first();
 
 		// If the folder content has already been populated, do nothing.
-		if ( length ) {
+		if ( $.trim( target.text() ).length ) {
 			return;
 		}
 
@@ -37,46 +52,27 @@
 			return;
 		}
 		fetching_child_groups = true;
-		target.addClass( 'loading' );
+
+		// Show a loading indicator.
+		target.addClass( "loading" );
 
 		// Make the AJAX request and populate the list.
 		$.ajax({
 			url: ajaxurl,
-			type: 'GET',
+			type: "GET",
 			data: {
-				parent_id: anchor.data( 'group-id' ),
-				action: 'hgbp_get_child_groups',
+				parent_id: anchor.data( "group-id" ),
+				action: "hgbp_get_child_groups",
 			},
 			success: function( response ) {
-				console.log( 'runnning success' );
 				$( target ).html( response );
-			},
-			error: function( response ) {
-				console.log( 'runnning error' );
 			}
 		})
 		.done( function( response ) {
-				console.log( 'runnning done' );
-				fetching_child_groups = false;
-				target.removeClass( 'loading' );
+			fetching_child_groups = false;
+			target.removeClass( "loading" );
 		});
 
-	}
-
-	/**
-	 * Toggle the child groups pane and indicators.
-	 */
-	function toggle_results_pane( anchor ) {
-		// Toggle the class.
-		anchor.siblings( ".child-groups" ).toggleClass( "open" );
-		anchor.toggleClass( "open" );
-
-		// Update the aria-expanded atribute on the related control.
-		if ( anchor.siblings( ".child-groups" ).hasClass( "open" ) ) {
-			anchor.attr( "aria-expanded", true );
-		} else {
-			anchor.attr( "aria-expanded", false );
-		}
 	}
 
 }(jQuery));

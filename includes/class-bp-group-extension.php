@@ -67,28 +67,44 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	 */
 	function settings_screen( $group_id = null ) {
 		?>
-		<label for="parent-id"><?php _ex( 'Parent Group', 'Label for the parent group select on a single group manage screen', 'hierarchical-groups-for-bp' ); ?></label>
+		<label class="emphatic" for="parent-id"><?php _ex( 'Parent Group', 'Label for the parent group select on a single group manage screen', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
 		$current_parent_group_id = hgbp_get_parent_group_id( $group_id );
 		$possible_parent_groups = hgbp_get_possible_parent_groups( $group_id, bp_loggedin_user_id() );
 
-		if ( $possible_parent_groups ) :
+		if ( ! $current_parent_group_id ) :
 			?>
-			<select id="parent-id" name="parent-id" autocomplete="off">
-				<option value="0" <?php selected( 0, $current_parent_group_id ); ?>><?php echo _x( 'None selected', 'The option that sets a group to be a top-level group and have no parent.', 'hierarchical-groups-for-bp' ); ?></option>
-			<?php foreach ( $possible_parent_groups as $possible_parent_group ) {
+			<p class="info"><?php _e( 'This group is currently a top-level group.', 'hierarchical-groups-for-bp' ); ?></p>
+			<?php
+		else :
+			$parent_group = groups_get_group( $current_parent_group_id );
+			// The parent group could be a hidden group, so the current user may not be able to know about it. :\
+			if ( 'hidden' == bp_get_group_status( $parent_group ) && ! groups_is_user_member( bp_loggedin_user_id(), $parent_group->id ) ) :
+				$current_parent_group_id = 'hidden-from-user';
 				?>
-				<option value="<?php echo $possible_parent_group->id; ?>" <?php selected( $current_parent_group_id, $possible_parent_group->id ); ?>><?php echo $possible_parent_group->name; ?></option>
+				<p class="info"><?php _e( 'This group&rsquo;s current parent group is a hidden group, and you are not a member of that group.', 'hierarchical-groups-for-bp' ); ?></p>
 				<?php
+			else :
+				?>
+				<p class="info"><?php printf( __( 'This group&rsquo;s current parent group is %s.', 'hierarchical-groups-for-bp' ), bp_get_group_name( $parent_group ) ); ?></p>
+				<?php
+			endif;
+		endif; ?>
+			<select id="parent-id" name="parent-id" autocomplete="off">
+				<option value="no-change" <?php selected( 'hidden-from-user', $current_parent_group_id ); ?>><?php echo _x( 'Keep current parent group', 'The option to keep the current parent.', 'hierarchical-groups-for-bp' ); ?></option>
+				<option value="0" <?php selected( 0, $current_parent_group_id ); ?>><?php echo _x( 'No parent group', 'The option that sets a group to be a top-level group and have no parent.', 'hierarchical-groups-for-bp' ); ?></option>
+			<?php
+			if ( $possible_parent_groups ) {
+
+				foreach ( $possible_parent_groups as $possible_parent_group ) {
+					?>
+					<option value="<?php echo $possible_parent_group->id; ?>" <?php selected( $current_parent_group_id, $possible_parent_group->id ); ?>><?php echo $possible_parent_group->name; ?></option>
+					<?php
+				}
 			}
 			?>
 			</select>
 			<?php
-		else :
-			?>
-			<p><?php _e( 'There are no groups available to be a parent to this group.', 'hierarchical-groups-for-bp' ); ?></p>
-			<?php
-		endif;
 		?>
 
 		<fieldset class="hierarchy-allowed-subgroup-creators radio">
@@ -143,10 +159,15 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	 */
 	function settings_screen_save( $group_id = null ) {
 		$group_object = groups_get_group( $group_id );
-		$parent_id = isset( $_POST['parent-id'] ) ? $_POST['parent-id'] : 0;
-		if ( $group_object->parent_id != $parent_id ) {
-			$group_object->parent_id = $parent_id;
-			$group_object->save();
+
+		// Save parent ID. Do nothing if value passed is "no-change".
+		if ( isset( $_POST['parent-id'] ) && 'no-change' != $_POST['parent-id'] ) {
+			$parent_id = $_POST['parent-id'] ? (int) $_POST['parent-id'] : 0;
+
+			if ( $group_object->parent_id != $parent_id ) {
+				$group_object->parent_id = $parent_id;
+				$group_object->save();
+			}
 		}
 
 		$allowed_creators = isset( $_POST['allowed-subgroup-creators'] ) ? $_POST['allowed-subgroup-creators'] : '';

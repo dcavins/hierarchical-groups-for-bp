@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Hierarchical Groups for BP 1.0.0\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/hierarchical-groups-for-bp\n"
-"POT-Creation-Date: 2016-12-06 21:32:26+00:00\n"
+"POT-Creation-Date: 2016-12-07 17:09:59+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,113 +25,143 @@ msgstr ""
 "X-Poedit-Bookmarks: \n"
 "X-Textdomain-Support: yes\n"
 
-#: admin/class-hgbp-admin.php:95 admin/class-hgbp-admin.php:96
+#: admin/class-hgbp-admin.php:86 admin/class-hgbp-admin.php:87
 msgid "Hierarchy Options"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:111
+#: admin/class-hgbp-admin.php:102
 msgid "Settings"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:128
+#: admin/class-hgbp-admin.php:119
 msgid "Show the groups directories as a hierarchical tree."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:136
+#: admin/class-hgbp-admin.php:127
 msgid "Replace the flat groups directory with a hierarchical directory."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:145
+#: admin/class-hgbp-admin.php:136
 msgid "Group Activity Syndication"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:153
+#: admin/class-hgbp-admin.php:144
 msgid "Include related group activity in group activity streams."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:162
+#: admin/class-hgbp-admin.php:153
 msgid "Who can override this setting for each group?"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:176
+#: admin/class-hgbp-admin.php:162
+msgid "Import Data from Other Plugins"
+msgstr ""
+
+#: admin/class-hgbp-admin.php:170
+msgid "Select an import tool to run."
+msgstr ""
+
+#: admin/class-hgbp-admin.php:184
 msgid ""
 "Hierarchy settings can be set per-group or globally. Set global defaults "
 "here. Note that users will not see activity from groups they cannot visit."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:187
+#: admin/class-hgbp-admin.php:195
 msgid ""
 "<strong>Include parent group activity</strong> in every group activity "
 "stream."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:189
+#: admin/class-hgbp-admin.php:197
 msgid ""
 "<strong>Include child group activity</strong> in every group activity "
 "stream."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:191
+#: admin/class-hgbp-admin.php:199
 msgid ""
 "<strong>Include parent and child group activity</strong> in every group "
 "activity stream."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:193
+#: admin/class-hgbp-admin.php:201
 msgid ""
 "<strong>Do not include related group activity</strong> in any group "
 "activity stream."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:89
-msgid "There are no groups available to be a parent to this group."
+#: admin/class-hgbp-admin.php:255
+msgid "Don't import anything right now."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:96
+#: admin/class-hgbp-admin.php:257
 msgid ""
-"Which members of this group are allowed to select this group as the parent "
-"group of another group?"
+"Import the \"subgroup creators\" setting for each group as set by BP Group "
+"Hierarchy."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:104
+#: includes/class-bp-group-extension.php:77
+msgid "This group is currently a top-level group."
+msgstr ""
+
+#: includes/class-bp-group-extension.php:85
+msgid ""
+"This group&rsquo;s current parent group is a hidden group, and you are not "
+"a member of that group."
+msgstr ""
+
+#: includes/class-bp-group-extension.php:89
+msgid "This group&rsquo;s current parent group is %s."
+msgstr ""
+
+#: includes/class-bp-group-extension.php:112
+msgid "Who is allowed to select this group as the parent group of another group?"
+msgstr ""
+
+#: includes/class-bp-group-extension.php:121
+msgid "Any logged-in site member"
+msgstr ""
+
+#: includes/class-bp-group-extension.php:124
 msgid "All group members"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:106
+#: includes/class-bp-group-extension.php:126
 msgid "Group admins and mods only"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:108
+#: includes/class-bp-group-extension.php:128
 msgid "Group admins only"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:111
+#: includes/class-bp-group-extension.php:130
 msgid "No one"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:123
+#: includes/class-bp-group-extension.php:142
 msgid ""
 "Include activity from parent and child groups in this group&rsquo;s "
 "activity stream."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:125
+#: includes/class-bp-group-extension.php:144
 msgid "Include parent group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:127
+#: includes/class-bp-group-extension.php:146
 msgid "Include child group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:129
+#: includes/class-bp-group-extension.php:148
 msgid "Include parent and child group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:131
+#: includes/class-bp-group-extension.php:150
 msgid "Do not include related group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:133
+#: includes/class-bp-group-extension.php:152
 msgid "Inherit global setting."
 msgstr ""
 
@@ -169,22 +199,22 @@ msgstr ""
 msgid "dcavins"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:206
+#: admin/class-hgbp-admin.php:214
 msgctxt "Response for allow overrides of include group activity global setting"
 msgid "<strong>Group administrators</strong> can choose a setting for their group."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:208
+#: admin/class-hgbp-admin.php:216
 msgctxt "Response for allow overrides of include group activity global setting"
 msgid "<strong>Site administrators</strong> can choose a setting for each group."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:210
+#: admin/class-hgbp-admin.php:218
 msgctxt "Response for allow overrides of include group activity global setting"
 msgid "<strong>Enforce global setting</strong> for all groups."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:229
+#: admin/class-hgbp-admin.php:237
 msgctxt "Response for use directory tree global setting"
 msgid "Show a hierarchical directory."
 msgstr ""
@@ -201,9 +231,14 @@ msgctxt "Label for the parent group select on a single group manage screen"
 msgid "Parent Group"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:78
+#: includes/class-bp-group-extension.php:94
+msgctxt "The option to keep the current parent."
+msgid "Keep current parent group"
+msgstr ""
+
+#: includes/class-bp-group-extension.php:95
 msgctxt "The option that sets a group to be a top-level group and have no parent."
-msgid "None selected"
+msgid "No parent group"
 msgstr ""
 
 #: includes/hgbp-internal-functions.php:32

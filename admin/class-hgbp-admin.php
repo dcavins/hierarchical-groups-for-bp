@@ -158,6 +158,23 @@ class HGBP_Admin extends HGBP_Public {
 
 		// Tools for importing settings from previous plugins.
 		add_settings_section(
+			'hgbp_labels',
+			__( 'Customize labels', 'hierarchical-groups-for-bp' ),
+			array( $this, 'labels_section_callback' ),
+			$this->plugin_slug
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-group-tab-label', 'sanitize_text_field' );
+		add_settings_field(
+			'hgbp-group-tab-label',
+			'',
+			array( $this, 'render_labels_section' ),
+			$this->plugin_slug,
+			'hgbp_labels'
+		);
+
+		// Tools for importing settings from previous plugins.
+		add_settings_section(
 			'hgbp_import_tools',
 			__( 'Import Data from Other Plugins', 'hierarchical-groups-for-bp' ),
 			array( $this, 'import_tools_section_callback' ),
@@ -235,6 +252,26 @@ class HGBP_Admin extends HGBP_Public {
 		$setting = hgbp_get_directory_as_tree_setting();
 		?>
 		<label for="hgbp-groups-directory-show-tree"><input type="checkbox" id="hgbp-groups-directory-show-tree" name="hgbp-groups-directory-show-tree" value="1"<?php checked( $setting ); ?>> <?php _ex( 'Show a hierarchical directory.', 'Response for use directory tree global setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<?php
+	}
+
+	/**
+	 * Provide a section description for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function labels_section_callback() {}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_labels_section() {
+		$label = get_option( 'hgbp-group-tab-label' );
+		?>
+		<label for="hgbp-group-tab-label"><?php _ex( 'Group hierarchy tab label:', 'Label for tab label text input on site hierarchy options screen', 'hierarchical-groups-for-bp' ); ?></label>&emsp;<input type="text" id="hgbp-group-tab-label" name="hgbp-group-tab-label" value="<?php echo esc_textarea( $label ); ?>">
+		<p class="description"><?php _e( 'Change the word on the BuddyPress group tab from "Hierarchy" to whatever you&rsquo;d like. To show the number of child groups in the label, include the string <code>%s</code> in your new label, like <code>Subgroups %s</code>.', 'hierarchical-groups-for-bp' ) ?></p>
 		<?php
 	}
 

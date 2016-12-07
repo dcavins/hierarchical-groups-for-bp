@@ -233,11 +233,11 @@ class HGBP_Public {
 		 * 'hgbp_enable_has_group_args_filter' filter.
 		 */
 		$use_tree = hgbp_get_directory_as_tree_setting();
-		$filter = false;
+		$force_parent_id = false;
 		if ( $use_tree ) {
 			// Check that the incoming args are basically defaults.
-			if ( ( ! isset( $args['type'] ) || 'active' == $args['type'] )
-					&& ( ! isset( $args['orderby'] ) || 'last_activity' == $args['orderby'] )
+			if ( ( empty( $args['type'] ) || 'active' == $args['type'] )
+					&& ( empty( $args['orderby'] ) || 'last_activity' == $args['orderby'] )
 					&& ( empty( $args['slug'] ) )
 					&& ( empty( $args['search_terms'] ) )
 					&& ( empty( $args['group_type'] ) )
@@ -247,9 +247,9 @@ class HGBP_Public {
 					&& ( empty( $args['include'] ) )
 					&& ( empty( $args['exclude'] ) )
 					&& ( empty( $args['parent_id'] ) )
-					&& ( ! isset( $args['scope'] ) || 'personal' != $args['scope'] )
+					&& ( empty( $args['scope'] ) || 'personal' != $args['scope'] )
 				) {
-				$filter = true;
+				$force_parent_id = true;
 			}
 		}
 
@@ -258,15 +258,18 @@ class HGBP_Public {
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param bool  $filter Whether to apply a parent_id to a groups loop.
-		 * @param array $args   Incoming bp_has_groups() args.
+		 * @param bool  $force_parent_id Whether to apply a parent_id to a groups loop.
+		 * @param array $args            Incoming bp_has_groups() args.
 		 */
-		$filter = apply_filters( 'hgbp_enable_has_group_args_filter', $filter, $args );
+		$force_parent_id = apply_filters( 'hgbp_enable_has_group_args_force_parent_id', $force_parent_id, $args );
 
-		if ( $filter ) {
-			// Set the parent_id.
-			if ( bp_is_groups_directory() && ! hgbp_is_my_groups_view() ) {
+		// Maybe set the parent_id on the main groups directory.
+		if ( bp_is_groups_directory() && ! hgbp_is_my_groups_view() ) {
+			if ( $force_parent_id ) {
 				$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : 0;
+			} elseif ( isset( $_REQUEST['parent_id'] ) )  {
+				// Even if a parent ID is not forced, requests may still come in for subgroup loops.
+				$args['parent_id'] = (int) $_REQUEST['parent_id'];
 			}
 		}
 

@@ -181,7 +181,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		if ( isset( $_POST['hgbp-include-activity-from-relatives'] ) ) {
 			if ( 'inherit' == $_POST['hgbp-include-activity-from-relatives'] ) {
 				// If "inherit", delete the group meta.
-				$success = groups_delete_groupmeta( $group_id, $posted );
+				$success = groups_delete_groupmeta( $group_id, 'hgbp-include-activity-from-relatives' );
 			} else {
 				$setting = hgbp_sanitize_include_setting( $_POST['hgbp-include-activity-from-relatives'] );
 				$success = groups_update_groupmeta( $group_id, 'hgbp-include-activity-from-relatives', $setting );

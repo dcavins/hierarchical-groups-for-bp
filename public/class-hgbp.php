@@ -342,7 +342,7 @@ class HGBP_Public {
 		// We only need to filter if this not a top-level group.
 		if ( $group->parent_id != 0 ) {
 			$group_path = hgbp_build_hierarchical_slug( $group->id );
-			$permalink  = trailingslashit( bp_get_groups_directory_permalink() . $group_path . '/' );
+			$permalink  = trailingslashit( bp_get_groups_directory_permalink() . $group_path );
 		}
 		return $permalink;
 	}

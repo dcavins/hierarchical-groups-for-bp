@@ -211,7 +211,7 @@ function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
  * @return string Level of enforcement for overriding the default settings.
  */
 function hgbp_sanitize_subgroup_creators_setting( $value ) {
-	$valid = array( 'member', 'mod', 'admin', 'noone' );
+	$valid = array( 'loggedin', 'member', 'mod', 'admin', 'noone' );
 	if ( ! in_array( $value, $valid, true ) ) {
 		$value = 'noone';
 	}

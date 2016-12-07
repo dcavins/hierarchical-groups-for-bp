@@ -224,8 +224,8 @@ class HGBP_Public {
 		 * Should we filter this groups loop at all?
 		 * We only want to filter if this is an otherwise unfiltered view.
 		 * Basically, if the user wants to order by most members, it's unlikely
-		 * they mean, "sort the top level groups by the number of members".
-		 * They probably mean, "Show me the largest/smallest group".
+		 * they mean, "sort the top level groups by the number of members."
+		 * They probably mean, "Show me the largest group."
 		 * One thing we can't know is if type => popular and orderby => last_activity
 		 * are intentionally set or just the defaults.
 		 * This is a guess.
@@ -390,7 +390,6 @@ class HGBP_Public {
 	 * @return array
 	 */
 	public function add_activity_aggregation( $args ) {
-
 		// Only fire on group activity streams.
 		if ( $args['object'] != 'groups' ) {
 			return $args;
@@ -475,38 +474,42 @@ class HGBP_Public {
 		}
 
 		if ( 'create_subgroups' == $capability ) {
-			// If group creation is restricted, respect that setting.
-			if ( bp_restrict_group_creation() && ! bp_user_can( $user_id, 'bp_moderate' ) ) {
-				return false;
-			}
-
 			// We need to know which group is in question.
 			if ( empty( $args['group_id'] ) ) {
 				return false;
 			}
-			$group_id = (int) $args['group_id'];
 
-			// Possible settings for the group meta setting 'allowed_subgroup_creators'
-			$creator_setting = groups_get_groupmeta( $group_id, 'hgbp-allowed-subgroup-creators' );
-			switch ( $creator_setting ) {
-				case 'admin' :
-					$retval = groups_is_user_admin( $user_id, $group_id );
-					break;
+			// Site admins can do the hokey pokey.
+			if ( bp_user_can( $user_id, 'bp_moderate' ) ) {
+				$retval = true;
+			} else {
+				$group_id = (int) $args['group_id'];
 
-				case 'mod' :
-					$retval = ( groups_is_user_mod( $user_id, $group_id ) ||
-								groups_is_user_admin( $user_id, $group_id ) );
-					break;
+				// Possible settings for the group meta setting 'allowed_subgroup_creators'
+				$creator_setting = hgbp_get_allowed_subgroup_creators( $group_id );
+				switch ( $creator_setting ) {
+					case 'admin' :
+						$retval = groups_is_user_admin( $user_id, $group_id );
+						break;
 
-				case 'member' :
-					$retval = groups_is_user_member( $user_id, $group_id );
-					break;
+					case 'mod' :
+						$retval = ( groups_is_user_mod( $user_id, $group_id )
+									|| groups_is_user_admin( $user_id, $group_id ) );
+						break;
 
-				case 'noone' :
-				default :
-					// @TODO: This seems weird, but I can imagine situations where only site admins should be able to associate groups.
-					$retval = bp_user_can( $user_id, 'bp_moderate' );
-					break;
+					case 'member' :
+						$retval = groups_is_user_member( $user_id, $group_id );
+						break;
+
+					case 'loggedin' :
+						$retval = is_user_logged_in();
+						break;
+
+					case 'noone' :
+					default :
+						$retval = false;
+						break;
+				}
 			}
 		}
 

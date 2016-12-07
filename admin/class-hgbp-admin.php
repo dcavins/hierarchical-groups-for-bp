@@ -35,14 +35,6 @@ class HGBP_Admin extends HGBP_Public {
 	 * @since    1.0.0
 	 */
 	public function add_action_hooks() {
-		/*
-		 * @TODO :
-		 *
-		 * - Uncomment following lines if the admin class should only be available for super admins
-		 */
-		/* if( ! is_super_admin() ) {
-			return;
-		} */
 
 		// Load admin style sheet and JavaScript.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
@@ -56,7 +48,6 @@ class HGBP_Admin extends HGBP_Public {
 
 		// Add settings to the admin page.
 		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ) );
-
 
 	}
 

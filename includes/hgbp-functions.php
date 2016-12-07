@@ -234,15 +234,11 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
  * @return int ID of parent group.
  */
 function hgbp_get_parent_group_id( $group_id = false, $user_id = false, $context = 'normal' ) {
-	/*
-	 * Passing a group id of 0 would find all top-level groups, which could be
-	 * intentional. We only try to find the current group when the $group_id is false.
-	 */
 	if ( $group_id === false ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
-			// If we can't resolve the group_id, don't proceed with a zero value.
-			return array();
+			// If we can't resolve the group_id, don't proceed.
+			return 0;
 		}
 	}
 
@@ -356,10 +352,7 @@ function hgbp_get_possible_parent_groups( $group_id = false, $user_id = false ) 
 		'per_page'        => false, // Do not limit the number returned.
 		'page'            => false, // Do not limit the number returned.
 	);
-	// If the user is not a site admin, limit the set to groups she belongs to.
-	if ( ! bp_user_can( $user_id, 'bp_moderate' ) ) {
-		$args['user_id'] = $user_id;
-	}
+
 	$possible_parents = groups_get_groups( $args );
 	foreach ( $possible_parents['groups'] as $k => $group ) {
 		// Check whether the user can create child groups of this group.

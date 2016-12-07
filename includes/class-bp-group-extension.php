@@ -109,20 +109,23 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 
 		<fieldset class="hierarchy-allowed-subgroup-creators radio">
 
-			<legend><?php _e( 'Which members of this group are allowed to select this group as the parent group of another group?', 'hierarchical-groups-for-bp' ); ?></legend>
+			<legend><?php _e( 'Who is allowed to select this group as the parent group of another group?', 'hierarchical-groups-for-bp' ); ?></legend>
 
 			<?php
-			$subgroup_creators = hgbp_get_allowed_subgroup_creators();
-
-			// If only site admins can create groups, don't display impossible options.
-			if ( ! bp_restrict_group_creation() ) :
-			?>
-				<label for="allowed-subgroup-creators-members"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-members" value="member" <?php checked( $subgroup_creators, 'member' ); ?> /> <?php _e( 'All group members', 'hierarchical-groups-for-bp' ); ?></label>
-
-				<label for="allowed-subgroup-creators-mods"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-mods" value="mod" <?php checked( $subgroup_creators, 'mod' ); ?> /> <?php _e( 'Group admins and mods only', 'hierarchical-groups-for-bp' ); ?></label>
-
-				<label for="allowed-subgroup-creators-admins"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-admins" value="admin" <?php checked( $subgroup_creators, 'admin' ); ?> /> <?php _e( 'Group admins only', 'hierarchical-groups-for-bp' ); ?></label>
+			$subgroup_creators = hgbp_get_allowed_subgroup_creators( $group_id );
+			/*
+			 * Don't include the loggedin option if this group is hidden--
+			 * you have to be a member to even know about hidden groups.
+			 */
+			if ( 'hidden' != bp_get_group_status( groups_get_group( $group_id ) ) ) : ?>
+				<label for="allowed-subgroup-creators-loggedin"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-loggedin" value="loggedin" <?php checked( $subgroup_creators, 'loggedin' ); ?> /> <?php _e( 'Any logged-in site member', 'hierarchical-groups-for-bp' ); ?></label>
 			<?php endif; ?>
+
+			<label for="allowed-subgroup-creators-members"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-members" value="member" <?php checked( $subgroup_creators, 'member' ); ?> /> <?php _e( 'All group members', 'hierarchical-groups-for-bp' ); ?></label>
+
+			<label for="allowed-subgroup-creators-mods"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-mods" value="mod" <?php checked( $subgroup_creators, 'mod' ); ?> /> <?php _e( 'Group admins and mods only', 'hierarchical-groups-for-bp' ); ?></label>
+
+			<label for="allowed-subgroup-creators-admins"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-admins" value="admin" <?php checked( $subgroup_creators, 'admin' ); ?> /> <?php _e( 'Group admins only', 'hierarchical-groups-for-bp' ); ?></label>
 
 			<label for="allowed-subgroup-creators-noone"><input type="radio" name="allowed-subgroup-creators" id="allowed-subgroup-creators-noone" value="noone" <?php checked( $subgroup_creators, 'noone' ); ?> /> <?php _e( 'No one', 'hierarchical-groups-for-bp' ); ?></label>
 		</fieldset>

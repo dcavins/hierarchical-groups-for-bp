@@ -47,7 +47,7 @@ This plugin makes use of features found only in BuddyPress 2.7. or newer.
 
 Create a new language file from the included `hierarchical-groups-for-bp.pot` file.
 Save the language files in a new directory, `wp-content/languages/hierarchical-groups-for-bp/`, with the filenames `hierarchical-groups-for-bp-{locale}.mo`
-and `hierarchical-groups-for-bp-{locale}.po`. Please consider contributing to the translation project for this plugin (add link once published).
+and `hierarchical-groups-for-bp-{locale}.po`. Please consider contributing to the translation project for this plugin (add link once published). Read more about [creating custom language files](https://codex.buddypress.org/getting-started/customizing/customizing-labels-messages-and-urls/).
 
 
 == Changelog ==

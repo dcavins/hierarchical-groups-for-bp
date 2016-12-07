@@ -49,6 +49,10 @@ class HGBP_Admin extends HGBP_Public {
 		// Add settings to the admin page.
 		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ) );
 
+		// Add Group Type column.
+		add_filter( 'bp_groups_list_table_get_columns', array( $this, 'add_parent_group_column' ) );
+		add_filter( 'bp_groups_admin_get_group_custom_column', array( $this, 'column_content_parent_group' ), 10, 3 );
+
 	}
 
 	/**
@@ -354,4 +358,49 @@ class HGBP_Admin extends HGBP_Public {
 		<?php
 	}
 
+	/**
+	 * Add Parent Group column to the WordPress admin groups list table.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $columns Groups table columns.
+	 *
+	 * @return array $columns
+	 */
+	public function add_parent_group_column( $columns = array() ) {
+		$columns['hgbp_parent_group'] = _x( 'Parent Group', 'Label for the WP groups table parent group column', 'hierarchical-groups-for-bp' );
+
+		return $columns;
+	}
+
+	/**
+	 * Markup for the Parent Group column.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $value       Empty string.
+	 * @param string $column_name Name of the column being rendered.
+	 * @param array  $item        The current group item in the loop.
+	 */
+	public function column_content_parent_group( $retval = '', $column_name, $item ) {
+		if ( 'hgbp_parent_group' !== $column_name ) {
+			return $retval;
+		}
+
+		if ( 0 != $item[ 'parent_id' ] ) {
+			$parent_group = groups_get_group( $item[ 'parent_id' ] );
+			$parent_edit_url = bp_get_admin_url( 'admin.php?page=bp-groups&amp;gid=' . $item['parent_id'] . '&amp;action=edit' );
+			$retval = '<a href="' . $parent_edit_url . '">' . bp_get_group_name( $parent_group ) . '</a>';
+		}
+
+		/**
+		 * Filters the markup for the Parent Group column.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $retval Markup for the Parent Group column.
+		 * @param array  $item   The current group item in the loop.
+		 */
+		echo apply_filters_ref_array( 'hgbp_groups_admin_get_parent_group_column', array( $retval, $item ) );
+	}
 }

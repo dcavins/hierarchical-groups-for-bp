@@ -165,6 +165,23 @@ class HGBP_Admin extends HGBP_Public {
 			'hgbp_activity_syndication'
 		);
 
+		// Tools for importing settings from previous plugins.
+		add_settings_section(
+			'hgbp_import_tools',
+			__( 'Import Data from Other Plugins', 'hierarchical-groups-for-bp' ),
+			array( $this, 'import_tools_section_callback' ),
+			$this->plugin_slug
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-run-import-tools', array( $this, 'maybe_run_import_tools' ) );
+		add_settings_field(
+			'hgbp-include-activity-from-relatives',
+			__( 'Select an import tool to run.', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_import_tools_selection' ),
+			$this->plugin_slug,
+			'hgbp_import_tools'
+		);
+
 	}
 
 	/**
@@ -228,6 +245,65 @@ class HGBP_Admin extends HGBP_Public {
 		?>
 		<label for="hgbp-groups-directory-show-tree"><input type="checkbox" id="hgbp-groups-directory-show-tree" name="hgbp-groups-directory-show-tree" value="1"<?php checked( $setting ); ?>> <?php _ex( 'Show a hierarchical directory.', 'Response for use directory tree global setting', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
+	}
+
+	/**
+	 * Provide a section description for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function import_tools_section_callback() {}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_import_tools_selection() {
+		?>
+		<label for="hgbp-run-import-tools-do-nothing"><input type="radio" id="hgbp-run-import-tools-do-nothing" name="hgbp-run-import-tools" value="do-nothing" checked="checked"> <?php _e( 'Don\'t import anything right now.', 'hierarchical-groups-for-bp' ); ?></label>
+
+		<label for="hgbp-run-import-tools-bpgh-subgroup-creators"><input type="radio" id="hgbp-run-import-tools-bpgh-subgroup-creators" name="hgbp-run-import-tools" value="bpgh-subgroup-creators"> <?php _e( 'Import the "subgroup creators" setting for each group as set by BP Group Hierarchy.', 'hierarchical-groups-for-bp' ); ?></label>
+		<?php
+	}
+
+	/**
+	 * Maybe run an import tool to migrate data from the old BP Group Hierarchy plugin.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param  string The value passed from the save routine.
+	 */
+	public function maybe_run_import_tools( $value ) {
+		if ( 'bpgh-subgroup-creators' == $value ) {
+			global $wpdb;
+			$bp = buddypress();
+
+			// Fetch all of the relevant metadata.
+			$sql = "SELECT group_id, meta_value FROM " . $bp->groups->table_name_groupmeta . " WHERE meta_key = 'bp_group_hierarchy_subgroup_creators'";
+			$results = $wpdb->get_results( $sql );
+
+			foreach ( $results as $old_setting ) {
+				switch ( $old_setting->meta_value ) {
+					case 'anyone':
+						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'loggedin' );
+						break;
+
+					case 'group_members':
+						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'member' );
+						break;
+
+					case 'group_admins':
+						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'admin' );
+						break;
+
+					case 'noone':
+					default:
+						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'noone' );
+						break;
+				}
+			}
+		}
 	}
 
 	/**

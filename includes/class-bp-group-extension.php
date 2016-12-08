@@ -66,6 +66,10 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	 * @since 1.0.0
 	 */
 	function settings_screen( $group_id = null ) {
+		// On the create screen, the group_id isn't passed reliably.
+		if ( empty( $group_id ) && ! empty( $_COOKIE['bp_new_group_id'] ) ) {
+			$group_id = (int) $_COOKIE['bp_new_group_id'];
+		}
 		?>
 		<label class="emphatic" for="parent-id"><?php _ex( 'Parent Group', 'Label for the parent group select on a single group manage screen', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php

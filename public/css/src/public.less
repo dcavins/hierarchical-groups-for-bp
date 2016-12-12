@@ -21,6 +21,7 @@
 }
 
 .toggle-child-groups {
+	line-height: 1.8;
 	&:before {
 		content: "";
 		position: relative;
@@ -37,6 +38,19 @@
 	}
 	&.open:before {
 		transform: rotate(0deg);
+	}
+	// Styled like standard count indicators in BP.
+	.count {
+		background: #eee;
+		border-radius: 50%;
+		border: 1px solid #ccc;
+		color: #6c6c6c;
+		display: inline;
+		font-size: 70%;
+		margin-left: 2px;
+		padding: 3px 6px;
+		text-align: center;
+		vertical-align: middle;
 	}
 }
 
@@ -71,7 +85,7 @@
 	}
 }
 
-// Styles for the group settings form
+// Styles for the group settings form.
 .hierarchy form[name="group-settings-form"] {
 	.info {
 		margin-bottom: .5em;

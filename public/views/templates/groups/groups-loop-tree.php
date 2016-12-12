@@ -92,9 +92,12 @@ do_action( 'bp_before_groups_loop' ); ?>
 			 * Show the 'show child groups' toggle only if the group has child
 			 * groups that should be visible in this context.
 			 */
-			if ( hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id(), 'directory' ) ) : ?>
+			if ( $number_children = hgbp_group_has_children( bp_get_group_id(), bp_loggedin_user_id(), 'directory' ) ) : ?>
 				<div class="child-groups-container">
-					<a href="<?php hgbp_group_hierarchy_permalink(); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php _ex( 'Child groups', 'Label for the control on group directories that shows or hides the child groups.', 'hierarchical-groups-for-bp' ); ?></a>
+					<a href="<?php hgbp_group_hierarchy_permalink(); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php printf(
+							_x( 'Child groups %s', 'Label for the control on group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' ),
+							'<span class="count">' . $number_children . '</span>'
+						); ?></a>
 					<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>
 				</div>
 			<?php endif; ?>

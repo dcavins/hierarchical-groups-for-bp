@@ -49,7 +49,7 @@ class HGBP_Admin extends HGBP_Public {
 		// Add settings to the admin page.
 		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ) );
 
-		// Add Group Type column.
+		// Add "Parent Group" column to the WP Groups List table.
 		add_filter( 'bp_groups_list_table_get_columns', array( $this, 'add_parent_group_column' ) );
 		add_filter( 'bp_groups_admin_get_group_custom_column', array( $this, 'column_content_parent_group' ), 10, 3 );
 

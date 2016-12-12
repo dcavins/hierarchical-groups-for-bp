@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Hierarchical Groups for BP 1.0.0\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/hierarchical-groups-for-bp\n"
-"POT-Creation-Date: 2016-12-07 20:19:51+00:00\n"
+"POT-Creation-Date: 2016-12-12 20:59:43+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -113,67 +113,67 @@ msgid ""
 "Hierarchy."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:77
+#: includes/class-bp-group-extension.php:81
 msgid "This group is currently a top-level group."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:85
+#: includes/class-bp-group-extension.php:89
 msgid ""
 "This group&rsquo;s current parent group is a hidden group, and you are not "
 "a member of that group."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:89
+#: includes/class-bp-group-extension.php:93
 msgid "This group&rsquo;s current parent group is %s."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:112
+#: includes/class-bp-group-extension.php:116
 msgid "Who is allowed to select this group as the parent group of another group?"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:121
+#: includes/class-bp-group-extension.php:125
 msgid "Any logged-in site member"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:124
+#: includes/class-bp-group-extension.php:128
 msgid "All group members"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:126
+#: includes/class-bp-group-extension.php:130
 msgid "Group admins and mods only"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:128
+#: includes/class-bp-group-extension.php:132
 msgid "Group admins only"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:130
+#: includes/class-bp-group-extension.php:134
 msgid "No one"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:142
+#: includes/class-bp-group-extension.php:146
 msgid ""
 "Include activity from parent and child groups in this group&rsquo;s "
 "activity stream."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:144
+#: includes/class-bp-group-extension.php:148
 msgid "Include parent group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:146
+#: includes/class-bp-group-extension.php:150
 msgid "Include child group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:148
+#: includes/class-bp-group-extension.php:152
 msgid "Include parent and child group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:150
+#: includes/class-bp-group-extension.php:154
 msgid "Do not include related group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:152
+#: includes/class-bp-group-extension.php:156
 msgid "Inherit global setting."
 msgstr ""
 
@@ -189,7 +189,7 @@ msgstr ""
 msgid "active %s"
 msgstr ""
 
-#: public/views/templates/groups/groups-loop-tree.php:131
+#: public/views/templates/groups/groups-loop-tree.php:134
 msgid "There were no groups found."
 msgstr ""
 
@@ -248,17 +248,17 @@ msgctxt "Label for group management tab"
 msgid "Hierarchy"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:70
+#: includes/class-bp-group-extension.php:74
 msgctxt "Label for the parent group select on a single group manage screen"
 msgid "Parent Group"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:94
+#: includes/class-bp-group-extension.php:98
 msgctxt "The option to keep the current parent."
 msgid "Keep current parent group"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:95
+#: includes/class-bp-group-extension.php:99
 msgctxt "The option that sets a group to be a top-level group and have no parent."
 msgid "No parent group"
 msgstr ""
@@ -270,9 +270,9 @@ msgctxt ""
 msgid "Hierarchy %s"
 msgstr ""
 
-#: public/views/templates/groups/groups-loop-tree.php:97
+#: public/views/templates/groups/groups-loop-tree.php:98
 msgctxt ""
 "Label for the control on group directories that shows or hides the child "
-"groups."
-msgid "Child groups"
+"groups. %s will be replaced with the number of child groups."
+msgid "Child groups %s"
 msgstr ""

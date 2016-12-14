@@ -267,8 +267,11 @@ class HGBP_Public {
 		if ( bp_is_groups_directory() && ! hgbp_is_my_groups_view() ) {
 			if ( $force_parent_id ) {
 				$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : 0;
-			} elseif ( isset( $_REQUEST['parent_id'] ) )  {
-				// Even if a parent ID is not forced, requests may still come in for subgroup loops.
+			} elseif ( empty( $args['parent_id'] ) && isset( $_REQUEST['parent_id'] ) )  {
+				/*
+				 * Even if a parent ID is not forced, requests may still come
+				 * in for subgroup loops. Respect a passed parent ID, though.
+				 */
 				$args['parent_id'] = (int) $_REQUEST['parent_id'];
 			}
 		}
@@ -279,9 +282,11 @@ class HGBP_Public {
 			 * Change some of the default args to generate a directory-style loop.
 			 *
 			 * Use the current group id as the parent ID on a single group's
-			 * hierarchy screen.
+			 * hierarchy screen. (Don't override passed parent IDs, though.)
 			 */
-			$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : bp_get_current_group_id();
+			if ( empty( $args['parent_id'] ) ) {
+				$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : bp_get_current_group_id();
+			}
 			// Unset the type and slug set in bp_has_groups() when in a single group.
 			$args['type'] = $args['slug'] = null;
 			// Set update_admin_cache to true, because this is actually a directory.

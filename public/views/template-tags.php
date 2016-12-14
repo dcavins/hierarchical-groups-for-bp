@@ -168,3 +168,40 @@ function hgbp_groups_loop_pagination_bottom() {
 		</div>
 		<?php
 	}
+
+/**
+ * Output the child groups toggle and container for a group directory list.
+ *
+ * @since 1.0.0
+ */
+function hgbp_child_group_section() {
+	global $groups_template;
+	/*
+	 * Store the $groups_template global, so that the wrapper group
+	 * can be restored after the has_groups() loop is completed.
+	 */
+	$parent_groups_template = $groups_template;
+
+	/*
+	 * Show the 'show child groups' toggle only if groups would be shown by a
+	 * bp_has_groups() loop. For the most accurate results, use a
+	 * bp_has_groups() loop.
+	 */
+	if ( bp_has_groups( bp_ajax_querystring('groups') . '&parent_id=' . bp_get_group_id() ) ) :
+		global $groups_template;
+		$number_children = $groups_template->total_group_count;
+
+		// Put the parent $groups_template back.
+		$groups_template = $parent_groups_template;
+		?>
+		<div class="child-groups-container">
+			<a href="<?php hgbp_group_hierarchy_permalink(); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php printf(
+					_x( 'Child groups %s', 'Label for the control on group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' ),
+					'<span class="count">' . $number_children . '</span>'
+				); ?></a>
+			<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>
+		</div>
+	<?php else :
+		$groups_template = $parent_groups_template;
+	endif;
+}

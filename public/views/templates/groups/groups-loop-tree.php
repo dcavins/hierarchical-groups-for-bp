@@ -29,7 +29,7 @@ do_action( 'bp_before_groups_loop' ); ?>
 	 *
 	 * @since 1.0.0
 	 */
-	do_action( 'bp_before_directory_groups_list_tree' ); ?>
+	do_action( 'hgbp_before_directory_groups_list_tree' ); ?>
 
 	<?php
 
@@ -126,7 +126,7 @@ do_action( 'bp_before_groups_loop' ); ?>
 	 *
 	 * @since 1.0.0
 	 */
-	do_action( 'bp_after_directory_groups_list_tree' ); ?>
+	do_action( 'hgbp_after_directory_groups_list_tree' ); ?>
 
 <?php else: ?>
 

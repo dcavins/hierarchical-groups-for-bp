@@ -219,6 +219,37 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 }
 
 /**
+ * Check a slug to see if a child group of a specific parent group exists.
+ *
+ * Like `groups_get_id()`, but limited to children of a specific group. Avoids
+ * slug collisions between group tab names and groups with the same slug.
+ * For instance, if there's a unrelated group called "Docs", you want the
+ * "docs" tab of a group to ignore that group and return the docs pane for the
+ * current group.
+ * Caveat: If you create a child group with the same slug as a tab of the parent
+ * group, you'll always get the child group.
+ *
+ * @since 1.0.0
+ *
+ * @param string $slug      Group slug to check.
+ * @param int    $parent_id ID of the parent group.
+ *
+ * @return int ID of found group.
+ */
+function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
+	global $wpdb;
+	$bp = buddypress();
+
+	if ( empty( $slug ) ) {
+		return 0;
+	}
+
+	$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$bp->groups->table_name} WHERE slug = %s AND parent_id = %d", strtolower( $slug ), $parent_id ) );
+
+	return is_numeric( $id ) ? (int) $id : 0;
+}
+
+/**
  * Get the parent group ID for a specific group.
  *
  * To return the parent group regardless of visibility, leave the $user_id

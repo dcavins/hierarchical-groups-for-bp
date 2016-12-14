@@ -366,13 +366,16 @@ class HGBP_Public {
 				return;
 			}
 
+			// The current group slug is the 'bp_current_action'.
+			$parent_id = groups_get_id( bp_current_action() );
+
 			/*
 			 * The Single Group Globals section of BP_Groups_Component::setup_globals()
 			 * uses the current action to set up the current group. Pull found
 			 * group slugs out of the action variables array.
 			 */
 			foreach ( $action_variables as $maybe_slug ) {
-				if ( groups_get_id( $maybe_slug ) ) {
+				if ( $parent_id = hgbp_child_group_exists( $maybe_slug, $parent_id ) ) {
 					$bp->current_action = array_shift( $bp->action_variables );
 				} else {
 					// If we've gotten into real action variables, stop.

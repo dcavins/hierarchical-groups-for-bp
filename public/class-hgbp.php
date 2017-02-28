@@ -343,7 +343,12 @@ class HGBP_Public {
 	 *
 	 * @return string Filtered permalink for the group.
 	 */
-	public function make_permalink_hierarchical( $permalink, $group ) {
+	public function make_permalink_hierarchical( $permalink, $group = null) {
+ 		
+ 		if(is_null($group)) {
+ 			return $permalink;
+ 		}
+		
 		// We only need to filter if this not a top-level group.
 		if ( $group->parent_id != 0 ) {
 			$group_path = hgbp_build_hierarchical_slug( $group->id );

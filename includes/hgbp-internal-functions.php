@@ -185,7 +185,7 @@ function hgbp_group_include_hierarchical_activity( $group_id = 0 ) {
  * @return bool Which members of a group are allowed to associate subgroups with it.
  */
 function hgbp_get_directory_as_tree_setting() {
-	return (bool) get_option( 'hgbp-groups-directory-show-tree' );
+	return (bool) bp_get_option( 'hgbp-groups-directory-show-tree' );
 }
 
 /**
@@ -214,7 +214,7 @@ function hgbp_get_allowed_subgroup_creators( $group_id = 0 ) {
  *
  * @return string Level of enforcement for overriding the default settings.
  */
-function hgbp_sanitize_subgroup_creators_setting( $value ) {
+function hgbp_sanitize_subgroup_creators_setting( $value = 'noone' ) {
 	$valid = array( 'loggedin', 'member', 'mod', 'admin', 'noone' );
 	if ( ! in_array( $value, $valid, true ) ) {
 		$value = 'noone';
@@ -230,7 +230,7 @@ function hgbp_sanitize_subgroup_creators_setting( $value ) {
  * @return string|bool "yes" or "no" if it's set, false if unknown.
  */
 function hgbp_get_global_activity_setting() {
-	$option = get_option( 'hgbp-include-activity-from-relatives' );
+	$option = bp_get_option( 'hgbp-include-activity-from-relatives', 'include-from-none' );
 	return hgbp_sanitize_include_setting( $option );
 }
 
@@ -242,7 +242,7 @@ function hgbp_get_global_activity_setting() {
  * @return string Level of enforcement for overriding the default settings.
  */
 function hgbp_get_global_activity_enforce_setting() {
-	$option = get_option( 'hgbp-include-activity-enforce' );
+	$option = bp_get_option( 'hgbp-include-activity-enforce', 'strict' );
 	return hgbp_sanitize_include_setting_enforce( $option );
 }
 
@@ -253,7 +253,7 @@ function hgbp_get_global_activity_enforce_setting() {
  *
  * @return string Level of enforcement for overriding the default settings.
  */
-function hgbp_sanitize_include_setting( $value ) {
+function hgbp_sanitize_include_setting( $value = 'include-from-none' ) {
 	$valid = array(
 		'include-from-parents',
 		'include-from-children',
@@ -273,7 +273,7 @@ function hgbp_sanitize_include_setting( $value ) {
  *
  * @return string Level of enforcement for overriding the default settings.
  */
-function hgbp_sanitize_include_setting_enforce( $value ) {
+function hgbp_sanitize_include_setting_enforce( $value = 'strict' ) {
 	$valid = array(
 		'group-admins',
 		'site-admins',

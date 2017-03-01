@@ -339,7 +339,8 @@ class HGBP_Admin extends HGBP_Public {
 			'hgbp-group-tab-label'                 => 'sanitize_text_field',
 		);
 		foreach ( $fields as $key => $sanitize_callback ) {
-			$value = call_user_func( $sanitize_callback, $_POST[ $key ] );
+			$value = isset( $_POST[ $key ] ) ? $_POST[ $key ] : '';
+			$value = call_user_func( $sanitize_callback, $value );
 			bp_update_option( $key, $value );
 		}
 

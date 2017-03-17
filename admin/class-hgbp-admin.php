@@ -49,6 +49,12 @@ class HGBP_Admin extends HGBP_Public {
 		// Add settings to the admin page.
 		add_action( bp_core_admin_hook(), array( $this, 'settings_init' ) );
 
+		/*
+		 * Save settings. This can't be done using the Settings API, because
+		 * the API doesn't handle saving settings in network admin.
+		 */
+		add_action( 'bp_admin_init', array( $this, 'settings_save' ) );
+
 		// Add "Parent Group" column to the WP Groups List table.
 		add_filter( 'bp_groups_list_table_get_columns', array( $this, 'add_parent_group_column' ) );
 		add_filter( 'bp_groups_admin_get_group_custom_column', array( $this, 'column_content_parent_group' ), 10, 3 );
@@ -69,7 +75,12 @@ class HGBP_Admin extends HGBP_Public {
 		}
 
 		$screen = get_current_screen();
-		if ( isset( $screen->id ) && in_array( $screen->id, array( $this->plugin_screen_hook_suffix, 'toplevel_page_bp-groups' ) ) ) {
+		$target_screens = array(
+			$this->plugin_screen_hook_suffix, // Single site settings screen
+			$this->plugin_screen_hook_suffix . '-network', // Network admin settings screen
+			'toplevel_page_bp-groups' // Groups and single group screens
+			);
+		if ( isset( $screen->id ) && in_array( $screen->id, $target_screens ) ) {
 			if ( is_rtl() ) {
 				wp_enqueue_style( $this->plugin_slug .'-admin-styles-rtl', plugins_url( 'css/admin-rtl.css', __FILE__ ), array(), $this->version );
 			} else {
@@ -272,7 +283,7 @@ class HGBP_Admin extends HGBP_Public {
 	 * @since    1.0.0
 	 */
 	public function render_labels_section() {
-		$label = get_option( 'hgbp-group-tab-label' );
+		$label = bp_get_option( 'hgbp-group-tab-label' );
 		?>
 		<label for="hgbp-group-tab-label"><?php _ex( 'Group hierarchy tab label:', 'Label for tab label text input on site hierarchy options screen', 'hierarchical-groups-for-bp' ); ?></label>&emsp;<input type="text" id="hgbp-group-tab-label" name="hgbp-group-tab-label" value="<?php echo esc_textarea( $label ); ?>">
 		<p class="description"><?php _e( 'Change the word on the BuddyPress group tab from "Hierarchy" to whatever you&rsquo;d like. To show the number of child groups in the label, include the string <code>%s</code> in your new label, like <code>Subgroups %s</code>.', 'hierarchical-groups-for-bp' ) ?></p>
@@ -297,6 +308,51 @@ class HGBP_Admin extends HGBP_Public {
 
 		<label for="hgbp-run-import-tools-bpgh-subgroup-creators"><input type="radio" id="hgbp-run-import-tools-bpgh-subgroup-creators" name="hgbp-run-import-tools" value="bpgh-subgroup-creators"> <?php _e( 'Import the "subgroup creators" setting for each group as set by BP Group Hierarchy.', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
+	}
+
+	/**
+	 * Save settings. This can't be done using the Settings API, because
+	 * the API doesn't handle saving settings in network admin. This function
+	 * handles saving the plugin's global settings in both the single site and
+	 * network admin contexts.
+	 *
+	 * @since    1.0.0
+	 */
+	public function settings_save() {
+		if ( ! isset( $_POST['option_page'] ) || $this->plugin_slug != $_POST['option_page'] ) {
+			return;
+		}
+
+		/*
+		 * Check nonce.
+		 * Nonce name as set in settings_fields(), used to output the form's meta inputs.
+		 */
+		if ( ! check_admin_referer( $this->plugin_slug . '-options' ) ) {
+			return;
+		}
+
+		// Clean up the passed values and update the stored values.
+		$fields = array(
+			'hgbp-groups-directory-show-tree'      => 'absint',
+			'hgbp-include-activity-from-relatives' => 'hgbp_sanitize_include_setting',
+			'hgbp-include-activity-enforce'        => 'hgbp_sanitize_include_setting_enforce',
+			'hgbp-group-tab-label'                 => 'sanitize_text_field',
+		);
+		foreach ( $fields as $key => $sanitize_callback ) {
+			$value = isset( $_POST[ $key ] ) ? $_POST[ $key ] : '';
+			$value = call_user_func( $sanitize_callback, $value );
+			bp_update_option( $key, $value );
+		}
+
+		// Run import tools if needed.
+		if ( isset( $_POST['hgbp-run-import-tools'] ) ) {
+			$this->maybe_run_import_tools( $_POST['hgbp-run-import-tools'] );
+		}
+
+		// Redirect back to the form.
+		$redirect = bp_get_admin_url( add_query_arg( array( 'page' => $this->plugin_slug, 'updated' => 'true' ), 'admin.php' ) );
+		wp_redirect( $redirect );
+		die();
 	}
 
 	/**
@@ -345,16 +401,26 @@ class HGBP_Admin extends HGBP_Public {
 	 */
 	public function display_plugin_admin_page() {
 		?>
-		<form action="<?php echo admin_url( 'options.php' ) ?>" method='post'>
-			<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
-
+		<div class="wrap">
+			<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<hr class="wp-header-end">
 			<?php
-			settings_fields( $this->plugin_slug );
-			do_settings_sections( $this->plugin_slug );
-			submit_button();
+			if ( ! empty( $_REQUEST[ 'updated' ] ) ) {
+				?>
+				<div id="message" class="updated notice notice-success">
+					<p><?php _e( 'Settings updated.', 'hierarchical-groups-for-bp' ); ?></p>
+				</div>
+				<?php
+			}
 			?>
-
-		</form>
+			<form action="<?php echo bp_get_admin_url( add_query_arg( array( 'page' => $this->plugin_slug ), 'admin.php' ) ); ?>" method="post">
+				<?php
+				settings_fields( $this->plugin_slug );
+				do_settings_sections( $this->plugin_slug );
+				submit_button();
+				?>
+			</form>
+		</div>
 		<?php
 	}
 

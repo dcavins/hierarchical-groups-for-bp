@@ -100,7 +100,7 @@ class HGBP_Admin extends HGBP_Public {
 			'bp-groups',
 			__( 'Hierarchy Options', 'hierarchical-groups-for-bp' ),
 			__( 'Hierarchy Options', 'hierarchical-groups-for-bp' ),
-			'manage_options',
+			'bp_moderate',
 			$this->plugin_slug,
 			array( $this, 'display_plugin_admin_page' )
 		);
@@ -328,6 +328,12 @@ class HGBP_Admin extends HGBP_Public {
 		 * Nonce name as set in settings_fields(), used to output the form's meta inputs.
 		 */
 		if ( ! check_admin_referer( $this->plugin_slug . '-options' ) ) {
+			return;
+		}
+
+
+		// Check that user has the proper capability.
+		if ( ! current_user_can( 'bp_moderate' ) ) {
 			return;
 		}
 

@@ -345,8 +345,8 @@ class HGBP_Admin extends HGBP_Public {
 		}
 
 		// Run import tools if needed.
-		if ( isset( $_POST['hgbp-run-import-tools'] ) ) {
-			$this->maybe_run_import_tools( $_POST['hgbp-run-import-tools'] );
+		if ( isset( $_POST['hgbp-run-import-tools'] ) && 'bpgh-subgroup-creators' == $_POST['hgbp-run-import-tools'] ) {
+			$this->run_import_tools();
 		}
 
 		// Redirect back to the form.
@@ -359,38 +359,44 @@ class HGBP_Admin extends HGBP_Public {
 	 * Maybe run an import tool to migrate data from the old BP Group Hierarchy plugin.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param  string The value passed from the save routine.
 	 */
-	public function maybe_run_import_tools( $value ) {
-		if ( 'bpgh-subgroup-creators' == $value ) {
-			global $wpdb;
-			$bp = buddypress();
+	public function run_import_tools() {
+		// Fetch all of the groups that have the relevant metadata.
+		$group_args = array(
+			'meta_query'  => array(
+				array(
+					'key'      => 'bp_group_hierarchy_subgroup_creators',
+					'compare'  => 'exists'
+				)
+			),
+			'show_hidden' => true,
+			'per_page'    => null,
+		);
+		$groups = groups_get_groups( $group_args );
 
-			// Fetch all of the relevant metadata.
-			$sql = "SELECT group_id, meta_value FROM " . $bp->groups->table_name_groupmeta . " WHERE meta_key = 'bp_group_hierarchy_subgroup_creators'";
-			$results = $wpdb->get_results( $sql );
+		foreach ( $groups[ 'groups' ] as $group ) {
+			$old_setting = groups_get_groupmeta( $group->id, 'bp_group_hierarchy_subgroup_creators' );
 
-			foreach ( $results as $old_setting ) {
-				switch ( $old_setting->meta_value ) {
-					case 'anyone':
-						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'loggedin' );
-						break;
+			switch ( $old_setting ) {
+				case 'anyone':
+					$new_setting = 'loggedin';
+					break;
 
-					case 'group_members':
-						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'member' );
-						break;
+				case 'group_members':
+					$new_setting = 'member';
+					break;
 
-					case 'group_admins':
-						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'admin' );
-						break;
+				case 'group_admins':
+					$new_setting = 'admin';
+					break;
 
-					case 'noone':
-					default:
-						groups_update_groupmeta( $old_setting->group_id, 'hgbp-allowed-subgroup-creators', 'noone' );
-						break;
-				}
+				case 'noone':
+				default:
+					$new_setting = 'noone';
+					break;
 			}
+
+			groups_update_groupmeta( $group->id, 'hgbp-allowed-subgroup-creators', $new_setting );
 		}
 	}
 

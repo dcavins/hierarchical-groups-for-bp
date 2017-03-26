@@ -35,6 +35,12 @@ function hierarchical_groups_for_bp_init() {
 		return;
 	}
 
+	// This plugin requires BuddyPress 2.7 or greater.
+	if ( ! function_exists( 'bp_get_version' ) || version_compare( bp_get_version(), '2.7', '<' ) ) {
+		bp_core_add_message( __( 'Hierarchical Groups for BuddyPress requires BuddyPress 2.7 or newer.', 'hierarchical-groups-for-bp' ), 'error' );
+		return;
+	}
+
 	// Helper functions
 	require_once( plugin_dir_path( __FILE__ ) . 'includes/hgbp-internal-functions.php' );
 	require_once( plugin_dir_path( __FILE__ ) . 'includes/hgbp-functions.php' );
@@ -59,15 +65,6 @@ function hierarchical_groups_for_bp_init() {
 
 }
 add_action( 'bp_loaded', 'hierarchical_groups_for_bp_init' );
-
-/*
- * Register hooks that are fired when the plugin is activated or deactivated.
- * When the plugin is deleted, the uninstall.php file is loaded.
- *
- */
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-hgbp-activator.php';
-register_activation_hook( __FILE__, array( 'HGBP_Activator', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'HGBP_Activator', 'deactivate' ) );
 
 /**
  * Helper function.

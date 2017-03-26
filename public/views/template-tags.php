@@ -39,14 +39,14 @@ function hgbp_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) 
 		$user_id = bp_loggedin_user_id();
 
 		// Create the base group's entry.
-		$item        = '<a href="' . bp_get_group_permalink( $group ) . '">' . bp_get_group_name( $group ) . '</a>';
+		$item        = '<a href="' . esc_url( bp_get_group_permalink( $group ) ) . '">' . esc_html( bp_get_group_name( $group ) ) . '</a>';
 		$breadcrumbs = array( $item );
 		$parent_id   = hgbp_get_parent_group_id( $group->id, $user_id );
 
 		// Add breadcrumbs for the ancestors.
 		while ( $parent_id ) {
 			$parent_group  = groups_get_group( $parent_id );
-			$breadcrumbs[] = '<a href="' . bp_get_group_permalink( $parent_group ) . '">' . bp_get_group_name( $parent_group ) . '</a>';
+			$breadcrumbs[] = '<a href="' . esc_url( bp_get_group_permalink( $parent_group ) ) . '">' . esc_html( bp_get_group_name( $parent_group ) ) . '</a>';
 			$parent_id     = hgbp_get_parent_group_id( $parent_group->id, $user_id );
 		}
 
@@ -151,8 +151,8 @@ function hgbp_groups_loop_pagination_bottom() {
 				if ( ! empty( $_REQUEST['parent_id'] ) ) :
 					$parent_group = groups_get_group( (int) $_REQUEST['parent_id'] );
 				?>
-					<a href="<?php hgbp_group_hierarchy_permalink( $parent_group ); ?>" class="view-all-child-groups-link"><?php
-					printf( __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' ), bp_get_group_name( $parent_group ) ); ?></a>
+					<a href="<?php esc_url( hgbp_group_hierarchy_permalink( $parent_group ) ); ?>" class="view-all-child-groups-link"><?php
+					esc_html( printf( __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' ), bp_get_group_name( $parent_group ) ) ); ?></a>
 				<?php endif;
 
 			else : ?>
@@ -195,10 +195,10 @@ function hgbp_child_group_section() {
 		$groups_template = $parent_groups_template;
 		?>
 		<div class="child-groups-container">
-			<a href="<?php hgbp_group_hierarchy_permalink(); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php printf(
+			<a href="<?php esc_url( hgbp_group_hierarchy_permalink() ); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php esc_html( printf(
 					_x( 'Child groups %s', 'Label for the control on group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' ),
 					'<span class="count">' . $number_children . '</span>'
-				); ?></a>
+				) ); ?></a>
 			<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>
 		</div>
 	<?php else :

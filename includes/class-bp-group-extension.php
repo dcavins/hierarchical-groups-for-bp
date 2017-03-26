@@ -90,7 +90,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 				<?php
 			else :
 				?>
-				<p class="info"><?php printf( __( 'This group&rsquo;s current parent group is %s.', 'hierarchical-groups-for-bp' ), bp_get_group_name( $parent_group ) ); ?></p>
+				<p class="info"><?php esc_html( printf( __( 'This group&rsquo;s current parent group is %s.', 'hierarchical-groups-for-bp' ), bp_get_group_name( $parent_group ) ) ); ?></p>
 				<?php
 			endif;
 		endif; ?>
@@ -102,7 +102,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 
 				foreach ( $possible_parent_groups as $possible_parent_group ) {
 					?>
-					<option value="<?php echo $possible_parent_group->id; ?>" <?php selected( $current_parent_group_id, $possible_parent_group->id ); ?>><?php echo $possible_parent_group->name; ?></option>
+					<option value="<?php echo $possible_parent_group->id; ?>" <?php selected( $current_parent_group_id, $possible_parent_group->id ); ?>><?php echo esc_html( $possible_parent_group->name ); ?></option>
 					<?php
 				}
 			}

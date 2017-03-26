@@ -454,9 +454,13 @@ class HGBP_Admin extends HGBP_Public {
 		}
 
 		if ( 0 != $item[ 'parent_id' ] ) {
-			$parent_group = groups_get_group( $item[ 'parent_id' ] );
-			$parent_edit_url = bp_get_admin_url( 'admin.php?page=bp-groups&amp;gid=' . $item['parent_id'] . '&amp;action=edit' );
-			$retval = '<a href="' . $parent_edit_url . '">' . bp_get_group_name( $parent_group ) . '</a>';
+			$parent_group    = groups_get_group( $item[ 'parent_id' ] );
+			$parent_edit_url = esc_url( add_query_arg( array(
+				'page'   => 'bp-groups',
+				'gid'    => $item['parent_id'],
+				'action' => 'edit',
+			), bp_get_admin_url( 'admin.php' ) ) );
+			$retval = '<a href="' . $parent_edit_url . '">' . esc_html( bp_get_group_name( $parent_group ) ) . '</a>';
 		}
 
 		/**

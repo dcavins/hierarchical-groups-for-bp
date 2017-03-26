@@ -237,16 +237,32 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
  * @return int ID of found group.
  */
 function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
-	global $wpdb;
-	$bp = buddypress();
-
 	if ( empty( $slug ) ) {
 		return 0;
 	}
 
-	$id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$bp->groups->table_name} WHERE slug = %s AND parent_id = %d", strtolower( $slug ), $parent_id ) );
+	/*
+	 * Take advantage of caching in groups_get_groups().
+	 * Fetch groups with parent_id and loop through looking for a matching slug.
+	 * @TODO: BP2.9 will probably add "slug" support to groups_get_groups().
+	 */
+	$child_groups = groups_get_groups( array(
+		'parent_id'   => array( $parent_id ),
+		'show_hidden' => true,
+		'per_page'    => false,
+		'page'        => false,
+	) );
 
-	return is_numeric( $id ) ? (int) $id : 0;
+	$child_id = 0;
+	foreach ( $child_groups['groups'] as $group ) {
+		if ( $slug == $group->slug ) {
+			$child_id = $group->id;
+			// Stop once we've got a match.
+			break;
+		}
+	}
+
+	return $child_id;
 }
 
 /**

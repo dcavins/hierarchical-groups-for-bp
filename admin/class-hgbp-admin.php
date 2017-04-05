@@ -179,11 +179,29 @@ class HGBP_Admin extends HGBP_Public {
 			$this->plugin_slug
 		);
 
+		register_setting( $this->plugin_slug, 'hgbp-directory-child-group-section-label', 'sanitize_text_field' );
+		add_settings_field(
+			'hgbp-directory-child-group-section-label',
+			'',
+			array( $this, 'render_hgbp_directory_child_group_section_label_section' ),
+			$this->plugin_slug,
+			'hgbp_labels'
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-directory-child-group-view-all-link', 'sanitize_text_field' );
+		add_settings_field(
+			'hgbp-directory-child-group-view-all-link',
+			'',
+			array( $this, 'render_hgbp_directory_child_group_view_all_link_section' ),
+			$this->plugin_slug,
+			'hgbp_labels'
+		);
+
 		register_setting( $this->plugin_slug, 'hgbp-group-tab-label', 'sanitize_text_field' );
 		add_settings_field(
 			'hgbp-group-tab-label',
 			'',
-			array( $this, 'render_labels_section' ),
+			array( $this, 'render_group_tab_label_section' ),
 			$this->plugin_slug,
 			'hgbp_labels'
 		);
@@ -282,11 +300,49 @@ class HGBP_Admin extends HGBP_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function render_labels_section() {
+	public function render_hgbp_directory_child_group_section_label_section() {
+		$label = bp_get_option( 'hgbp-directory-child-group-section-label' );
+		?>
+		<label for="hgbp-directory-child-group-section-label"><?php _ex( 'Group directory child group section label:', 'Label for label setting on site hierarchy options screen', 'hierarchical-groups-for-bp' ); ?></label>&emsp;<input type="text" id="hgbp-directory-child-group-section-label" name="hgbp-directory-child-group-section-label" value="<?php echo esc_textarea( $label ); ?>"> <a href="#TB_inline?width=650&height=630&inlineId=modal-directory-child-group-section-label-location" class="thickbox"><?php _e( 'Where is this label used?', 'hierarchical-groups-for-bp' ); ?></a>
+		<p class="description"><?php _e( 'Change the child groups section header that appears on the hierarchical version of the BuddyPress groups directory. To show the number of child groups in the label, include the string <code>%s</code> in your new label, like <code>Subgroups %s</code>.', 'hierarchical-groups-for-bp' ); ?></p>
+
+		<div id="modal-directory-child-group-section-label-location" style="display:none;">
+			<img src="<?php echo hgbp_get_plugin_base_uri() . 'admin/images/directory-child-group-section-label-location.png'; ?>" alt="<?php _e( 'Graphic showing where this label is used', 'hierarchical-groups-for-bp' ); ?>">
+		</div>
+		<?php
+	}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_hgbp_directory_child_group_view_all_link_section() {
+		$label = bp_get_option( 'hgbp-directory-child-group-view-all-link' );
+		?>
+		<label for="hgbp-directory-child-group-view-all-link"><?php _ex( 'Group directory child group &ldquo;view all&rdquo; link text:', 'Label for label setting on site hierarchy options screen', 'hierarchical-groups-for-bp' ); ?></label>&emsp;<input type="text" id="hgbp-directory-child-group-view-all-link" name="hgbp-directory-child-group-view-all-link" value="<?php echo esc_textarea( $label ); ?>"> <a href="#TB_inline?width=650&height=630&inlineId=modal-directory-child-group-view-all-link-location" class="thickbox"><?php _e( 'Where is this label used?', 'hierarchical-groups-for-bp' ); ?></a>
+		<p class="description"><?php _e( 'Change the text of the &ldquo;view all&rdquo; link that appears on the hierarchical version of the BuddyPress groups directory. To include the name of the parent group in the linked text, include the string <code>%s</code> in your new string, like <code>View all subgroups of %s.</code>.', 'hierarchical-groups-for-bp' ); ?></p>
+
+		<div id="modal-directory-child-group-view-all-link-location" style="display:none;">
+			<img src="<?php echo hgbp_get_plugin_base_uri() . 'admin/images/directory-child-group-view-all-link-location.png'; ?>" alt="<?php _e( 'Graphic showing where this label is used', 'hierarchical-groups-for-bp' ); ?>">
+		</div>
+		<?php
+	}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_group_tab_label_section() {
 		$label = bp_get_option( 'hgbp-group-tab-label' );
 		?>
-		<label for="hgbp-group-tab-label"><?php _ex( 'Group hierarchy tab label:', 'Label for tab label text input on site hierarchy options screen', 'hierarchical-groups-for-bp' ); ?></label>&emsp;<input type="text" id="hgbp-group-tab-label" name="hgbp-group-tab-label" value="<?php echo esc_textarea( $label ); ?>">
-		<p class="description"><?php _e( 'Change the word on the BuddyPress group tab from "Hierarchy" to whatever you&rsquo;d like. To show the number of child groups in the label, include the string <code>%s</code> in your new label, like <code>Subgroups %s</code>.', 'hierarchical-groups-for-bp' ) ?></p>
+		<label for="hgbp-group-tab-label"><?php _ex( 'Group navigation tab label:', 'Label for label setting on site hierarchy options screen', 'hierarchical-groups-for-bp' ); ?></label>&emsp;<input type="text" id="hgbp-group-tab-label" name="hgbp-group-tab-label" value="<?php echo esc_textarea( $label ); ?>"> <a href="#TB_inline?width=650&height=630&inlineId=modal-tab-label-location" class="thickbox"><?php _e( 'Where is this label used?', 'hierarchical-groups-for-bp' ); ?></a>
+		<p class="description"><?php _e( 'Change the word on the BuddyPress group tab from &ldquo;Hierarchy&rdquo; to whatever you&rsquo;d like. To show the number of child groups in the label, include the string <code>%s</code> in your new label, like <code>Subgroups %s</code>.', 'hierarchical-groups-for-bp' ); ?></p>
+
+		<div id="modal-tab-label-location" style="display:none;">
+			<img src="<?php echo hgbp_get_plugin_base_uri() . 'admin/images/tab-label-location.png'; ?>" alt="<?php _e( 'Graphic showing where this label is used', 'hierarchical-groups-for-bp' ); ?>">
+		</div>
 		<?php
 	}
 
@@ -339,10 +395,12 @@ class HGBP_Admin extends HGBP_Public {
 
 		// Clean up the passed values and update the stored values.
 		$fields = array(
-			'hgbp-groups-directory-show-tree'      => 'absint',
-			'hgbp-include-activity-from-relatives' => 'hgbp_sanitize_include_setting',
-			'hgbp-include-activity-enforce'        => 'hgbp_sanitize_include_setting_enforce',
-			'hgbp-group-tab-label'                 => 'sanitize_text_field',
+			'hgbp-groups-directory-show-tree'           => 'absint',
+			'hgbp-include-activity-from-relatives'      => 'hgbp_sanitize_include_setting',
+			'hgbp-include-activity-enforce'             => 'hgbp_sanitize_include_setting_enforce',
+			'hgbp-directory-child-group-section-label'  => 'sanitize_text_field',
+			'hgbp-directory-child-group-view-all-link'  => 'sanitize_text_field',
+			'hgbp-group-tab-label'                      => 'sanitize_text_field',
 		);
 		foreach ( $fields as $key => $sanitize_callback ) {
 			$value = isset( $_POST[ $key ] ) ? $_POST[ $key ] : '';
@@ -412,6 +470,8 @@ class HGBP_Admin extends HGBP_Public {
 	 * @since    1.0.0
 	 */
 	public function display_plugin_admin_page() {
+		// Thickbox is used to display the labels location images in a modal window.
+		add_thickbox();
 		?>
 		<div class="wrap">
 			<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>

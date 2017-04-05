@@ -29,12 +29,15 @@ function hgbp_get_hierarchy_screen_slug() {
  * @return string Label to use on the hierarchy navigation item.
  */
 function hgbp_get_hierarchy_nav_item_name() {
+	// Check for a saved option for this string first.
 	$base_name = get_option( 'hgbp-group-tab-label' );
+	// Next, allow translations to be applied.
 	if ( empty( $base_name ) ) {
 		$base_name = _x( 'Hierarchy %s', 'Label for group navigation tab. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );
 	}
-	$name =	sprintf( $base_name, '<span>' . number_format( hgbp_group_has_children( bp_get_current_group_id(), bp_loggedin_user_id(), 'exclude_hidden' ) ) . '</span>' );
-	return apply_filters( 'hgbp_screen_nav_item_name', $name );
+	$name = sprintf( $base_name, '<span>' . number_format( hgbp_group_has_children( bp_get_current_group_id(), bp_loggedin_user_id(), 'exclude_hidden' ) ) . '</span>' );
+	// Finally, allow filtration for per-group customization.
+	return apply_filters( 'hgbp_group_tab_label', $name );
 }
 
 /**

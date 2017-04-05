@@ -151,8 +151,17 @@ function hgbp_groups_loop_pagination_bottom() {
 				if ( ! empty( $_REQUEST['parent_id'] ) ) :
 					$parent_group = groups_get_group( (int) $_REQUEST['parent_id'] );
 				?>
-					<a href="<?php esc_url( hgbp_group_hierarchy_permalink( $parent_group ) ); ?>" class="view-all-child-groups-link"><?php
-					esc_html( printf( __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' ), bp_get_group_name( $parent_group ) ) ); ?></a>
+					<a href="<?php hgbp_group_hierarchy_permalink( $parent_group ); ?>" class="view-all-child-groups-link"><?php
+						// Check for a saved option for this string first.
+						$label = get_option( 'hgbp-directory-child-group-view-all-link' );
+						// Next, allow translations to be applied.
+						if ( empty( $label ) ) {
+							$label = __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' );
+						}
+						$label = sprintf( $label, bp_get_group_name( $parent_group ) );
+						// Finally, allow filtration for per-group customization.
+						echo esc_html( apply_filters( 'hgbp_directory_child_group_view_all_link', $label ) );
+					?></a>
 				<?php endif;
 
 			else : ?>
@@ -195,10 +204,17 @@ function hgbp_child_group_section() {
 		$groups_template = $parent_groups_template;
 		?>
 		<div class="child-groups-container">
-			<a href="<?php esc_url( hgbp_group_hierarchy_permalink() ); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php esc_html( printf(
-					_x( 'Child groups %s', 'Label for the control on group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' ),
-					'<span class="count">' . $number_children . '</span>'
-				) ); ?></a>
+			<a href="<?php esc_url( hgbp_group_hierarchy_permalink() ); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php
+				// Check for a saved option first.
+				$label = get_option( 'hgbp-directory-child-group-section-label' );
+				// Next, allow translations to be applied.
+				if ( empty( $label ) ) {
+					$label = _x( 'Child groups %s', 'Label for the control on hierarchical group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );
+				}
+				$label = sprintf( $label, '<span class="count">' . $number_children . '</span>' );
+				// Finally, allow filtration for per-group customization.
+				echo esc_html( apply_filters( 'hgbp_directory_child_group_section_header_label', $label ) );
+			?></a>
 			<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>
 		</div>
 	<?php else :

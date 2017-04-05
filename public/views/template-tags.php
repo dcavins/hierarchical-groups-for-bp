@@ -211,9 +211,9 @@ function hgbp_child_group_section() {
 				if ( empty( $label ) ) {
 					$label = _x( 'Child groups %s', 'Label for the control on hierarchical group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );
 				}
-				$label = sprintf( $label, '<span class="count">' . $number_children . '</span>' );
+				$label = sprintf( esc_html( $label ), '<span class="count">' . $number_children . '</span>' );
 				// Finally, allow filtration for per-group customization.
-				echo esc_html( apply_filters( 'hgbp_directory_child_group_section_header_label', $label ) );
+				echo apply_filters( 'hgbp_directory_child_group_section_header_label', $label );
 			?></a>
 			<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>
 		</div>

@@ -2,8 +2,8 @@
 // Taken almost verbatim from the BuddyPress Docs testing setup.
 
 if ( ! defined( 'BP_TESTS_DIR' ) ) {
-	// define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../buddypress/tests/phpunit' );
-	define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../bp-svn-bporg/tests/phpunit' );
+	define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../buddypress/tests/phpunit' );
+	// define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../bp-svn-bporg/tests/phpunit' );
 }
 
 if ( file_exists( BP_TESTS_DIR . '/bootstrap.php' ) ) :

@@ -69,7 +69,7 @@ function hgbp_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) 
  * @since 1.0.0
  */
 function hgbp_group_hierarchy_permalink( $group = false ) {
-	echo hgbp_get_group_hierarchy_permalink( $group );
+	echo esc_url( hgbp_get_group_hierarchy_permalink( $group ) );
 }
 
 	/**
@@ -196,7 +196,7 @@ function hgbp_child_group_section() {
 	 * bp_has_groups() loop. For the most accurate results, use a
 	 * bp_has_groups() loop.
 	 */
-	if ( bp_has_groups( bp_ajax_querystring('groups') . '&parent_id=' . bp_get_group_id() ) ) :
+	if ( bp_has_groups( bp_ajax_querystring( 'groups' ) . '&parent_id=' . bp_get_group_id() ) ) :
 		global $groups_template;
 		$number_children = $groups_template->total_group_count;
 

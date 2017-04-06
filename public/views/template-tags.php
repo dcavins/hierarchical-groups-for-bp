@@ -192,11 +192,18 @@ function hgbp_child_group_section() {
 	$parent_groups_template = $groups_template;
 
 	/*
-	 * Show the 'show child groups' toggle only if groups would be shown by a
-	 * bp_has_groups() loop. For the most accurate results, use a
-	 * bp_has_groups() loop.
+	 * For the most accurate results, only show the 'show child groups' toggle
+	 * if groups would be shown by a bp_has_groups() loop. Keep the args simple
+	 * to avoid unnecessary joins and hopefully hit the BP_Groups_Group::get()
+	 * cache.
 	 */
-	if ( bp_has_groups( bp_ajax_querystring( 'groups' ) . '&parent_id=' . bp_get_group_id() ) ) :
+	$has_group_args = array(
+		'parent_id'          => bp_get_group_id(),
+		'orderby'            => 'date_created',
+		'update_admin_cache' => false,
+		'per_page'           => false,
+	);
+	if ( bp_has_groups( $has_group_args ) ) :
 		global $groups_template;
 		$number_children = $groups_template->total_group_count;
 

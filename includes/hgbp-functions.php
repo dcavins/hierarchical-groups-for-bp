@@ -37,11 +37,10 @@ function hgbp_is_my_groups_view() {
 	// Could be the user profile groups pane.
 	if ( bp_is_user_groups() ) {
 		$retval = true;
-	} elseif ( bp_is_groups_directory() ) {
-		// Could be the "my groups" filter on the main directory?
-		if ( isset( $_COOKIE['bp-groups-scope'] ) && 'personal' == $_COOKIE['bp-groups-scope'] ) {
-			$retval = true;
-		}
+
+	// Could be the "my groups" filter on the main directory?
+	} elseif ( bp_is_groups_directory() && ( isset( $_COOKIE['bp-groups-scope'] ) && 'personal' == $_COOKIE['bp-groups-scope'] ) ) {
+		$retval = true;
 	}
 
 	return $retval;
@@ -68,7 +67,7 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
 	 */
-	if ( $group_id === false ) {
+	if ( false === $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
@@ -122,7 +121,7 @@ function hgbp_group_has_children( $group_id = false, $user_id = false, $context 
 	 * Passing a group id of 0 finds all top-level groups, which could be
 	 * intentional. Try to find the current group only when the $group_id is false.
 	 */
-	if ( $group_id === false ) {
+	if ( false === $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
@@ -173,7 +172,7 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
 	 */
-	if ( $group_id === false ) {
+	if ( false === $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
@@ -281,7 +280,7 @@ function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
  * @return int ID of parent group.
  */
 function hgbp_get_parent_group_id( $group_id = false, $user_id = false, $context = 'normal' ) {
-	if ( $group_id === false ) {
+	if ( false === $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed.
@@ -327,7 +326,7 @@ function hgbp_get_ancestor_group_ids( $group_id = false, $user_id = false, $cont
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
 	 */
-	if ( $group_id === false ) {
+	if ( false === $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.

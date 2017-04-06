@@ -242,22 +242,36 @@ function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
 
 	/*
 	 * Take advantage of caching in groups_get_groups().
-	 * Fetch groups with parent_id and loop through looking for a matching slug.
-	 * @TODO: BP2.9 will probably add "slug" support to groups_get_groups().
 	 */
-	$child_groups = groups_get_groups( array(
-		'parent_id'   => array( $parent_id ),
-		'show_hidden' => true,
-		'per_page'    => false,
-		'page'        => false,
-	) );
-
 	$child_id = 0;
-	foreach ( $child_groups['groups'] as $group ) {
-		if ( $slug == $group->slug ) {
-			$child_id = $group->id;
-			// Stop once we've got a match.
-			break;
+	if ( version_compare( bp_get_version(), '2.9', '<' ) ) {
+		// Fetch groups with parent_id and loop through looking for a matching slug.
+		$child_groups = groups_get_groups( array(
+			'parent_id'   => array( $parent_id ),
+			'show_hidden' => true,
+			'per_page'    => false,
+			'page'        => false,
+		) );
+
+		foreach ( $child_groups['groups'] as $group ) {
+			if ( $slug == $group->slug ) {
+				$child_id = $group->id;
+				// Stop once we've got a match.
+				break;
+			}
+		}
+	} else {
+		// BP 2.9 adds "slug" support to groups_get_groups().
+		$child_groups = groups_get_groups( array(
+			'parent_id'   => array( $parent_id ),
+			'slug'        => array( $slug ),
+			'show_hidden' => true,
+			'per_page'    => false,
+			'page'        => false,
+		) );
+
+		if ( $child_groups['groups'] ) {
+			$child_id = current( $child_groups['groups'] )->id;
 		}
 	}
 

@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Hierarchical Groups for BP 1.0.0\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/hierarchical-groups-for-bp\n"
-"POT-Creation-Date: 2017-03-01 15:37:13+00:00\n"
+"POT-Creation-Date: 2017-04-06 14:07:56+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -57,64 +57,95 @@ msgstr ""
 msgid "Customize labels"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:194
+#: admin/class-hgbp-admin.php:212
 msgid "Import Data from Other Plugins"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:202
+#: admin/class-hgbp-admin.php:220
 msgid "Select an import tool to run."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:216
+#: admin/class-hgbp-admin.php:234
 msgid ""
 "Hierarchy settings can be set per-group or globally. Set global defaults "
 "here. Note that users will not see activity from groups they cannot visit."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:227
+#: admin/class-hgbp-admin.php:245
 msgid ""
 "<strong>Include parent group activity</strong> in every group activity "
 "stream."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:229
+#: admin/class-hgbp-admin.php:247
 msgid ""
 "<strong>Include child group activity</strong> in every group activity "
 "stream."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:231
+#: admin/class-hgbp-admin.php:249
 msgid ""
 "<strong>Include parent and child group activity</strong> in every group "
 "activity stream."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:233
+#: admin/class-hgbp-admin.php:251
 msgid ""
 "<strong>Do not include related group activity</strong> in any group "
 "activity stream."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:289
-msgid ""
-"Change the word on the BuddyPress group tab from \"Hierarchy\" to whatever "
-"you&rsquo;d like. To show the number of child groups in the label, include "
-"the string <code>%s</code> in your new label, like <code>Subgroups "
-"%s</code>."
+#: admin/class-hgbp-admin.php:306 admin/class-hgbp-admin.php:323
+#: admin/class-hgbp-admin.php:340
+msgid "Where is this label used?"
 msgstr ""
 
 #: admin/class-hgbp-admin.php:307
+msgid ""
+"Change the child groups section header that appears on the hierarchical "
+"version of the BuddyPress groups directory. To show the number of child "
+"groups in the label, include the string <code>%s</code> in your new label, "
+"like <code>Subgroups %s</code>."
+msgstr ""
+
+#: admin/class-hgbp-admin.php:310 admin/class-hgbp-admin.php:327
+#: admin/class-hgbp-admin.php:344
+msgid "Graphic showing where this label is used"
+msgstr ""
+
+#: admin/class-hgbp-admin.php:324
+msgid ""
+"Change the text of the &ldquo;view all&rdquo; link that appears on the "
+"hierarchical version of the BuddyPress groups directory. To include the "
+"name of the parent group in the linked text, include the string "
+"<code>%s</code> in your new string, like <code>View all subgroups of "
+"%s.</code>."
+msgstr ""
+
+#: admin/class-hgbp-admin.php:341
+msgid ""
+"Change the word on the BuddyPress group tab from &ldquo;Hierarchy&rdquo; to "
+"whatever you&rsquo;d like. To show the number of child groups in the label, "
+"include the string <code>%s</code> in your new label, like <code>Subgroups "
+"%s</code>."
+msgstr ""
+
+#: admin/class-hgbp-admin.php:363
 msgid "Don't import anything right now."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:309
+#: admin/class-hgbp-admin.php:365
 msgid ""
 "Import the \"subgroup creators\" setting for each group as set by BP Group "
 "Hierarchy."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:404
+#: admin/class-hgbp-admin.php:483
 msgid "Settings updated."
+msgstr ""
+
+#: hierarchical-groups-for-bp.php:40
+msgid "Hierarchical Groups for BuddyPress requires BuddyPress 2.7 or newer."
 msgstr ""
 
 #: includes/class-bp-group-extension.php:81
@@ -181,11 +212,7 @@ msgstr ""
 msgid "Inherit global setting."
 msgstr ""
 
-#: includes/class-hgbp-activator.php:151
-msgid "Hierarchical Groups for BP requires BuddyPress 2.7 or newer."
-msgstr ""
-
-#: public/views/template-tags.php:155
+#: public/views/template-tags.php:159
 msgid "View all child groups of %s."
 msgstr ""
 
@@ -215,32 +242,42 @@ msgstr ""
 msgid "dcavins"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:246
+#: admin/class-hgbp-admin.php:264
 msgctxt "Response for allow overrides of include group activity global setting"
 msgid "<strong>Group administrators</strong> can choose a setting for their group."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:248
+#: admin/class-hgbp-admin.php:266
 msgctxt "Response for allow overrides of include group activity global setting"
 msgid "<strong>Site administrators</strong> can choose a setting for each group."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:250
+#: admin/class-hgbp-admin.php:268
 msgctxt "Response for allow overrides of include group activity global setting"
 msgid "<strong>Enforce global setting</strong> for all groups."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:269
+#: admin/class-hgbp-admin.php:287
 msgctxt "Response for use directory tree global setting"
 msgid "Show a hierarchical directory."
 msgstr ""
 
-#: admin/class-hgbp-admin.php:288
-msgctxt "Label for tab label text input on site hierarchy options screen"
-msgid "Group hierarchy tab label:"
+#: admin/class-hgbp-admin.php:306
+msgctxt "Label for label setting on site hierarchy options screen"
+msgid "Group directory child group section label:"
 msgstr ""
 
-#: admin/class-hgbp-admin.php:431
+#: admin/class-hgbp-admin.php:323
+msgctxt "Label for label setting on site hierarchy options screen"
+msgid "Group directory child group &ldquo;view all&rdquo; link text:"
+msgstr ""
+
+#: admin/class-hgbp-admin.php:340
+msgctxt "Label for label setting on site hierarchy options screen"
+msgid "Group navigation tab label:"
+msgstr ""
+
+#: admin/class-hgbp-admin.php:509
 msgctxt "Label for the WP groups table parent group column"
 msgid "Parent Group"
 msgstr ""
@@ -267,16 +304,16 @@ msgctxt "The option that sets a group to be a top-level group and have no parent
 msgid "No parent group"
 msgstr ""
 
-#: includes/hgbp-internal-functions.php:34
+#: includes/hgbp-internal-functions.php:36
 msgctxt ""
 "Label for group navigation tab. %s will be replaced with the number of "
 "child groups."
 msgid "Hierarchy %s"
 msgstr ""
 
-#: public/views/template-tags.php:199
+#: public/views/template-tags.php:212
 msgctxt ""
-"Label for the control on group directories that shows or hides the child "
-"groups. %s will be replaced with the number of child groups."
+"Label for the control on hierarchical group directories that shows or hides "
+"the child groups. %s will be replaced with the number of child groups."
 msgid "Child groups %s"
 msgstr ""

@@ -30,12 +30,18 @@ function hgbp_get_hierarchy_screen_slug() {
  */
 function hgbp_get_hierarchy_nav_item_name() {
 	// Check for a saved option for this string first.
-	$base_name = get_option( 'hgbp-group-tab-label' );
+	$name = get_option( 'hgbp-group-tab-label' );
 	// Next, allow translations to be applied.
-	if ( empty( $base_name ) ) {
-		$base_name = _x( 'Hierarchy %s', 'Label for group navigation tab. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );
+	if ( empty( $name ) ) {
+		$name = _x( 'Hierarchy %s', 'Label for group navigation tab. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );
 	}
-	$name = sprintf( $base_name, '<span>' . number_format( hgbp_group_has_children( bp_get_current_group_id(), bp_loggedin_user_id(), 'exclude_hidden' ) ) . '</span>' );
+	/*
+	 * Apply the number of groups indicator span.
+	 * Don't run if we don't know the group ID.
+	 */
+	if ( $group_id = bp_get_current_group_id() ) {
+		$name = sprintf( $name, '<span>' . number_format( hgbp_group_has_children( $group_id, bp_loggedin_user_id(), 'exclude_hidden' ) ) . '</span>' );
+	}
 	// Finally, allow filtration for per-group customization.
 	return apply_filters( 'hgbp_group_tab_label', $name );
 }

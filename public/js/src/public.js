@@ -28,11 +28,7 @@
 		anchor.toggleClass( "open" );
 
 		// Update the aria-expanded attribute on the related control.
-		if ( anchor.siblings( ".child-groups" ).hasClass( "open" ) ) {
-			anchor.attr( "aria-expanded", true );
-		} else {
-			anchor.attr( "aria-expanded", false );
-		}
+		anchor.attr( "aria-expanded", anchor.siblings( ".child-groups" ).hasClass( "open" ) );
 	}
 
 	/**

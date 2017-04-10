@@ -159,8 +159,16 @@ function hgbp_groups_loop_pagination_bottom() {
 							$label = __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' );
 						}
 						$label = sprintf( $label, bp_get_group_name( $parent_group ) );
-						// Finally, allow filtration for per-group customization.
-						echo esc_html( apply_filters( 'hgbp_directory_child_group_view_all_link', $label ) );
+
+						/**
+						 * Filters the "view all subgroups" link text for a group.
+						 *
+						 * @since 1.0.0
+						 *
+						 * @param string          $value        Label to use.
+						 * @param BP_Groups_Group $parent_group Parent group object.
+						 */
+						echo esc_html( apply_filters( 'hgbp_directory_child_group_view_all_link', $label, $parent_group ) );
 					?></a>
 				<?php endif;
 
@@ -219,7 +227,15 @@ function hgbp_child_group_section() {
 					$label = _x( 'Child groups %s', 'Label for the control on hierarchical group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );
 				}
 				$label = sprintf( esc_html( $label ), '<span class="count">' . $number_children . '</span>' );
-				// Finally, allow filtration for per-group customization.
+
+				/**
+				 * Filters the "Child groups" toggle text for a group's entry on the
+				 * hierarchical groups directory.
+				 *
+				 * @since 1.0.0
+				 *
+				 * @param string $value Label to use.
+				 */
 				echo apply_filters( 'hgbp_directory_child_group_section_header_label', $label );
 			?></a>
 			<div class="child-groups" id="child-groups-of-<?php bp_group_id(); ?>"></div>

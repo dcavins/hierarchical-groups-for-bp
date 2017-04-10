@@ -18,6 +18,13 @@
  * @return string Slug to use as part of the url.
  */
 function hgbp_get_hierarchy_screen_slug() {
+	/**
+	 * Filters the slug used for the hierarchy screen for a group.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $value Slug to use.
+	 */
 	return apply_filters( 'hgbp_screen_slug', 'hierarchy' );
 }
 
@@ -42,8 +49,15 @@ function hgbp_get_hierarchy_nav_item_name() {
 	if ( $group_id = bp_get_current_group_id() ) {
 		$name = sprintf( $name, '<span>' . number_format( hgbp_group_has_children( $group_id, bp_loggedin_user_id(), 'exclude_hidden' ) ) . '</span>' );
 	}
-	// Finally, allow filtration for per-group customization.
-	return apply_filters( 'hgbp_group_tab_label', $name );
+	/**
+	 * Filters the label of the hierarchy screen's navigation item for a group.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $value    Label to use.
+	 * @param int    $group_id ID of the current group.
+	 */
+	return apply_filters( 'hgbp_group_tab_label', $name, $group_id );
 }
 
 /**
@@ -114,7 +128,6 @@ function hgbp_include_group_by_context( $group = false, $user_id = false, $conte
 	 * @param int             $user_id ID of user to check.
 	 * @param string          $user_id Current context.
 	 */
-
 	return apply_filters( 'hgbp_include_group_by_context', $include, $group, $user_id, $context );
 }
 
@@ -181,6 +194,15 @@ function hgbp_group_include_hierarchical_activity( $group_id = 0 ) {
 		$include = hgbp_get_global_activity_setting();
 	}
 
+	/**
+	 * Filters whether a group's activity stream should include parent or
+	 * child group activity.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $include  Whether to include this group.
+	 * @param int    $group_id ID of the group to check.
+	 */
 	return apply_filters( 'hgbp_group_include_hierarchical_activity', $include, $group_id );
 }
 

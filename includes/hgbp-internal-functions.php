@@ -80,6 +80,11 @@ function hgbp_include_group_by_context( $group = false, $user_id = false, $conte
 	if ( ! isset( $group->id ) ) {
 		return $include;
 	}
+
+	if ( current_user_can( 'bp_moderate' ) ) {
+		$include = true;
+	}
+
 	/*
 	 * 'exclude_hidden' is useful on directories, where hidden groups
 	 * are excluded by BP.
@@ -89,9 +94,9 @@ function hgbp_include_group_by_context( $group = false, $user_id = false, $conte
 			$include = true;
 		}
 	/*
-	 * 'exclude_private' includes only groups for which the user can view the activity streams.
+	 * 'activity' includes only groups for which the user can view the activity streams.
 	 */
-	} elseif ( 'exclude_private' == $context ) {
+	} elseif ( 'activity' == $context ) {
 		// For activity stream inclusion, require public status or membership.
 		if ( 'public' == $group->status || groups_is_user_member( $user_id, $group->id ) ) {
 			$include = true;
@@ -102,14 +107,6 @@ function hgbp_include_group_by_context( $group = false, $user_id = false, $conte
 	 */
 	} elseif ( 'mygroups' == $context ) {
 		if ( groups_is_user_member( $user_id, $group->id ) ) {
-			$include = true;
-		}
-	/*
-	 * 'activity' includes only groups for which the user can view the activity streams.
-	 */
-	} elseif ( 'activity' == $context ) {
-		// For activity stream inclusion, require public status or membership.
-		if ( 'public' == $group->status || groups_is_user_member( $user_id, $group->id ) ) {
 			$include = true;
 		}
 	} elseif ( 'normal' == $context ) {

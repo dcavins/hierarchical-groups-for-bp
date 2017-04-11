@@ -145,40 +145,40 @@ function hgbp_groups_loop_pagination_bottom() {
 
 			<?php
 			// Check for AJAX requests for the child groups toggle.
-			if ( isset( $_REQUEST['action'] ) && 'hgbp_get_child_groups' == $_REQUEST['action'] ) :
+			// Provide a link to the parent group's hierarchy screen.
+			if ( isset( $_REQUEST['action'] )
+				&& 'hgbp_get_child_groups' == $_REQUEST['action']
+				&& ! empty( $_REQUEST['parent_id'] )
+				&& ( $parent_group = groups_get_group( (int) $_REQUEST['parent_id'] ) )
+				&& hgbp_include_group_by_context( $parent_group, bp_loggedin_user_id(), 'normal' )
+				) :
+			?>
+				<a href="<?php hgbp_group_hierarchy_permalink( $parent_group ); ?>" class="view-all-child-groups-link"><?php
+					// Check for a saved option for this string first.
+					$label = get_option( 'hgbp-directory-child-group-view-all-link' );
+					// Next, allow translations to be applied.
+					if ( empty( $label ) ) {
+						$label = __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' );
+					}
+					$label = sprintf( $label, bp_get_group_name( $parent_group ) );
 
-				// Provide a link to the parent group's hierarchy screen.
-				if ( ! empty( $_REQUEST['parent_id'] ) ) :
-					$parent_group = groups_get_group( (int) $_REQUEST['parent_id'] );
-				?>
-					<a href="<?php hgbp_group_hierarchy_permalink( $parent_group ); ?>" class="view-all-child-groups-link"><?php
-						// Check for a saved option for this string first.
-						$label = get_option( 'hgbp-directory-child-group-view-all-link' );
-						// Next, allow translations to be applied.
-						if ( empty( $label ) ) {
-							$label = __( 'View all child groups of %s.', 'hierarchical-groups-for-bp' );
-						}
-						$label = sprintf( $label, bp_get_group_name( $parent_group ) );
-
-						/**
-						 * Filters the "view all subgroups" link text for a group.
-						 *
-						 * @since 1.0.0
-						 *
-						 * @param string          $value        Label to use.
-						 * @param BP_Groups_Group $parent_group Parent group object.
-						 */
-						echo esc_html( apply_filters( 'hgbp_directory_child_group_view_all_link', $label, $parent_group ) );
-					?></a>
-				<?php endif;
-
+					/**
+					 * Filters the "view all subgroups" link text for a group.
+					 *
+					 * @since 1.0.0
+					 *
+					 * @param string          $value        Label to use.
+					 * @param BP_Groups_Group $parent_group Parent group object.
+					 */
+					echo esc_html( apply_filters( 'hgbp_directory_child_group_view_all_link', $label, $parent_group ) );
+				?></a>
 			else : ?>
 
-					<div class="pagination-links" id="group-dir-pag-<?php echo $location; ?>">
+				<div class="pagination-links" id="group-dir-pag-<?php echo $location; ?>">
 
-						<?php bp_groups_pagination_links(); ?>
+					<?php bp_groups_pagination_links(); ?>
 
-					</div>
+				</div>
 
 				<?php
 			endif; ?>

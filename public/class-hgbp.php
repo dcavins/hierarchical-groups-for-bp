@@ -75,6 +75,12 @@ class HGBP_Public {
 		// Potentially override the groups loop template.
 		add_filter( 'bp_get_template_part', array( $this, 'filter_groups_loop_template'), 10, 3 );
 
+		/*
+		 * Adds toggle allowing user to choose whether to restrict groups list to top-level groups
+		 * (working top down), or whether to intermingle.
+		 */
+		add_action( 'bp_groups_directory_group_types', array( $this, 'output_enable_tree_checkbox' ) );
+
 		// Hook bp_has_groups filters right before a group directory is rendered.
 		add_action( 'bp_before_groups_loop', array( $this, 'add_has_group_parse_arg_filters' ) );
 
@@ -200,13 +206,34 @@ class HGBP_Public {
 	 * to render the group wrapper.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @param $args Array of parsed arguments.
-	 *
-	 * @return array
  	 */
 	public function add_has_group_parse_arg_filters() {
 		add_filter( 'bp_after_has_groups_parse_args', array( $this, 'filter_has_groups_args' ) );
+	}
+
+	/**
+	 * Adds toggle allowing user to choose whether to restrict groups list
+	 * to top-level groups (working top down), or whether to intermingle.
+	 *
+ 	 * @since 1.0.0
+	 *
+	 * @return 	string html markup
+	 */
+	public function output_enable_tree_checkbox() {
+		if ( ! hgbp_get_directory_as_tree_setting() ) {
+			return;
+		}
+
+		// Calculate the checkbox status, based on the cookie value.
+		$checked = true;
+		if ( isset( $_COOKIE['bp-groups-use-tree-view'] ) && 0 == $_COOKIE['bp-groups-use-tree-view'] ) {
+			$checked = false;
+		}
+		?>
+		<li class="hgbp-enable-tree-view-container no-ajax" id="hgbp-enable-tree-view-container" style="float:left;">
+			<input id="hgbp-enable-tree-view" name="hgbp-enable-tree-view" type="checkbox" <?php checked( $checked ); ?> class="no-ajax" /> <label for="hgbp-enable-tree-view" class="no-ajax"><?php _e( 'Include top-level groups only.', 'hierarchical-groups-for-bp' ); ?></label>
+		</li>
+		<?php
 	}
 
 	/**
@@ -222,30 +249,32 @@ class HGBP_Public {
 	public function filter_has_groups_args( $args ) {
 		/*
 		 * Should we filter this groups loop at all?
-		 * We only want to filter if this is an otherwise unfiltered view.
-		 * Basically, if the user wants to order by most members, it's unlikely
-		 * they mean, "sort the top level groups by the number of members."
-		 * They probably mean, "Show me the largest group."
-		 * One thing we can't know is if type => popular and orderby => last_activity
-		 * are intentionally set or just the defaults.
+		 * We only want to filter if adding the hierarchy makes sense.
+		 * For instance, if a user searches for groups matching "oboes",
+		 * they probably want the results, not only groups that match "oboes"
+		 * AND have a parent_id of 0.
+		 * Adding the toggle means that if a user choosing an orderby, we let
+		 * them decide whether they want hierarchical results or not.
+		 * We never apply hierarchy to a "my groups" view, because a user
+		 * would have to belong to all ancestor groups of a child group they
+		 * belong to in order to see that child group.
 		 * This is a guess.
 		 * Feel free to customize the guess for your site using the
 		 * 'hgbp_enable_has_group_args_filter' filter.
 		 */
 		$use_tree = hgbp_get_directory_as_tree_setting();
+
+		// If the tree view is allowed, has the user set a preference?
+		if ( $use_tree && isset( $_COOKIE['bp-groups-use-tree-view'] ) ) {
+			$use_tree = (bool) $_COOKIE['bp-groups-use-tree-view'];
+		}
+
 		$force_parent_id = false;
 		if ( $use_tree ) {
 			// Check that the incoming args are basically defaults.
-			if ( ( empty( $args['type'] ) || 'active' == $args['type'] )
-					&& ( empty( $args['orderby'] ) || 'last_activity' == $args['orderby'] )
-					&& ( empty( $args['slug'] ) )
-					&& ( empty( $args['search_terms'] ) )
-					&& ( empty( $args['group_type'] ) )
-					&& ( empty( $args['group_type__in'] ) )
-					&& ( empty( $args['group_type__not_in'] ) )
-					&& ( empty( $args['meta_query'] ) )
+			if (
+					( empty( $args['slug'] ) )
 					&& ( empty( $args['include'] ) )
-					&& ( empty( $args['exclude'] ) )
 					&& ( empty( $args['parent_id'] ) )
 					&& ( empty( $args['scope'] ) || 'personal' != $args['scope'] )
 				) {

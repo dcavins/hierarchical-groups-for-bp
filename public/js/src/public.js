@@ -4,6 +4,31 @@
 	var fetching_child_groups = false;
 
 	$( document ).ready( function() {
+		// Enable the "show tree view" toggle only when loading the "all groups" view.
+		$( "#hgbp-enable-tree-view-container input" ).prop( "disabled", $( "#groups-personal" ).hasClass( "selected" ) );
+
+		/*
+		 * Hide the "show tree view" toggle when switching away from the "all groups" view.
+		 * Using a very targeted MutationObserver seems like the best bet for now.
+		 * Worst-case scenario if this code isn't supported is that user sees toggle that
+		 * is ignored on the "my groups" view, so not too bad.
+		 */
+		var $directory_nav_item = $( "#groups-all" );
+		var observer = new MutationObserver( function( mutations ) {
+			mutations.forEach( function( mutation ) {
+				if ( mutation.attributeName === "class" ) {
+					$( "#hgbp-enable-tree-view-container input" ).prop( "disabled", $( "#groups-personal" ).hasClass( "selected" ) );
+				}
+			} );
+		} );
+		observer.observe( $directory_nav_item[0],  {
+			attributes: true,
+			childList: false,
+			characterData: false,
+			subtree: false,
+			attributeFilter: ['class']
+		} );
+
 		/*
 		 * Expand folders to show contents on click.
 		 * Contents are fetched via an AJAX request.
@@ -17,7 +42,31 @@
 			// Send for the results.
 			fetch_child_groups( $( this ) );
 		} );
+
+		// Refresh groups list when the "use tree view" toggle is clicked.
+		$( "#buddypress" ).on( "change", "#hgbp-enable-tree-view", function( e ) {
+			send_filter_request( $( this ) );
+		} );
 	} );
+
+	/*
+	 * Refresh groups list when the "use tree view" toggle is clicked.
+	 */
+	function send_filter_request( input ) {
+		var checked      = input.prop( "checked" ) ? 1 : 0,
+			filter       = $( "select#groups-order-by" ).val(),
+			search_terms = "";
+
+		$.cookie( "bp-groups-use-tree-view", checked, { path: "/" } );
+
+		if ( $(".dir-search input").length ) {
+			search_terms = $(".dir-search input").val();
+		}
+
+		bp_filter_request( "groups", filter, "filter", "div.groups", search_terms, 1, $.cookie( "bp-group-extras" ) );
+
+		return false;
+	}
 
 	/**
 	 * Toggle the child groups pane and indicators.

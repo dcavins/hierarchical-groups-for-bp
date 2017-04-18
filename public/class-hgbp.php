@@ -243,9 +243,25 @@ class HGBP_Public {
 		if ( isset( $_COOKIE['bp-groups-use-tree-view'] ) && 0 == $_COOKIE['bp-groups-use-tree-view'] ) {
 			$checked = false;
 		}
+
+		// Set the label. Check for a saved option for this string first.
+		$label = bp_get_option( 'hgbp-directory-enable-tree-view-label' );
+		// Next, allow translations to be applied.
+		if ( empty( $label ) ) {
+			$label = __( 'Include top-level groups only.', 'hierarchical-groups-for-bp' );
+		}
+
+		/**
+		 * Filters the "enable tree view" toggle label.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $value Label to use.
+		 */
+		$label = apply_filters( 'hgbp_directory_enable_tree_view_label', $label );
 		?>
 		<li class="hgbp-enable-tree-view-container no-ajax" id="hgbp-enable-tree-view-container" style="float:left;">
-			<input id="hgbp-enable-tree-view" name="hgbp-enable-tree-view" type="checkbox" <?php checked( $checked ); ?> class="no-ajax" /> <label for="hgbp-enable-tree-view" class="no-ajax"><?php _e( 'Include top-level groups only.', 'hierarchical-groups-for-bp' ); ?></label>
+			<input id="hgbp-enable-tree-view" name="hgbp-enable-tree-view" type="checkbox" <?php checked( $checked ); ?> class="no-ajax" /> <label for="hgbp-enable-tree-view" class="no-ajax"><?php echo $label; ?></label>
 		</li>
 		<?php
 	}

@@ -179,6 +179,15 @@ class HGBP_Admin extends HGBP_Public {
 			$this->plugin_slug
 		);
 
+		register_setting( $this->plugin_slug, 'hgbp-directory-enable-tree-view-label', 'sanitize_text_field' );
+		add_settings_field(
+			'hgbp-directory-enable-tree-view-label',
+			'',
+			array( $this, 'render_hgbp_directory_enable_tree_view_label_section' ),
+			$this->plugin_slug,
+			'hgbp_labels'
+		);
+
 		register_setting( $this->plugin_slug, 'hgbp-directory-child-group-section-label', 'sanitize_text_field' );
 		add_settings_field(
 			'hgbp-directory-child-group-section-label',
@@ -296,6 +305,23 @@ class HGBP_Admin extends HGBP_Public {
 	public function labels_section_callback() {}
 
 	/**
+	 * Render "enable tree view" label setting.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_hgbp_directory_enable_tree_view_label_section() {
+		$label = bp_get_option( 'hgbp-directory-enable-tree-view-label' );
+		?>
+		<label for="hgbp-directory-enable-tree-view-label"><?php _ex( 'Group directory &ldquo;use tree view&rdquo; toggle label:', 'Label for label setting on site hierarchy options screen', 'hierarchical-groups-for-bp' ); ?></label>&emsp;<input type="text" id="hhgbp-directory-enable-tree-view-label" name="hgbp-directory-enable-tree-view-label" value="<?php echo esc_textarea( $label ); ?>"> <a href="#TB_inline?width=650&height=630&inlineId=modal-hgbp-directory-enable-tree-view-label-location" class="thickbox"><?php _e( 'Where is this label used?', 'hierarchical-groups-for-bp' ); ?></a>
+		<p class="description"><?php _e( 'Change the label of the &ldquo;use tree view&rdquo; toggle on the main group directory.', 'hierarchical-groups-for-bp' ); ?></p>
+
+		<div id="modal-hgbp-directory-enable-tree-view-label-location" style="display:none;">
+			<img src="<?php echo hgbp_get_plugin_base_uri() . 'admin/images/directory-enable-tree-view-label-location.png'; ?>" alt="<?php _e( 'Graphic showing where this label is used', 'hierarchical-groups-for-bp' ); ?>">
+		</div>
+		<?php
+	}
+
+	/**
 	 * Set up the fields for the global settings screen.
 	 *
 	 * @since    1.0.0
@@ -397,6 +423,7 @@ class HGBP_Admin extends HGBP_Public {
 			'hgbp-groups-directory-show-tree'           => 'absint',
 			'hgbp-include-activity-from-relatives'      => 'hgbp_sanitize_include_setting',
 			'hgbp-include-activity-enforce'             => 'hgbp_sanitize_include_setting_enforce',
+			'hgbp-directory-enable-tree-view-label'     => 'sanitize_text_field',
 			'hgbp-directory-child-group-section-label'  => 'sanitize_text_field',
 			'hgbp-directory-child-group-view-all-link'  => 'sanitize_text_field',
 			'hgbp-group-tab-label'                      => 'sanitize_text_field',

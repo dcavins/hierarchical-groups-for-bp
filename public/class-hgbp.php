@@ -84,6 +84,9 @@ class HGBP_Public {
 		// Hook bp_has_groups filters right before a group directory is rendered.
 		add_action( 'bp_before_groups_loop', array( $this, 'add_has_group_parse_arg_filters' ) );
 
+		// Unhook bp_has_groups filters right after a group directory is rendered.
+		add_action( 'bp_after_groups_loop', array( $this, 'remove_has_group_parse_arg_filters' ) );
+
 		// Add pagination blocks to the groups-loop-tree directory.
 		add_action( 'hgbp_before_directory_groups_list_tree', 'hgbp_groups_loop_pagination_top' );
 		add_action( 'hgbp_after_directory_groups_list_tree', 'hgbp_groups_loop_pagination_bottom' );
@@ -209,6 +212,17 @@ class HGBP_Public {
  	 */
 	public function add_has_group_parse_arg_filters() {
 		add_filter( 'bp_after_has_groups_parse_args', array( $this, 'filter_has_groups_args' ) );
+	}
+
+	/**
+	 * Remove bp_has_groups filters right before the directory is rendered.
+	 * This helps avoid modifying the other use of bp_has_group() like
+	 * widgets that might appear on a page with a group directory.
+	 *
+	 * @since 1.0.0
+ 	 */
+	public function remove_has_group_parse_arg_filters() {
+		remove_filter( 'bp_after_has_groups_parse_args', array( $this, 'filter_has_groups_args' ) );
 	}
 
 	/**

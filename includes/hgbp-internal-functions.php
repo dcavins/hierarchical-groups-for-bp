@@ -37,7 +37,7 @@ function hgbp_get_hierarchy_screen_slug() {
  */
 function hgbp_get_hierarchy_nav_item_name() {
 	// Check for a saved option for this string first.
-	$name = get_option( 'hgbp-group-tab-label' );
+	$name = bp_get_option( 'hgbp-group-tab-label' );
 	// Next, allow translations to be applied.
 	if ( empty( $name ) ) {
 		$name = _x( 'Hierarchy %s', 'Label for group navigation tab. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );

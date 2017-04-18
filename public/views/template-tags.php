@@ -172,7 +172,7 @@ function hgbp_groups_loop_pagination_bottom() {
 					 */
 					echo esc_html( apply_filters( 'hgbp_directory_child_group_view_all_link', $label, $parent_group ) );
 				?></a>
-			else : ?>
+			<?php else : ?>
 
 				<div class="pagination-links" id="group-dir-pag-<?php echo $location; ?>">
 
@@ -221,7 +221,7 @@ function hgbp_child_group_section() {
 		<div class="child-groups-container">
 			<a href="<?php esc_url( hgbp_group_hierarchy_permalink() ); ?>" class="toggle-child-groups" data-group-id="<?php bp_group_id(); ?>" aria-expanded="false" aria-controls="child-groups-of-<?php bp_group_id(); ?>"><?php
 				// Check for a saved option first.
-				$label = get_option( 'hgbp-directory-child-group-section-label' );
+				$label = bp_get_option( 'hgbp-directory-child-group-section-label' );
 				// Next, allow translations to be applied.
 				if ( empty( $label ) ) {
 					$label = _x( 'Child groups %s', 'Label for the control on hierarchical group directories that shows or hides the child groups. %s will be replaced with the number of child groups.', 'hierarchical-groups-for-bp' );

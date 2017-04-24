@@ -13,21 +13,23 @@
 		 * Worst-case scenario if this code isn't supported is that user sees toggle that
 		 * is ignored on the "my groups" view, so not too bad.
 		 */
-		var $directory_nav_item = $( "#groups-all" );
-		var observer = new MutationObserver( function( mutations ) {
-			mutations.forEach( function( mutation ) {
-				if ( mutation.attributeName === "class" ) {
-					$( "#hgbp-enable-tree-view-container input" ).prop( "disabled", $( "#groups-personal" ).hasClass( "selected" ) );
-				}
+		var $directory_nav_item = document.getElementById( "groups-all" );
+		if ( $directory_nav_item !== null && window.MutationObserver ) {
+			var observer = new MutationObserver( function( mutations ) {
+				mutations.forEach( function( mutation ) {
+					if ( mutation.attributeName === "class" ) {
+						$( "#hgbp-enable-tree-view-container input" ).prop( "disabled", $( "#groups-personal" ).hasClass( "selected" ) );
+					}
+				} );
 			} );
-		} );
-		observer.observe( $directory_nav_item[0],  {
-			attributes: true,
-			childList: false,
-			characterData: false,
-			subtree: false,
-			attributeFilter: ['class']
-		} );
+			observer.observe( $directory_nav_item,  {
+				attributes: true,
+				childList: false,
+				characterData: false,
+				subtree: false,
+				attributeFilter: ['class']
+			} );
+		}
 
 		/*
 		 * Expand folders to show contents on click.

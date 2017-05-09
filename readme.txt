@@ -26,7 +26,7 @@ It also incorporates good ideas from the "BP Group Hierarchy Propagate" plugin w
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/plugin-name` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Visit the Groups->Hierarchy Options screen to configure the plugin.
 
@@ -46,7 +46,7 @@ This plugin makes use of features found only in BuddyPress 2.7. or newer.
 = How can I use this plugin in my language? =
 
 Create a new language file from the included `hierarchical-groups-for-bp.pot` file.
-Save the language files in a new directory, `wp-content/languages/hierarchical-groups-for-bp/`, with the filenames `hierarchical-groups-for-bp-{locale}.mo`
+Save the language files in the directory, `wp-content/languages/plugins/`, with the filenames `hierarchical-groups-for-bp-{locale}.mo`
 and `hierarchical-groups-for-bp-{locale}.po`. Please consider contributing to the translation project for this plugin (add link once published). Read more about [creating custom language files](https://codex.buddypress.org/getting-started/customizing/customizing-labels-messages-and-urls/).
 
 

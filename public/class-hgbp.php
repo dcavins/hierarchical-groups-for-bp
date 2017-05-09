@@ -138,10 +138,19 @@ class HGBP_Public {
 	 * @since    1.0.0
 	 */
 	public function load_plugin_textdomain() {
-		$domain = $this->plugin_slug;
-		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
+		global $wp_version;
 
-		load_textdomain( $domain, trailingslashit( WP_LANG_DIR ) . $domain . '/' . $domain . '-' . $locale . '.mo' );
+		/*
+		 * WordPress 4.6 and newer automatically loads language files found at
+		 * wp-content/languages/plugins/hierarchical-groups-for-bp-LOCALE.mo
+		 * This is for older installations of WordPress.
+		 */
+
+		if ( version_compare( $wp_version, '4.6', '<' ) ) {
+			$domain = $this->plugin_slug;
+			$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
+			load_textdomain( $domain, WP_LANG_DIR . '/plugins/' . $domain . '-' . $locale . '.mo' );
+		}
 	}
 
 	/**

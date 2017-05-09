@@ -112,7 +112,12 @@
 				action: "hgbp_get_child_groups",
 			},
 			success: function( response ) {
-				$( target ).html( response );
+				/*
+				 * Upon success, flow the html into the target container.
+				 * Also fire an event so other javascript can respond if needed, like
+				 * jQuery( ".child-groups" ).on( "childGroupsContainerPopulated", function(){ console.log( "doing something" ); });
+				 */
+				$( target ).html( response ).trigger( "childGroupsContainerPopulated" );
 			}
 		})
 		.done( function( response ) {

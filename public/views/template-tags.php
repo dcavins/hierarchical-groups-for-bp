@@ -244,3 +244,27 @@ function hgbp_child_group_section() {
 		$groups_template = $parent_groups_template;
 	endif;
 }
+
+/**
+ * Add breadcrumb links and a "Child Group" header to the single group hierarchy screen.
+ *
+ * @since 1.0.0
+ */
+function hgbp_single_group_hierarchy_screen_list_header() {
+	if ( hgbp_is_hierarchy_screen() ) :
+		// Add the parent groups breadcrumb links
+		if ( hgbp_get_parent_group_id( false, bp_loggedin_user_id(), 'normal' ) ) :
+		?>
+		<div class="parent-group-breadcrumbs">
+			<h3><?php _e( 'Parent Groups', 'hierarchical-groups-for-bp' ); ?></h3>
+			<?php hgbp_group_permalink_breadcrumbs(); ?>
+		</div>
+		<hr />
+		<?php
+		endif;
+		// Add a header for the groups list.
+		?>
+		<h3><?php _e( 'Child Groups', 'hierarchical-groups-for-bp' ); ?></h3>
+		<?php
+	endif;
+}

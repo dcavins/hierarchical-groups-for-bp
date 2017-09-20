@@ -19,6 +19,11 @@ do_action( 'bp_before_groups_loop' ); ?>
 	<p class="current-group-type"><?php bp_current_group_directory_type_message() ?></p>
 <?php endif; ?>
 
+<?php
+	// Fire an action outside of the has groups loop, but after the directory type message.
+	do_action( 'hgbp_before_groups_loop' );
+?>
+
 <?php if ( bp_has_groups( bp_ajax_querystring( 'groups' ) ) ) : ?>
 
 	<?php

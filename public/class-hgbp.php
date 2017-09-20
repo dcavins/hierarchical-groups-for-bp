@@ -91,6 +91,9 @@ class HGBP_Public {
 		add_action( 'hgbp_before_directory_groups_list_tree', 'hgbp_groups_loop_pagination_top' );
 		add_action( 'hgbp_after_directory_groups_list_tree', 'hgbp_groups_loop_pagination_bottom' );
 
+		// Add the hierarchy breadcrumb links to a single group's hierarchy screen.
+		add_action( 'hgbp_before_groups_loop', 'hgbp_single_group_hierarchy_screen_list_header' );
+
 		// Add the "has-children" class to a group item that has children.
 		add_filter( 'bp_get_group_class', array( $this, 'filter_group_classes' ) );
 

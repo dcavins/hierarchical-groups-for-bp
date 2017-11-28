@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Hierarchical Groups for BP 1.0.0\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/hierarchical-groups-for-bp\n"
-"POT-Creation-Date: 2017-09-20 17:58:31+00:00\n"
+"POT-Creation-Date: 2017-11-28 22:09:49+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -154,67 +154,67 @@ msgstr ""
 msgid "Hierarchical Groups for BuddyPress requires BuddyPress 2.7 or newer."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:81
+#: includes/class-bp-group-extension.php:80
 msgid "This group is currently a top-level group."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:89
+#: includes/class-bp-group-extension.php:88
 msgid ""
 "This group&rsquo;s current parent group is a hidden group, and you are not "
 "a member of that group."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:93
+#: includes/class-bp-group-extension.php:92
 msgid "This group&rsquo;s current parent group is %s."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:116
+#: includes/class-bp-group-extension.php:115
 msgid "Who is allowed to select this group as the parent group of another group?"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:125
+#: includes/class-bp-group-extension.php:124
 msgid "Any logged-in site member"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:128
+#: includes/class-bp-group-extension.php:127
 msgid "All group members"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:130
+#: includes/class-bp-group-extension.php:129
 msgid "Group admins and mods only"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:132
+#: includes/class-bp-group-extension.php:131
 msgid "Group admins only"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:134
+#: includes/class-bp-group-extension.php:133
 msgid "No one"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:146
+#: includes/class-bp-group-extension.php:145
 msgid ""
 "Include activity from parent and child groups in this group&rsquo;s "
 "activity stream."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:148
+#: includes/class-bp-group-extension.php:147
 msgid "Include parent group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:150
+#: includes/class-bp-group-extension.php:149
 msgid "Include child group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:152
+#: includes/class-bp-group-extension.php:151
 msgid "Include parent and child group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:154
+#: includes/class-bp-group-extension.php:153
 msgid "Do not include related group activity."
 msgstr ""
 
-#: includes/class-bp-group-extension.php:156
+#: includes/class-bp-group-extension.php:155
 msgid "Inherit global setting."
 msgstr ""
 
@@ -305,24 +305,24 @@ msgctxt "Label for the WP groups table parent group column"
 msgid "Parent Group"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:23
-#: includes/class-bp-group-extension.php:26
-#: includes/class-bp-group-extension.php:30
+#: includes/class-bp-group-extension.php:22
+#: includes/class-bp-group-extension.php:25
+#: includes/class-bp-group-extension.php:29
 msgctxt "Label for group management tab"
 msgid "Hierarchy"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:74
+#: includes/class-bp-group-extension.php:73
 msgctxt "Label for the parent group select on a single group manage screen"
 msgid "Parent Group"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:98
+#: includes/class-bp-group-extension.php:97
 msgctxt "The option to keep the current parent."
 msgid "Keep current parent group"
 msgstr ""
 
-#: includes/class-bp-group-extension.php:99
+#: includes/class-bp-group-extension.php:98
 msgctxt "The option that sets a group to be a top-level group and have no parent."
 msgid "No parent group"
 msgstr ""

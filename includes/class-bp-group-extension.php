@@ -19,7 +19,6 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 			'show_tab'          => $nav_item_visibility,
 			'screens' => array(
 				'create' => array(
-					'name' => 'side',
 					'name' => _x( 'Hierarchy', 'Label for group management tab', 'hierarchical-groups-for-bp' ),
 				),
 				'edit' => array(

@@ -17,7 +17,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 			'nav_item_position' => 61,
 			'access'            => $nav_item_visibility,
 			'show_tab'          => $nav_item_visibility,
-			'screens' => array(
+			'screens'           => apply_filters( 'hgbp_group_extension_screens_param', array(
 				'create' => array(
 					'name' => _x( 'Hierarchy', 'Label for group management tab', 'hierarchical-groups-for-bp' ),
 				),
@@ -28,7 +28,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 					'metabox_context' => 'side',
 					'name' => _x( 'Hierarchy', 'Label for group management tab', 'hierarchical-groups-for-bp' ),
 				),
-			),
+			) ),
 		);
 		parent::init( $args );
 	}

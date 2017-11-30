@@ -171,7 +171,24 @@ class HGBP_Admin extends HGBP_Public {
 			'hgbp_activity_syndication'
 		);
 
-		// Tools for importing settings from previous plugins.
+		// Setting for what should be included on a single group's hierarchy screen.
+		add_settings_section(
+			'hgbp_group_hierarchy_screen_contents_section',
+			__( 'Single Group Hierarchy Screen Contents', 'hierarchical-groups-for-bp' ),
+			array( $this, 'group_hierarchy_screen_contents_section_callback' ),
+			$this->plugin_slug
+		);
+
+		register_setting( $this->plugin_slug, 'hgbp-group-hierarchy-screen-contents', 'hgbp_sanitize_hierarchy_screen_contents_setting' );
+		add_settings_field(
+			'hgbp-group-hierarchy-screen-contents',
+			__( 'Include these sections on a single group\'s hierarchy screen.', 'hierarchical-groups-for-bp' ),
+			array( $this, 'render_group_hierarchy_screen_contents' ),
+			$this->plugin_slug,
+			'hgbp_group_hierarchy_screen_contents_section'
+		);
+
+		// Label customization.
 		add_settings_section(
 			'hgbp_labels',
 			__( 'Customize labels', 'hierarchical-groups-for-bp' ),
@@ -296,6 +313,29 @@ class HGBP_Admin extends HGBP_Public {
 		<label for="hgbp-groups-directory-show-tree"><input type="checkbox" id="hgbp-groups-directory-show-tree" name="hgbp-groups-directory-show-tree" value="1"<?php checked( $setting ); ?>> <?php _ex( 'Show a hierarchical directory.', 'Response for use directory tree global setting', 'hierarchical-groups-for-bp' ); ?></label>
 		<?php
 	}
+
+	/**
+	 * Provide a section description.
+	 *
+	 * @since    1.0.0
+	 */
+	public function group_hierarchy_screen_contents_section_callback() {}
+
+	/**
+	 * Set up the fields for the global settings screen.
+	 *
+	 * @since    1.0.0
+	 */
+	public function render_group_hierarchy_screen_contents() {
+		$setting = hgbp_get_group_hierarchy_screen_contents_setting();
+		?>
+		<label for="hgbp-group-hierarchy-screen-contents-ancestors"><input type="checkbox" id="hgbp-group-hierarchy-screen-contents-ancestors" name="hgbp-group-hierarchy-screen-contents[ancestors]" value="1"<?php checked( $setting['ancestors'] ); ?>> <?php _ex( 'Ancestor breadcrumbs', 'Response for single group hierarchy screen contents setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="hgbp-group-hierarchy-screen-contents-siblings"><input type="checkbox" id="hgbp-group-hierarchy-screen-contents-siblings" name="hgbp-group-hierarchy-screen-contents[siblings]" value="1"<?php checked( $setting['siblings'] ); ?>> <?php _ex( 'Directory of sibling groups', 'Response for single group hierarchy screen contents setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<label for="hgbp-group-hierarchy-screen-contents-children"><input type="checkbox" id="hgbp-group-hierarchy-screen-contents-children" name="hgbp-group-hierarchy-screen-contents[children]" value="1"<?php checked( $setting['children'] ); ?>> <?php _ex( 'Directory of child groups', 'Response for group single hierarchy screen contents setting', 'hierarchical-groups-for-bp' ); ?></label>
+		<?php
+	}
+
+
 
 	/**
 	 * Provide a section description for the global settings screen.
@@ -423,6 +463,7 @@ class HGBP_Admin extends HGBP_Public {
 			'hgbp-groups-directory-show-tree'           => 'absint',
 			'hgbp-include-activity-from-relatives'      => 'hgbp_sanitize_include_setting',
 			'hgbp-include-activity-enforce'             => 'hgbp_sanitize_include_setting_enforce',
+			'hgbp-group-hierarchy-screen-contents'      => 'hgbp_sanitize_hierarchy_screen_contents_setting',
 			'hgbp-directory-enable-tree-view-label'     => 'sanitize_text_field',
 			'hgbp-directory-child-group-section-label'  => 'sanitize_text_field',
 			'hgbp-directory-child-group-view-all-link'  => 'sanitize_text_field',

@@ -43,13 +43,12 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		$parent_groups_template = $groups_template;
 
 		/*
-		 * groups/single/subgroups-loop is a shell that calls groups-loop,
-		 * to make it possible to override the subgroups loop using the
-		 * BuddyPress template hierarchy.
+		 * groups/single/single-group-hierarchy-screen is used to create the
+		 * hierarchy screen for a single group.
 		 * Note that groups-loop will load groups-loop-tree if
 		 * 'use hierarchical template' is set to true.
 		 */
-		bp_get_template_part( 'groups/single/subgroups-loop' );
+		bp_get_template_part( 'groups/single/single-group-hierarchy-screen' );
 
 		/*
 		 * Reset the $groups_template global, so that the wrapper group

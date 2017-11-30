@@ -91,9 +91,6 @@ class HGBP_Public {
 		add_action( 'hgbp_before_directory_groups_list_tree', 'hgbp_groups_loop_pagination_top' );
 		add_action( 'hgbp_after_directory_groups_list_tree', 'hgbp_groups_loop_pagination_bottom' );
 
-		// Add the hierarchy breadcrumb links to a single group's hierarchy screen.
-		add_action( 'hgbp_before_groups_loop', 'hgbp_single_group_hierarchy_screen_list_header' );
-
 		// Add the "has-children" class to a group item that has children.
 		add_filter( 'bp_get_group_class', array( $this, 'filter_group_classes' ) );
 
@@ -289,6 +286,8 @@ class HGBP_Public {
 	 * @return array
  	 */
 	public function filter_has_groups_args( $args ) {
+		global $hgbp_group_loop_parent_group_id;
+
 		/*
 		 * Should we filter this groups loop at all?
 		 * We only want to filter if adding the hierarchy makes sense.
@@ -356,7 +355,9 @@ class HGBP_Public {
 			 * hierarchy screen. (Don't override passed parent IDs, though.)
 			 */
 			if ( empty( $args['parent_id'] ) ) {
-				$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : bp_get_current_group_id();
+				// The global should have been set in the template.
+				$parent_group_id   = isset( $hgbp_group_loop_parent_group_id ) ? $hgbp_group_loop_parent_group_id : bp_get_current_group_id();
+				$args['parent_id'] = isset( $_REQUEST['parent_id'] ) ? (int) $_REQUEST['parent_id'] : $parent_group_id;
 			}
 			// Unset the type and slug set in bp_has_groups() when in a single group.
 			$args['type'] = $args['slug'] = null;
@@ -393,7 +394,7 @@ class HGBP_Public {
 	public function ajax_subgroups_response_cb() {
 		// Within a single group, prefer the subgroups loop template.
 		if ( hgbp_is_hierarchy_screen() ) {
-			bp_get_template_part( 'groups/single/subgroups-loop' );
+			bp_get_template_part( 'groups/single/single-group-hierarchy-screen' );
 		} else {
 			bp_get_template_part( 'groups/groups-loop' );
 		}

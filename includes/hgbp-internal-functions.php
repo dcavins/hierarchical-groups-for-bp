@@ -312,3 +312,48 @@ function hgbp_sanitize_include_setting_enforce( $value = 'strict' ) {
 	}
 	return $value;
 }
+
+/**
+ * Fetch and parse the saved setting for what's included on a single group's
+ * hierarchy screen.
+ *
+ * @since 1.0.0
+ *
+ * @return array Which sections to include on the hierarchy screen.
+ */
+function hgbp_get_group_hierarchy_screen_contents_setting() {
+	$option = bp_get_option( 'hgbp-group-hierarchy-screen-contents', '' );
+	return hgbp_sanitize_hierarchy_screen_contents_setting( $option );
+}
+
+/**
+ * Filter the hierarchy screen contents setting.
+ *
+ * @since 1.0.0
+ *
+ * @return array Which sections to include.
+ */
+function hgbp_sanitize_hierarchy_screen_contents_setting( $value = null ) {
+	if ( ! is_array( $value ) ) {
+		// Useful defaults.
+		$value = array(
+			'ancestors' => 1,
+			'siblings'  => 0,
+			'children'  => 1
+		);
+	}
+	$sections = array(
+		'ancestors' => 0,
+		'siblings'  => 0,
+		'children'  => 0
+	);
+
+	// Null or zero value means that section isn't selected
+	foreach ( $sections as $key => $enabled ) {
+		if ( ! empty( $value[$key] ) ) {
+			$sections[$key] = 1;
+		}
+	}
+
+	return $sections;
+}

@@ -10,9 +10,9 @@
  */
 global $hgbp_group_loop_parent_group_id;
 
-$sections                        = hgbp_get_group_hierarchy_screen_contents_setting();
-$hgbp_group_loop_parent_group_id = bp_get_current_group_id();
-$parent_group_id                 = hgbp_get_parent_group_id( false, bp_loggedin_user_id(), 'normal' );
+$sections         = hgbp_get_group_hierarchy_screen_contents_setting();
+$current_group_id = bp_get_current_group_id();
+$parent_group_id  = hgbp_get_parent_group_id( false, bp_loggedin_user_id(), 'normal' );
 
 // Add the parent groups breadcrumb links
 if ( $sections['ancestors'] ) :
@@ -37,11 +37,9 @@ if ( $sections['siblings'] ) :
 	<?php
 endif;
 
-// Add a header for the child groups list.
-?>
-<?php
 // Add the child group section
 if ( $sections['children'] ) :
+	$hgbp_group_loop_parent_group_id = $current_group_id;
 	?>
 	<div class="child-groups-directory">
 		<h3><?php _e( 'Child Groups', 'hierarchical-groups-for-bp' ); ?></h3>
@@ -49,4 +47,3 @@ if ( $sections['children'] ) :
 	</div>
 	<?php
 endif;
-

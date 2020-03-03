@@ -2,7 +2,7 @@
 Contributors: dcavins
 Tags: BuddyPress
 Requires at least: 4.6
-Tested up to: 4.7
+Tested up to: 5.3.2
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -41,7 +41,7 @@ It also incorporates good ideas from the "BP Group Hierarchy Propagate" plugin w
 
 = Which versions of BuddyPress are supported? =
 
-This plugin makes use of features found only in BuddyPress 2.7. or newer.
+This plugin makes use of features found only in BuddyPress 2.7 or newer.
 
 = How can I use this plugin in my language? =
 

@@ -20,6 +20,7 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 			'screens'           => apply_filters( 'hgbp_group_extension_screens_param', array(
 				'create' => array(
 					'name' => _x( 'Hierarchy', 'Label for group management tab', 'hierarchical-groups-for-bp' ),
+					'position' => 2,
 				),
 				'edit' => array(
 					'name' => _x( 'Hierarchy', 'Label for group management tab', 'hierarchical-groups-for-bp' ),
@@ -75,9 +76,11 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 		$possible_parent_groups = hgbp_get_possible_parent_groups( $group_id, bp_loggedin_user_id() );
 
 		if ( ! $current_parent_group_id ) :
-			?>
-			<p class="info"><?php _e( 'This group is currently a top-level group.', 'hierarchical-groups-for-bp' ); ?></p>
-			<?php
+			if ( self::user_can_create_topLevelGroups() ) :
+				?>
+				<p class="info"><?php _e( 'This group is currently a top-level group.', 'hierarchical-groups-for-bp' ); ?></p>
+				<?php
+			endif;
 		else :
 			$parent_group = groups_get_group( $current_parent_group_id );
 			// The parent group could be a hidden group, so the current user may not be able to know about it. :\
@@ -93,8 +96,25 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 			endif;
 		endif; ?>
 			<select id="parent-id" name="parent-id" autocomplete="off">
-				<option value="no-change" <?php selected( 'hidden-from-user', $current_parent_group_id ); ?>><?php echo _x( 'Keep current parent group', 'The option to keep the current parent.', 'hierarchical-groups-for-bp' ); ?></option>
-				<option value="0" <?php selected( 0, $current_parent_group_id ); ?>><?php echo _x( 'No parent group', 'The option that sets a group to be a top-level group and have no parent.', 'hierarchical-groups-for-bp' ); ?></option>
+				<?php
+				if ( ! empty( $current_parent_group_id ) ) :
+					?>
+					<option value="no-change" <?php selected( 'hidden-from-user', $current_parent_group_id ); ?>><?php echo _x( 'Keep current parent group', 'The option to keep the current parent.', 'hierarchical-groups-for-bp' ); ?></option>
+					<?php
+				endif;
+				?>
+				<?php 
+				if ( self::user_can_create_topLevelGroups() ) :
+					?>
+					<option value="0" <?php selected( 0, $current_parent_group_id ); ?>><?php echo _x( 'No parent group', 'The option that sets a group to be a top-level group and have no parent.', 'hierarchical-groups-for-bp' ); ?></option>
+					<?php
+				else :
+					?>
+					<option value="0" <?php selected( 0, $current_parent_group_id ); ?>>-- <?php echo _x( 'Select', 'Parent group not yet selected.', 'hierarchical-groups-for-bp' ); ?> --</option>
+
+					<?php
+				endif;
+				?>
 			<?php
 			if ( $possible_parent_groups ) {
 
@@ -157,6 +177,29 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	<?php
 	}
 
+	static function user_can_create_topLevelGroups( $user_id = null ) {
+		$allowedRoles = array(
+			'administrator',
+			'editor',
+			);
+
+		if ( empty( $user_id ) ) {
+			global $current_user;
+			$userRoles = $current_user->roles;
+		} else {
+			$user = get_user_by( 'id' );
+			$userRoles = $user->roles;
+		}
+
+		foreach ( $userRoles as $roleID ) {
+			if ( in_array( $roleID, $allowedRoles ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Save parent association and subgroup creators set on settings screen.
 	 *
@@ -164,6 +207,18 @@ class Hierarchical_Groups_for_BP extends BP_Group_Extension {
 	 */
 	function settings_screen_save( $group_id = null ) {
 		$group_object = groups_get_group( $group_id );
+
+		if ( ! ( 
+			( is_numeric( $_POST['parent-id'] ) && ! empty( $_POST['parent-id'] ) ) || 
+			self::user_can_create_topLevelGroups() ) 
+			) {
+			bp_core_add_message( __( 'You have to select a parent group.', 'buddypress' ), 'error' );
+			if ( bp_is_current_action( 'create' ) ) {
+				bp_core_redirect( trailingslashit( bp_get_groups_directory_permalink() . 'create/step/' . bp_get_groups_current_create_step() ) );
+			}
+
+			return;
+		}
 
 		// Save parent ID. Do nothing if value passed is "no-change".
 		if ( isset( $_POST['parent-id'] ) && 'no-change' != $_POST['parent-id'] ) {

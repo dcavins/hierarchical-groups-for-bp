@@ -587,12 +587,12 @@ class HGBP_Admin extends HGBP_Public {
 	 * @param string $column_name Name of the column being rendered.
 	 * @param array  $item        The current group item in the loop.
 	 */
-	public function column_content_parent_group( $retval = '', $column_name, $item ) {
+	public function column_content_parent_group( $retval, $column_name, $item ) {
 		if ( 'hgbp_parent_group' !== $column_name ) {
 			return $retval;
 		}
 
-		if ( 0 != $item[ 'parent_id' ] ) {
+		if ( ! empty( $item[ 'parent_id' ] ) ) {
 			$parent_group    = groups_get_group( $item[ 'parent_id' ] );
 			$parent_edit_url = esc_url( add_query_arg( array(
 				'page'   => 'bp-groups',

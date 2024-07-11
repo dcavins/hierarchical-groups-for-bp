@@ -33,24 +33,28 @@ function hgbp_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) 
 	function hgbp_get_group_permalink_breadcrumbs( $group = false, $separator = ' / ' ) {
 		global $groups_template;
 
-		if ( empty( $group ) ) {
+		if ( empty( $group ) && isset( $groups_template->group ) ) {
 			$group = $groups_template->group;
 		}
-		$user_id = bp_loggedin_user_id();
 
-		// Create the base group's entry.
-		$item        = '<a href="' . esc_url( bp_get_group_permalink( $group ) ) . '">' . esc_html( bp_get_group_name( $group ) ) . '</a>';
-		$breadcrumbs = array( $item );
-		$parent_id   = hgbp_get_parent_group_id( $group->id, $user_id );
+		if ( ! $group instanceof BP_Groups_Group ) {
+			$breadcrumbs = '';
+		} else {
+			$user_id = bp_loggedin_user_id();
 
-		// Add breadcrumbs for the ancestors.
-		while ( $parent_id ) {
-			$parent_group  = groups_get_group( $parent_id );
-			$breadcrumbs[] = '<a href="' . esc_url( bp_get_group_permalink( $parent_group ) ) . '">' . esc_html( bp_get_group_name( $parent_group ) ) . '</a>';
-			$parent_id     = hgbp_get_parent_group_id( $parent_group->id, $user_id );
+			// Create the base group's entry.
+			$item        = '<a href="' . esc_url( bp_get_group_permalink( $group ) ) . '">' . esc_html( bp_get_group_name( $group ) ) . '</a>';
+			$breadcrumbs = array( $item );
+			$parent_id   = hgbp_get_parent_group_id( $group->id, $user_id );
+
+			// Add breadcrumbs for the ancestors.
+			while ( $parent_id ) {
+				$parent_group  = groups_get_group( $parent_id );
+				$breadcrumbs[] = '<a href="' . esc_url( bp_get_group_permalink( $parent_group ) ) . '">' . esc_html( bp_get_group_name( $parent_group ) ) . '</a>';
+				$parent_id     = hgbp_get_parent_group_id( $parent_group->id, $user_id );
+			}
+			$breadcrumbs = implode( $separator, array_reverse( $breadcrumbs ) );
 		}
-
-		$breadcrumbs = implode( $separator, array_reverse( $breadcrumbs ) );
 
 		/**
 		 * Filters the breadcrumb trail for the current group in the loop.
@@ -209,7 +213,7 @@ function hgbp_child_group_section() {
 		'parent_id'          => bp_get_group_id(),
 		'orderby'            => 'date_created',
 		'update_admin_cache' => false,
-		'per_page'           => false,
+		'per_page'           => null,
 	);
 	if ( bp_has_groups( $has_group_args ) ) :
 		global $groups_template;

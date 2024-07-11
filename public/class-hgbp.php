@@ -198,7 +198,7 @@ class HGBP_Public {
 	 * @return array $templates
 	 */
 	public function filter_groups_loop_template( $templates, $slug, $name ) {
-		if ( 'groups/groups-loop' == $slug && hgbp_get_directory_as_tree_setting() ) {
+		if ( $slug === 'groups/groups-loop' && hgbp_get_directory_as_tree_setting() ) {
 			/*
 			 * Add our setting to the front of the array, for the main groups
 			 * directory and a single group's hierarchy screen.

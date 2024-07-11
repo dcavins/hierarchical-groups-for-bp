@@ -12,7 +12,7 @@ global $hgbp_group_loop_parent_group_id;
 
 $sections         = hgbp_get_group_hierarchy_screen_contents_setting();
 $current_group_id = bp_get_current_group_id();
-$parent_group_id  = hgbp_get_parent_group_id( false, bp_loggedin_user_id(), 'normal' );
+$parent_group_id  = hgbp_get_parent_group_id( $current_group_id, bp_loggedin_user_id(), 'normal' );
 
 // Add the parent groups breadcrumb links
 if ( $sections['ancestors'] ) :

@@ -67,11 +67,11 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
 	 */
-	if ( false === $group_id ) {
+	if ( ! $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
-			return $retval;
+			return array();
 		}
 	}
 
@@ -79,8 +79,8 @@ function hgbp_get_child_groups( $group_id = false, $user_id = false, $context = 
 	$child_args = array(
 		'parent_id'   => $group_id,
 		'show_hidden' => true,
-		'per_page'    => false,
-		'page'        => false,
+		'per_page'    => null,
+		'page'        => null,
 	);
 	$children  = groups_get_groups( $child_args );
 
@@ -121,7 +121,7 @@ function hgbp_group_has_children( $group_id = false, $user_id = false, $context 
 	 * Passing a group id of 0 finds all top-level groups, which could be
 	 * intentional. Try to find the current group only when the $group_id is false.
 	 */
-	if ( false === $group_id ) {
+	if ( ! $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
@@ -150,7 +150,7 @@ function hgbp_group_has_children( $group_id = false, $user_id = false, $context 
 	}
 
 	$children = hgbp_get_child_groups( $group_id, $user_id, $context );
-	return count( $children );
+	return count( $children ) > 0;
 }
 
 /**
@@ -172,7 +172,7 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
 	 */
-	if ( false === $group_id ) {
+	if ( ! $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
@@ -195,8 +195,8 @@ function hgbp_get_descendent_groups( $group_id = false, $user_id = false, $conte
 		$child_args = array(
 			'parent_id'   => $parents,
 			'show_hidden' => true,
-			'per_page'    => false,
-			'page'        => false,
+			'per_page'    => null,
+			'page'        => null,
 		);
 		$children = groups_get_groups( $child_args );
 		// Reset parents array to rebuild for next round.
@@ -240,6 +240,10 @@ function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
 		return 0;
 	}
 
+	if ( ! $parent_id ) {
+		return 0;
+	}
+
 	/*
 	 * Take advantage of caching in groups_get_groups().
 	 */
@@ -249,8 +253,8 @@ function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
 		$child_groups = groups_get_groups( array(
 			'parent_id'   => array( $parent_id ),
 			'show_hidden' => true,
-			'per_page'    => false,
-			'page'        => false,
+			'per_page'    => null,
+			'page'        => null,
 		) );
 
 		foreach ( $child_groups['groups'] as $group ) {
@@ -266,8 +270,8 @@ function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
 			'parent_id'   => array( $parent_id ),
 			'slug'        => array( $slug ),
 			'show_hidden' => true,
-			'per_page'    => false,
-			'page'        => false,
+			'per_page'    => null,
+			'page'        => null,
 		) );
 
 		if ( $child_groups['groups'] ) {
@@ -294,7 +298,7 @@ function hgbp_child_group_exists( $slug, $parent_id = 0 ) {
  * @return int ID of parent group.
  */
 function hgbp_get_parent_group_id( $group_id = false, $user_id = false, $context = 'normal' ) {
-	if ( false === $group_id ) {
+	if ( ! $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed.
@@ -340,7 +344,7 @@ function hgbp_get_ancestor_group_ids( $group_id = false, $user_id = false, $cont
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
 	 */
-	if ( false === $group_id ) {
+	if ( ! $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
@@ -381,7 +385,7 @@ function hgbp_get_possible_parent_groups( $group_id = false, $user_id = false ) 
 	 * Passing a group id of 0 would find all top-level groups, which could be
 	 * intentional. We only try to find the current group when the $group_id is false.
 	 */
-	if ( false === $group_id ) {
+	if ( ! $group_id ) {
 		$group_id = bp_get_current_group_id();
 		if ( ! $group_id ) {
 			// If we can't resolve the group_id, don't proceed with a zero value.
@@ -389,7 +393,7 @@ function hgbp_get_possible_parent_groups( $group_id = false, $user_id = false ) 
 		}
 	}
 
-	if ( false === $user_id ) {
+	if ( ! $user_id ) {
 		$user_id = bp_loggedin_user_id();
 		if ( ! $user_id ) {
 			// If we can't resolve the user_id, don't proceed with a zero value.
@@ -409,8 +413,8 @@ function hgbp_get_possible_parent_groups( $group_id = false, $user_id = false ) 
 		'populate_extras' => false,
 		'exclude'         => $exclude_ids, // Exclude descendants and this group.
 		'show_hidden'     => true,
-		'per_page'        => false, // Do not limit the number returned.
-		'page'            => false, // Do not limit the number returned.
+		'per_page'        => null, // Do not limit the number returned.
+		'page'            => null, // Do not limit the number returned.
 	);
 
 	$possible_parents = groups_get_groups( $args );
